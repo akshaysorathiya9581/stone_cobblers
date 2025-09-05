@@ -104,6 +104,10 @@ a {
     content: "🏠";
 }
 
+.icon-customer::before {
+    content: "👤";
+}
+
 .icon-customers::before {
     content: "👥";
 }
@@ -166,6 +170,22 @@ a {
 
 .icon-check::before {
     content: "✅";
+}
+
+.icon-customer::before {
+    content: "👤";
+}
+
+.icon-budget::before {
+    content: "💰";
+}
+
+.icon-timeline::before {
+    content: "📅";
+}
+
+.icon-team::before {
+    content: "👥";
 }
 
 /* Main Content */
