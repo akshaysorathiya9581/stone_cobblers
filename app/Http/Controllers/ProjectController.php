@@ -43,7 +43,6 @@ class ProjectController extends Controller
             'timeline'       => $postData['timeline'],
             'status'         => $postData['status'],
             'progress'       => $postData['progress'],
-            'team'           => $postData['team'] ?? null,
         ]);
 
         return response()->json([
@@ -82,7 +81,6 @@ class ProjectController extends Controller
             'timeline'       => $postData['timeline'] ?? $project->timeline,
             'status'         => $postData['status'] ?? $project->status,
             'progress'       => $postData['progress'] ?? $project->progress,
-            'team'           => $postData['team'] ?? $project->team,
         ]);
 
         return response()->json([

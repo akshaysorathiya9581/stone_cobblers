@@ -200,11 +200,6 @@
 
                         <div class="form-fields">
                             <div class="form-field">
-                                <label class="form-label">Assign Team (comma separated)</label>
-                                <input type="text" name="team" class="form-input" placeholder="Team A, Team B"
-                                       value="{{ old('team', $project->team ?? '') }}">
-                                <div class="error-msg" data-for="team"></div>
-
                                 <h3 style="margin-bottom: 20px; color: #333;">Please review your project information:</h3>
                                 <div id="review-content" style="background: #f8f9fa; padding:20px; border-radius:8px; margin-bottom:20px;"></div>
                             </div>
@@ -218,7 +213,7 @@
                             <h1 class="form-title" style="color:rgb(22,163,74); margin:20px 0;">
                                 <span id="success-title">{{ isset($project) ? 'Project Updated Successfully!' : 'Project Created Successfully!' }}</span>
                             </h1>
-                            <p class="form-subtitle" id="success-subtitle">{{ isset($project) ? 'The project has been updated.' : 'Your project has been set up and is ready to go!' }}</p>
+                            <p class="form-subtitle" id="success-subtitle">Your project has been set up and is ready to go!</p>
                             <a href="{{ route('admin.projects.index') }}" class="nav-btn next" style="text-decoration:none; display:inline-flex;">
                                 <i>📋</i> Back to Projects
                             </a>

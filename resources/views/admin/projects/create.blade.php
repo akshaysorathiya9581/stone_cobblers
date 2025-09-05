@@ -192,10 +192,6 @@
 
                         <div class="form-fields">
                             <div class="form-field">
-                                <label class="form-label">Assign Team (comma separated)</label>
-                                <input type="text" name="team" class="form-input" placeholder="Team A, Team B">
-                                <div class="error-msg" data-for="team"></div>
-
                                 <h3 style="margin-bottom: 20px; color: #333;">Please review your project information:</h3>
                                 <div id="review-content"
                                     style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
@@ -373,8 +369,6 @@
                 .done(function (res) {
                     // expect JSON { success: true, project: {...}, message: '...' }
                     if (res && res.success) {
-                        // populate success message if returned
-                        $('#success-subtitle').text(res.message || 'Your project has been set up and is ready to go!');
                         // show success step
                         currentStep = $steps.length - 1;
                         showStep(currentStep);
