@@ -107,7 +107,7 @@
                     <!-- Step 3 -->
                     <div class="form-container-view">
                         <div class="form-header">
-                            <div class="form-icon icon-project"></div>
+                            <div class="form-icon icon-budget"></div>
                             <h1 class="form-title">What's the budget and timeline?</h1>
                             <p class="form-subtitle">Help us understand your project scope and timeline</p>
                         </div>
