@@ -60,13 +60,38 @@ class ProjectController extends Controller
 
     public function edit($id)
     {
-        return view('admin.projects.edit', compact('id'));
+        $customers = User::where('role', 'customer')->get();
+        $project = Project::where('id', $id)->first();
+        return view('admin.projects.edit', compact('id', 'customers', 'project'));
     }
 
-    public function update(Request $request, $id)
+   public function update(Request $request, $id)
     {
-        // update logic
+        $postData = $request->all();
+
+        // Find the project by ID
+        $project = Project::findOrFail($id);
+
+        $project->update([
+            'name'           => $postData['name'] ?? $project->name,
+            'subtitle'       => $postData['subtitle'] ?? $project->subtitle,
+            'description'    => $postData['description'] ?? $project->description,
+            'user_id'        => $postData['customer_id'] ?? $project->user_id, // relation to customer
+            'customer_notes' => $postData['customer_notes'] ?? $project->customer_notes,
+            'budget'         => $postData['budget'] ?? $project->budget,
+            'timeline'       => $postData['timeline'] ?? $project->timeline,
+            'status'         => $postData['status'] ?? $project->status,
+            'progress'       => $postData['progress'] ?? $project->progress,
+            'team'           => $postData['team'] ?? $project->team,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'project' => $project->fresh(), // latest data
+            'message' => 'Project updated successfully!',
+        ]);
     }
+
 
     public function destroy($id)
     {
