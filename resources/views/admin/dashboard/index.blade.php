@@ -10,11 +10,19 @@
     <div class="header">
         <div class="search-bar">
             <i>🔍</i>
-            <input type="text" placeholder="Search customers, projects, quotes...">
+            <input type="text" placeholder="Search customers, email, phone...">
         </div>
 
         <div class="header-actions">
-            <div class="user-avatar">BM</div>
+            <a href="#export" class="header-btn secondary" role="button">
+                <i>📤</i> Export
+            </a>
+
+            <a href="{{ route('admin.customers.create') }}" class="header-btn primary" role="button">
+                <i>➕</i> New Customer
+            </a>
+
+            <a href="/account" class="user-avatar" aria-label="Open profile">BM</a>
         </div>
     </div>
 
@@ -22,14 +30,14 @@
     <div class="content">
         <div class="content-header">
             <h1 class="content-title">Dashboard</h1>
-            {{-- <div class="action-buttons">
-                <button class="btn secondary">
+            <div class="action-buttons">
+                <a href="#" class="btn secondary" role="button">
                     <i>📊</i> Reports
-                </button>
-                <button class="btn primary">
+                </a>
+                <a href="{{ route('admin.customers.create') }}" class="btn primary" role="button">
                     <i>➕</i> Add Customer
-                </button>
-            </div> --}}
+                </a>
+            </div>
         </div>
 
         <!-- Stats Cards -->
