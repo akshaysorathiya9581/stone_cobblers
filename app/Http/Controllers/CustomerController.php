@@ -11,7 +11,11 @@ class CustomerController extends Controller
     public function index()
     {
         // Get all users with customer role
-        $customers = User::where('role', 'customer')->get();
+        $customers = User::where('role', 'customer')
+        ->withCount('projects')
+        ->withSum('projects', 'budget') // assuming projects table has `budget`
+        ->get();
+
         $totalCustomers   = User::count();
         $activeCustomers  = User::where('status', 'Active')->count();
         $vipCustomers     = User::where('status', 'VIP')->count();
