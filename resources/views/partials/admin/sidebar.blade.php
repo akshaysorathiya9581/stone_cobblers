@@ -21,7 +21,7 @@
             <i class="icon-projects"></i>
             Projects
         </a>
-        <a href="{{ route('admin.quotes.index') }}" class="nav-item">
+        <a href="{{ route('admin.quotes.index') }}" class="nav-item {{ request()->routeIs('admin.quotes.*') ? 'active' : '' }}">
             <i class="icon-quotes"></i>
             Quotes
         </a>
@@ -37,7 +37,7 @@
             <i class="icon-settings"></i>
             Settings
         </a>
-        <a href="{{ route('admin.files.index') }}" class="nav-item">
+        <a href="{{ route('admin.files.index') }}" class="nav-item {{ request()->routeIs('admin.files.*') ? 'active' : '' }}">
             <i class="icon-files"></i>
             Files
         </a>

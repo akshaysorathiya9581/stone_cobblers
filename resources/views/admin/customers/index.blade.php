@@ -262,7 +262,7 @@
 
                             <!-- Total Value -->
                             <div class="total-value">
-                                ${{ number_format($customer->total_value ?? 0, 2) }}
+                                ${{ number_format($customer->projects_sum_budget ?? 0, 2) }}
                             </div>
 
                             <!-- Projects Count -->

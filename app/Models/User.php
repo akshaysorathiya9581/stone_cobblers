@@ -59,4 +59,9 @@ class User extends Authenticatable
         $modules = json_decode($this->modules, true) ?? [];
         return in_array($module, $modules);
     }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class, 'user_id');
+    }
 }
