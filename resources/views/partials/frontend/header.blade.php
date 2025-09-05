@@ -1,0 +1,1 @@
+<!-- Global frontend head includes -->
