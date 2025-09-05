@@ -21,7 +21,7 @@
             <i class="icon-projects"></i>
             Projects
         </a>
-        <a href="#" class="nav-item">
+        <a href="{{ route('admin.quotes.index') }}" class="nav-item">
             <i class="icon-quotes"></i>
             Quotes
         </a>
@@ -37,7 +37,7 @@
             <i class="icon-settings"></i>
             Settings
         </a>
-        <a href="#" class="nav-item">
+        <a href="{{ route('admin.files.index') }}" class="nav-item">
             <i class="icon-files"></i>
             Files
         </a>

@@ -5,6 +5,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\FileController;
+
 
 // Frontend / Auth
 Route::get('/', [AuthController::class, 'index'])->name('login');
@@ -17,4 +20,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('customers', CustomerController::class);
     Route::resource('projects', ProjectController::class);
+    Route::resource('quotes', QuoteController::class);
+    Route::resource('files', FileController::class);
+
 });
