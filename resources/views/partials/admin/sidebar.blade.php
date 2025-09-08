@@ -6,64 +6,38 @@
             Stone Cobblers
         </div>
     </div>
+    @if(isset($sidebarMenuSections) && $sidebarMenuSections->count())
+        @foreach($sidebarMenuSections as $sectionTitle => $items)
+            <div class="nav-section">
+                <h3>{{ $sectionTitle }}</h3>
 
-    <div class="nav-section">
-        <h3>Main</h3>
-        <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-            <i class="icon-dashboard"></i>
-            Dashboard
-        </a>
-        <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
-            <i class="icon-customers"></i>
-            Customers
-        </a>
-        <a href="{{ route('admin.projects.index') }}" class="nav-item {{ request()->routeIs('admin.projects.*') ? 'active' : '' }}">
-            <i class="icon-projects"></i>
-            Projects
-        </a>
-        <a href="{{ route('admin.quotes.index') }}" class="nav-item {{ request()->routeIs('admin.quotes.*') ? 'active' : '' }}">
-            <i class="icon-quotes"></i>
-            Quotes
-        </a>
-    </div>
+                @foreach($items as $item)
+                    @php
+                        $isActive = isset($item['route']) && request()->routeIs($item['route'] . '*');
+                        // special-case logout item: we render a form trigger
+                        $isLogout = isset($item['is_logout']) && $item['is_logout'];
+                        $href = $item['route'] ? (route($item['route']) ) : '#';
+                    @endphp
 
-    <div class="nav-section">
-        <h3>Management</h3>
-        <a href="#" class="nav-item">
-            <i class="icon-reports"></i>
-            Reports
-        </a>
-        <a href="#" class="nav-item">
-            <i class="icon-settings"></i>
-            Settings
-        </a>
-        <a href="{{ route('admin.files.index') }}" class="nav-item {{ request()->routeIs('admin.files.*') ? 'active' : '' }}">
-            <i class="icon-files"></i>
-            Files
-        </a>
-    </div>
+                    @if($isLogout)
+                        <a href="#" class="nav-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="{{ $item['icon'] }}"></i>
+                            {{ $item['title'] }}
+                        </a>
+                    @else
+                        <a href="{{ $item['route'] ? $href : '#' }}"
+                           class="nav-item {{ $isActive ? 'active' : '' }}">
+                            <i class="{{ $item['icon'] }}"></i>
+                            {{ $item['title'] }}
+                        </a>
+                    @endif
+                @endforeach
+            </div>
+        @endforeach
+    @endif
 
-    <div class="nav-section">
-        <h3>Quick Access</h3>
-        <a href="#" class="nav-item">
-            <i class="icon-starred"></i>
-            Starred
-        </a>
-        <a href="#" class="nav-item">
-            <i class="icon-pinned"></i>
-            Pinned
-        </a>
-    </div>
-
-    <div class="nav-section">
-        <h3>Account</h3>
-        <a href="#" class="nav-item"
-           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="icon-logout"></i>
-            Logout
-        </a>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
-    </div>
+    {{-- Logout form (hidden) --}}
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
 </div>

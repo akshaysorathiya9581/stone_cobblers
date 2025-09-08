@@ -52,16 +52,62 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'modules' => 'array',
     ];
 
-    public function hasModule($module)
+    /**
+     * Check whether user has access to a given module.
+     * If modules = null → full access (admin).
+     */
+    public function hasModule(string $module): bool
     {
-        $modules = json_decode($this->modules, true) ?? [];
-        return in_array($module, $modules);
+        // dd(json_decode($this->modules));
+        if (empty($this->modules)) {
+            // echo "DSds"; die();
+            return true; // full access for admins
+        }
+
+        return in_array($module, json_decode($this->modules) ?? []);
     }
 
     public function projects()
     {
         return $this->hasMany(Project::class, 'user_id');
+    }
+
+    /**
+     * Return allowed module slugs for the user as array.
+     * If null, treat as empty array or you can decide default behavior.
+     */
+    public function getModulesAttribute($value)
+    {
+        // Let Laravel casts handle it; this method is optional if you use $casts.
+        return $this->attributes['modules'] ?? [];
+    }
+
+    /**
+     * Convenience: add module to user and save.
+     */
+    public function grantModule(string $module): self
+    {
+        $modules = $this->modules ?? [];
+        if (! in_array($module, $modules)) {
+            $modules[] = $module;
+            $this->modules = array_values($modules);
+            $this->save();
+        }
+        return $this;
+    }
+
+    /**
+     * Convenience: remove module and save.
+     */
+    public function revokeModule(string $module): self
+    {
+        $modules = $this->modules ?? [];
+        $modules = array_values(array_diff($modules, [$module]));
+        $this->modules = $modules;
+        $this->save();
+        return $this;
     }
 }

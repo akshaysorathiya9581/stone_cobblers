@@ -21,11 +21,29 @@ Route::get('/clear-cache', function () {
 
 // Admin Routes
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::post('/customers/check-email', [CustomerController::class, 'checkEmail'])->name('customers.check-email');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('customers', CustomerController::class);
-    Route::resource('projects', ProjectController::class);
-    Route::resource('quotes', QuoteController::class);
-    Route::resource('files', FileController::class);
+    // Dashboard (module: dashboard)
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('module:dashboard');
 
+    // Customers
+    Route::post('/customers/check-email', [CustomerController::class, 'checkEmail'])
+        ->name('customers.check-email')
+        ->middleware('module:customers');
+
+    Route::resource('customers', CustomerController::class)
+        ->middleware('module:customers');
+
+    // Projects
+    Route::resource('projects', ProjectController::class)
+        ->middleware('module:projects');
+
+    // Quotes
+    Route::resource('quotes', QuoteController::class)
+        ->middleware('module:quotes');
+
+    // Files
+    Route::resource('files', FileController::class)
+        ->middleware('module:files');
 });
+

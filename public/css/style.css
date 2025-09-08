@@ -188,6 +188,10 @@ a {
     content: "👥";
 }
 
+.icon-logout::before {
+    content: "🔓"; /* Unicode lock open emoji */
+}
+
 /* Main Content */
 .main-content {
     flex: 1;
