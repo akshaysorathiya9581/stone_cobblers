@@ -451,7 +451,7 @@ $(function () {
                 success: function (res) {
                     if(res.status) {
                         toastr.success(res.message);
-                        setTimeout(() => window.location.href = res.redirect, 1200);
+                        setTimeout(() => window.location.href = res.redirect, 200);
                     } else {
                         toastr.error(res.message || "Login failed. Please try again.");
                     }
