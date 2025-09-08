@@ -110,4 +110,15 @@ class User extends Authenticatable
         $this->save();
         return $this;
     }
+
+    // scope for customer users
+    public function scopeCustomers($q)
+    {
+        return $q->where('role', 'customer');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 }

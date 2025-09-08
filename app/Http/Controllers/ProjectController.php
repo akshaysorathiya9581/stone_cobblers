@@ -19,12 +19,45 @@ class ProjectController extends Controller
         //     ->count();
 
         return view('admin.projects.index', compact('projects', 'activeProjects', 'completedProjectsThisMonth'));
+
+        $user = auth()->user();
+
+        if ($user->isAdmin()) {
+            $totalCustomers = User::customers()->count();
+            $activeProjects = Project::active()->count();
+            $completedProjectsThisMonth = Project::completedThisMonth()->count();
+
+            $customers = User::customers()
+                ->withCount('projects')
+                ->withSum('projects', 'budget')
+                ->get();
+        } else {
+            $totalCustomers = $user->role === 'customer' ? 1 : 0;
+            $activeProjects = $user->projects()->active()->count();
+            $completedProjectsThisMonth = $user->projects()->completedThisMonth()->count();
+
+            $user->loadCount('projects')->loadSum('projects', 'budget');
+            $customers = collect([$user]);
+        }
+
+        return view('admin.projects.index', compact(
+            'totalCustomers',
+            'activeProjects',
+            'completedProjectsThisMonth'
+        ));
     }
 
     public function create()
     {
-        // Get all users with customer role
-        $customers = User::where('role', 'customer')->get();
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            // Admin: show all customers
+            $customers = User::where('role', 'customer')->get();
+        } else {
+            // Non-admin (customer/other): only themselves
+            $customers = collect([$user]);
+        }
 
         return view('admin.projects.create', compact('customers'));
     }
@@ -59,7 +92,16 @@ class ProjectController extends Controller
 
     public function edit($id)
     {
-        $customers = User::where('role', 'customer')->get();
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            // Admin: show all customers
+            $customers = User::where('role', 'customer')->get();
+        } else {
+            // Non-admin (customer/other): only themselves
+            $customers = collect([$user]);
+        }
+        
         $project = Project::where('id', $id)->first();
         return view('admin.projects.edit', compact('id', 'customers', 'project'));
     }

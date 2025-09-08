@@ -4,21 +4,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Project;
+use App\Services\DashboardService;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $totalCustomers   = User::count();
-        $activeProjects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->count();
+        $data = DashboardService::forUser(auth()->user());
         
-        // Get all users with customer role
-        $customers = User::where('role', 'customer')
-        ->withCount('projects')
-        ->withSum('projects', 'budget') // assuming projects table has `budget`
-        ->get();
-
-        return view('admin.dashboard.index', compact('totalCustomers', 'activeProjects', 'customers'));
+        return view('admin.dashboard.index', $data);
     }
 
     public function create()

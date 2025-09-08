@@ -18,4 +18,16 @@ class Project extends Model
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
+
+    public function scopeActive($q)
+    {
+        return $q->whereNotIn('status', ['Completed', 'Cancelled']);
+    }
+
+    public function scopeCompletedThisMonth($q)
+    {
+        return $q->whereNotIn('status', ['Completed', 'Cancelled'])
+                 ->whereMonth('updated_at', now()->month)
+                 ->whereYear('updated_at', now()->year);
+    }
 }
