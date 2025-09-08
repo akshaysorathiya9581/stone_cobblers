@@ -11,8 +11,14 @@ class DashboardController extends Controller
     {
         $totalCustomers   = User::count();
         $activeProjects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->count();
+        
+        // Get all users with customer role
+        $customers = User::where('role', 'customer')
+        ->withCount('projects')
+        ->withSum('projects', 'budget') // assuming projects table has `budget`
+        ->get();
 
-        return view('admin.dashboard.index', compact('totalCustomers', 'activeProjects'));
+        return view('admin.dashboard.index', compact('totalCustomers', 'activeProjects', 'customers'));
     }
 
     public function create()

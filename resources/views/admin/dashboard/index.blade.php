@@ -63,6 +63,83 @@
                 <div class="change">+18% vs last month</div>
             </div>
         </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active">All Customers</button>
+            <button class="tab">Template</button>
+            <button class="tab">Fabricate</button>
+            <button class="tab">Install</button>
+            <button class="tab">Follow-up</button>
+        </div>
+
+        <div class="customers-table custom-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Project</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($customers as $customer)
+                        <tr data-status="{{ strtolower($customer->status) }}">
+                            <!-- Customer -->
+                            <td class="customer-info">
+                                <div class="customer-avatar">
+                                    {{ strtoupper(substr($customer->first_name, 0, 1)) }}{{ strtoupper(substr($customer->last_name, 0, 1)) }}
+                                </div>
+                                <div class="customer-details">
+                                    <h4>{{ $customer->first_name }} {{ $customer->last_name }}</h4>
+                                    <p>{{ $customer->email }}</p>
+                                </div>
+                            </td>
+
+                            <!-- Project -->
+                            <td>
+                               {{ $customer->project_name ?? 'No Project' }}
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <span class="status-tag status-{{ strtolower($customer->status ?? 'standard') }}">
+                                    {{ strtoupper($customer->status ?? 'Standard') }}
+                                </span>
+                            </td>
+
+                            <!-- Priority -->
+                            <td>
+                                <span class="priority-tag priority-{{ strtolower($customer->priority ?? 'normal') }}">
+                                    {{ ucfirst($customer->priority ?? 'Normal') }}
+                                </span>
+                            </td>
+
+                            <!-- Last Updated -->
+                            <td>
+                                {{ $customer->updated_at ? $customer->updated_at->diffForHumans() : 'Never' }}
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="actions">
+                                <a href="{{ route('admin.customers.show', $customer->id) }}" class="action-btn view">View</a>
+                                <a href="{{ route('admin.customers.edit', $customer->id) }}" class="action-btn update">Edit</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <!-- Empty state -->
+            <div class="no-customers" style="display:none; padding:18px; text-align:center; color:#666;">
+                No customers found for this status.
+            </div>
+        </div>
+
+
     </div>
 @endsection
 
