@@ -743,53 +743,53 @@
     </div>
 
      <!-- Customer Quotes Modal -->
-<div class="modal" id="customerModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" id="modalTitle">Customer Quotes</h2>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-        </div>
-        
-        <div class="customer-info">
-            <div class="customer-avatar" id="modalAvatar">JS</div>
-            <div class="customer-details">
-                <h4 id="modalCustomerName">John Smith</h4>
-                <p id="modalCustomerProject">Kitchen Renovation</p>
+    <div class="modal" id="customerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Customer Quotes</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-        </div>
+            
+            <div class="customer-info">
+                <div class="customer-avatar" id="modalAvatar">JS</div>
+                <div class="customer-details">
+                    <h4 id="modalCustomerName">John Smith</h4>
+                    <p id="modalCustomerProject">Kitchen Renovation</p>
+                </div>
+            </div>
 
-        <div class="customer-quotes">
-            <h3>All Quotes for this Customer</h3>
-            <div class="quote-item">
-                <div><strong>QT-2024-001</strong></div>
-                <div>$12,450.00</div>
-                <div><span class="status-tag status-approved">Approved</span></div>
-                <div>Jan 15, 2024</div>
-                <div class="actions">
-                    <button class="action-btn view">View</button>
+            <div class="customer-quotes">
+                <h3>All Quotes for this Customer</h3>
+                <div class="quote-item">
+                    <div><strong>QT-2024-001</strong></div>
+                    <div>$12,450.00</div>
+                    <div><span class="status-tag status-approved">Approved</span></div>
+                    <div>Jan 15, 2024</div>
+                    <div class="actions">
+                        <button class="action-btn view">View</button>
+                    </div>
                 </div>
-            </div>
-            <div class="quote-item">
-                <div><strong>QT-2023-089</strong></div>
-                <div>$8,200.00</div>
-                <div><span class="status-tag status-approved">Approved</span></div>
-                <div>Dec 10, 2023</div>
-                <div class="actions">
-                    <button class="action-btn view">View</button>
+                <div class="quote-item">
+                    <div><strong>QT-2023-089</strong></div>
+                    <div>$8,200.00</div>
+                    <div><span class="status-tag status-approved">Approved</span></div>
+                    <div>Dec 10, 2023</div>
+                    <div class="actions">
+                        <button class="action-btn view">View</button>
+                    </div>
                 </div>
-            </div>
-            <div class="quote-item">
-                <div><strong>QT-2023-076</strong></div>
-                <div>$5,800.00</div>
-                <div><span class="status-tag status-rejected">Rejected</span></div>
-                <div>Nov 28, 2023</div>
-                <div class="actions">
-                    <button class="action-btn view">View</button>
+                <div class="quote-item">
+                    <div><strong>QT-2023-076</strong></div>
+                    <div>$5,800.00</div>
+                    <div><span class="status-tag status-rejected">Rejected</span></div>
+                    <div>Nov 28, 2023</div>
+                    <div class="actions">
+                        <button class="action-btn view">View</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 

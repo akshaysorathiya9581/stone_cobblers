@@ -48,24 +48,27 @@
             <div class="selector-grid">
                 <div class="selector-group">
                     <label for="customer-select">Customer</label>
-                    <select id="customer-select" onchange="filterFiles()">
+                    <select id="customer-select" name="customer_id" onchange="onCustomerChange()">
                         <option value="">All Customers</option>
-                        <option value="john-smith">John Smith</option>
-                        <option value="maria-santos">Maria Santos</option>
-                        <option value="robert-wilson">Robert Wilson</option>
-                        <option value="lisa-davis">Lisa Davis</option>
-                        <option value="mike-johnson">Mike Johnson</option>
+                        @foreach($customers as $c)
+                            <option value="{{ $c->id }}"
+                                {{ (isset($customerId) && $customerId == $c->id) ? 'selected' : '' }}>
+                                {{ $c->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
+
                 <div class="selector-group">
                     <label for="project-select">Project</label>
-                    <select id="project-select" onchange="filterFiles()">
+                    <select id="project-select" name="project_id" onchange="filterFiles()">
                         <option value="">All Projects</option>
-                        <option value="kitchen-renovation">Kitchen Renovation</option>
-                        <option value="bathroom-vanity">Bathroom Vanity</option>
-                        <option value="outdoor-patio">Outdoor Patio</option>
-                        <option value="kitchen-island">Kitchen Island</option>
-                        <option value="fireplace-surround">Fireplace Surround</option>
+                        @foreach($projects as $p)
+                            <option value="{{ $p->id }}"
+                                {{ (isset($projectId) && $projectId == $p->id) ? 'selected' : '' }}>
+                                {{ $p->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
