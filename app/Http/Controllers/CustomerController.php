@@ -42,9 +42,9 @@ class CustomerController extends Controller
             'address'          => $postData['address'],
             'city'             => $postData['city'],
             'state'            => $postData['state'],
-            'zip_code'         => $postData['zipCode'],
-            'additional_notes' => $postData['additionalNotes'] ?? null,
-            'referral_source'  => $postData['referralSource'] ?? null,
+            'zipCode'         => $postData['zipCode'],
+            'additionalNotes' => $postData['additionalNotes'] ?? null,
+            'referralSource'  => $postData['referralSource'] ?? null,
             'status'  => $postData['customer_status'] ?? 'Active',
             'password'         => Hash::make('123456'),
         ]);
@@ -64,12 +64,38 @@ class CustomerController extends Controller
 
     public function edit($id)
     {
-        return view('admin.customers.edit', compact('id'));
+        $customer = User::where('id', $id)->first();
+        return view('admin.customers.edit', compact('customer'));
     }
 
     public function update(Request $request, $id)
     {
-        // update logic
+        $postData = $request->all();
+        $fullName = trim($postData['first_name'].' '.$postData['last_name']);
+
+        $data = [
+            'name'             => $fullName,
+            'first_name'       => $postData['first_name'],
+            'last_name'        => $postData['last_name'],
+            'email'            => $postData['email'],
+            'phone'            => $postData['phone'],
+            'address'          => $postData['address'],
+            'city'             => $postData['city'],
+            'state'            => $postData['state'],
+            'zipCode'         => $postData['zipCode'],
+            'additionalNotes' => $postData['additionalNotes'] ?? null,
+            'referralSource'  => $postData['referralSource'] ?? null,
+            'status'  => $postData['customer_status'] ?? 'Active'
+        ];
+
+        $customer = User::findOrFail($id);
+        $customer->update($data);
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Customer updated successfully.',
+            'id' => $customer->id
+        ]);
     }
 
     public function destroy($id)
@@ -79,21 +105,25 @@ class CustomerController extends Controller
 
     public function checkEmail(Request $request)
     {
-        $v = Validator::make($request->all(), [
-            'email' => ['required','email','max:120'],
+        $request->validate([
+            'email' => ['required','email'],
+            'id' => ['nullable','integer']
         ]);
 
-        if ($v->fails()){
-            return response()->json([
-                'unique'  => false,
-                'message' => $v->errors()->first('email') ?? 'Invalid email.',
-            ]);
+        $email = $request->input('email');
+        $ignoreId = $request->input('id');
+
+        $query = User::where('email', $email);
+        if ($ignoreId) {
+            $query->where('id', '!=', $ignoreId);
         }
 
-        $exists = User::where('email', $request->email)->exists();
-        return response()->json([
-            'unique'  => !$exists,
-            'message' => $exists ? 'This email is already registered.' : 'Email is available.',
-        ]);
+        $exists = $query->exists();
+
+        if ($exists) {
+            return response()->json(['unique' => false, 'message' => 'Email is already registered.']);
+        }
+
+        return response()->json(['unique' => true, 'message' => '']);
     }
 }
