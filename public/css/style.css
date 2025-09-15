@@ -189,7 +189,8 @@ a {
 }
 
 .icon-logout::before {
-    content: "🔓"; /* Unicode lock open emoji */
+    content: "🔓";
+    /* Unicode lock open emoji */
 }
 
 /* Main Content */
@@ -1198,4 +1199,94 @@ a {
     justify-content: center;
     font-weight: bold;
     font-size: 14px;
+}
+
+.quote-type {
+    max-width: 500px;
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    text-align: center;
+}
+
+.quote-type .title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.quote-type .title .brand {
+    color: rgb(22, 163, 74, 1);
+}
+
+.quote-type .description {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.quote-type .quote-options {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.quote-type .quote-options h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.quote-type .checkbox-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.quote-type .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+}
+
+.quote-type .checkbox-item:hover {
+    border-color: rgb(22, 163, 74, 1);
+    background-color: #f0fdf4;
+}
+
+.quote-type .checkbox-item.selected {
+    border-color: rgb(22, 163, 74, 1);
+    background-color: #e8f5e8;
+}
+
+.quote-type .checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: rgb(22, 163, 74, 1);
+    cursor: pointer;
+}
+
+.quote-type .checkbox-item label {
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
 }
