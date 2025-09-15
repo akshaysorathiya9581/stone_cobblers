@@ -10,8 +10,11 @@
 </head>
 <body>
     <div class="dashboard">
-        @include('partials.admin.sidebar')
 
+        <!-- @if (!Request::is('admin/quotes/*'))
+        @endif -->
+        @include('partials.admin.sidebar')
+        
         <div class="main-content">
             @yield('content')
         </div>
