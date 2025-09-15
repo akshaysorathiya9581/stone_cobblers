@@ -150,75 +150,257 @@
       </div>
     </div>
 
-    <!-- STEP 2: Cabinet Manufacturer -->
+    <!-- STEP 2: Cabinet Manufacturer (updated: all inputs named for form submit) -->
     <div class="container step hidden" data-step="2" id="step-2">
-      <div class="header-row">
+    <div class="header-row">
         <h2 style="margin:0;color:#333">Kitchen Cabinet</h2>
         <div style="text-align:right">
-          <div style="font-size:14px;color:#666;margin-bottom:5px">Accumulative Cost Total:</div>
-          <div id="header-total-2" style="font-size:24px;font-weight:700;color:#2e7d32">$ -</div>
+        <div style="font-size:14px;color:#666;margin-bottom:5px">Accumulative Cost Total:</div>
+        <div id="header-total-2" style="font-size:24px;font-weight:700;color:#2e7d32">$ -</div>
         </div>
-      </div>
+    </div>
 
-      <div class="table-container">
-        <h3 style="background:#fff3cd;padding:10px;margin:0;border-bottom:1px solid #e0e0e0">CABINET MANUFACTURER</h3>
-        <table style="margin-top:12px">
-          <thead>
+    <div class="table-container">
+        <!-- Cabinet Manufacturer Section -->
+        <div style="margin-bottom: 30px;">
+        <h3 style="background-color: #fff3cd; padding: 10px; margin: 0; border-bottom: 1px solid #e0e0e0;">CABINET MANUFACTURER</h3>
+
+        <table style="margin-bottom: 20px; width:100%;">
+            <thead>
             <tr>
-              <th style="text-align:left;width:40%">Manufacturer</th>
-              <th style="text-align:right;width:20%">Unit</th>
-              <th style="text-align:center;width:20%">Qty</th>
-              <th style="text-align:right;width:20%">Total</th>
+                <th style="text-align:left;width:40%;">Manufacturer</th>
+                <th style="text-align:right;width:20%;">Unit Price</th>
+                <th style="text-align:center;width:20%;">Qty</th>
+                <th style="text-align:right;width:20%;">Line Total</th>
             </tr>
-          </thead>
-          <tbody id="manufacturer-rows">
+            </thead>
+
+            <tbody id="manufacturer-rows">
+            {{-- iterate manufacturers passed from controller --}}
             @php
-              $manufacturerLabels = array_keys($manufacturers ?? [
+                // fallback default list if $manufacturers not passed
+                $defaultManufacturers = [
                 'bertch'=>0.4310,'mantra'=>0.4450,'CB'=>0.4520,'802/USCD FROM 2020'=>0.4680,
                 'KCD/USCD'=>0.4680,'dura'=>0.4680,'OMEGA'=>0.4850
-              ]);
+                ];
+                $manufacturers = $manufacturers ?? $defaultManufacturers;
             @endphp
 
-            @foreach($manufacturerLabels as $m)
-            <tr data-name="{{ $m }}">
-              <td>{{ $m }}<input type="hidden" name="manufacturer[name][]" value="{{ $m }}"></td>
-              @php $unit = $manufacturers[$m] ?? 0; @endphp
-              <td style="text-align:right">
-                <span class="manufacturer-unit">{{ number_format($unit, 4, '.', '') }}</span>
-                <input type="hidden" name="manufacturer[unit_price][]" value="{{ number_format($unit, 4, '.', '') }}">
-              </td>
-              <td style="text-align:center">
-                <input type="number" class="qty-input manufacturer-qty" placeholder="0" min="0" step="0.01" value="0">
-              </td>
-              <td style="text-align:right" class="manufacturer-line empty-value">$ -</td>
+            @foreach($manufacturers as $name => $unitCost)
+            <tr data-name="{{ $name }}">
+                <td style="padding:8px;border:1px solid #e0e0e0;">
+                {{ $name }}
+                <input type="hidden" name="manufacturer[name][]" value="{{ $name }}">
+                </td>
+
+                <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
+                {{-- show formatted unit price and add hidden input for unit price (4 decimals kept) --}}
+                <span class="manufacturer-unit" data-unit="{{ number_format((float)$unitCost, 4, '.', '') }}">
+                    {{ number_format((float)$unitCost, 4, '.', '') }}
+                </span>
+                <input type="hidden" name="manufacturer[unit_price][]" value="{{ number_format((float)$unitCost, 4, '.', '') }}">
+                </td>
+
+                <td style="padding:8px;border:1px solid #e0e0e0;text-align:center;">
+                {{-- qty input (user editable) --}}
+                <input
+                    type="number"
+                    name="manufacturer[qty][]"
+                    class="qty-input manufacturer-qty"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    value="0"
+                    style="width:100%;"/>
+                </td>
+
+                <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;" class="manufacturer-line empty-value">
+                $ - 
+                </td>
             </tr>
             @endforeach
 
+            {{-- manufacturer subtotal row --}}
             <tr>
-              <td colspan="3" style="text-align:center;font-weight:700">=</td>
-              <td id="manufacturer-total" style="text-align:right;background:#e8f5e8">$ -</td>
+                <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:center;font-weight:700">=</td>
+                <td id="manufacturer-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8">$ -</td>
             </tr>
-          </tbody>
+            </tbody>
         </table>
-
-        <!-- small cost row -->
-        <div style="margin-top:18px">
-          <table style="width:100%">
-            <tr>
-              <td style="width:30%">20/20 LIST PRICE</td>
-              <td style="width:20%"><input type="number" id="list-price" class="qty-input" placeholder="0" min="0" step="0.01" value="0"></td>
-              <td id="multiplier-result" style="text-align:right;width:25%"></td>
-              <td id="cost-total" style="text-align:right;width:25%"></td>
-            </tr>
-          </table>
         </div>
-      </div>
 
-      <div class="nav-footer">
-        <button type="button" class="btn secondary" onclick="prevStep(2)"><span>←</span> Previous</button>
-        <div class="steps-indicator">Step 2 of 3</div>
-        <button type="button" class="btn" onclick="nextStep(2)">Next <span>→</span></button>
-      </div>
+        <!-- Cost Calculation Section (named inputs) -->
+        <div style="margin-bottom: 30px;">
+        <table style="margin-bottom:20px;width:100%;">
+            <tr>
+            <td style="width:30%;padding:8px;border:1px solid #e0e0e0;">20/20 LIST PRICE</td>
+            <td style="width:20%;padding:8px;border:1px solid #e0e0e0;background-color:#e8f5e8;">
+                <input type="number" id="list-price" name="list_price" class="qty-input" placeholder="num fill" min="0" step="0.01" value="0">
+            </td>
+            <td id="multiplier-result" style="width:25%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.000</td>
+            <td id="cost-total" style="width:25%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+        </table>
+        </div>
+
+        <!-- Margin Markup Section (named inputs) -->
+        <div style="margin-bottom: 30px;">
+        <h3 style="background-color:#f5f5f5;padding:10px;margin:0;border-bottom:1px solid #e0e0e0;">MARGIN MARKUP</h3>
+        <table style="margin-bottom:20px;width:100%;">
+            <tr>
+            <td style="width:30%;padding:8px;border:1px solid #e0e0e0;">1.425-1.5 CONTRACTOR 1ST TIME</td>
+            <td style="width:20%;padding:8px;border:1px solid #e0e0e0;">
+                <input type="number" name="margin_markup" id="margin-markup" class="qty-input" placeholder="1.60" min="0" step="0.01" value="1.60">
+            </td>
+            <td id="markup-result" style="width:50%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+            <!-- additional margin rows left static (no inputs) -->
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">1.5-1.55 CONTRACTOR</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            </tr>
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">1.55-1.6, 1.66-1.7 RETAIL</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            </tr>
+        </table>
+        </div>
+
+        <!-- Miscellaneous Items (named inputs) -->
+        <div style="margin-bottom: 30px;">
+        <table style="margin-bottom:20px;width:100%;">
+            <tr>
+            <td style="width:30%;padding:8px;border:1px solid #e0e0e0;">TSC BUFFER</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;">(500+)</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;" id="tsc-buffer">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">HARDWARE QUANTITY</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;background:#ffb74d;">
+                <input type="number" id="hardware-qty" name="hardware_qty" class="qty-input" placeholder="0.00" min="0" step="0.01" value="0.00">
+            </td>
+            <td id="hardware-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">MISC ITEMS</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">802 FREIGHT SURCHARGE</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">PRICE CHANGE BUFFER</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;background:#ffcdd2;">
+                <input type="number" id="price-buffer" name="price_buffer" class="qty-input" placeholder="0.00" min="0" step="0.01" value="0.00">
+            </td>
+            <td id="price-buffer-result" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">MORE THAN 1 PHONE CALL/DAY</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;background:#ffcdd2;">
+                <input type="number" id="phone-call-buffer" name="phone_call_buffer" class="qty-input" placeholder="0.00" min="0" step="0.01" value="0.00">
+            </td>
+            <td id="phone-call-result" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;background:#e8f5e8;font-weight:bold;">TOTAL RETAIL</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            <td id="total-retail" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">TAX</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            <td id="tax-amount" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+        </table>
+        </div>
+
+        <!-- Delivery Section (named inputs) -->
+        <div style="margin-bottom: 30px;">
+        <h3 style="background-color:#fff3cd;padding:10px;margin:0;border-bottom:1px solid #e0e0e0;">DELIVERY</h3>
+        <table style="margin-bottom:20px;width:100%;">
+            <tr>
+            <td style="width:30%;padding:8px;border:1px solid #e0e0e0;">FULL KIT TAILGATE</td>
+            <td style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">300.00</td>
+            <td style="width:20%;padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
+                <input type="number" id="delivery-full-kit" name="delivery_full_kit" class="qty-input" placeholder="" min="0" step="0.01" value="0">
+            </td>
+            <td id="delivery-full-kit-total" style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">UP TO TEN ITEMS</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">175.00</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
+                <input type="number" id="delivery-ten-items" name="delivery_ten_items" class="qty-input" placeholder="" min="0" step="0.01" value="0">
+            </td>
+            <td id="delivery-ten-items-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">SINGLE ITEM VAN</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">100.00</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
+                <input type="number" id="delivery-single-van" name="delivery_single_van" class="qty-input" placeholder="" min="0" step="0.01" value="0">
+            </td>
+            <td id="delivery-single-van-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;">CUSTOMER PICKUP</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;"></td>
+            <td style="padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
+                <input type="number" id="delivery-pickup" name="delivery_pickup" class="qty-input" placeholder="" min="0" step="0.01" value="0">
+            </td>
+            <td id="delivery-pickup-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+
+            <tr>
+            <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:right;font-weight:bold;background:#e8f5e8;">TOTAL</td>
+            <td id="delivery-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8;">0.00</td>
+            </tr>
+        </table>
+        </div>
+
+        <!-- Final Surcharge -->
+        <div style="margin-bottom:30px;">
+        <table style="width:100%;margin-bottom:20px;">
+            <tr>
+            <td style="width:30%;padding:8px;border:1px solid #e0e0e0;">DBA fee/fuel surcharge</td>
+            <td style="width:20%;padding:8px;border:1px solid #e0e0e0;">
+                <input type="number" id="dba-surcharge" name="dba_surcharge" class="qty-input" placeholder="0.03" min="0" step="0.01" value="0.03">
+            </td>
+            <td id="dba-result" style="width:50%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+            </tr>
+            <tr>
+            <td style="padding:8px;border:1px solid #e0e0e0;font-weight:bold;">final total DBA</td>
+            <td style="padding:8px;border:1px solid #e0e0e0;"></td>
+            <td id="final-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;font-weight:bold;">0.00</td>
+            </tr>
+        </table>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="padding:20px;border-top:1px solid #e0e0e0;background:#f8f9fa">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+        <button type="button" id="prev-tab-2" class="btn secondary" onclick="prevStep(2)"><span>←</span> Previous</button>
+        <div style="font-size:14px;color:#666">Step 2 of 3</div>
+        <button type="button" id="next-tab-2" class="btn" onclick="nextStep(2)">Next <span>→</span></button>
+        </div>
+    </div>
     </div>
 
     <!-- STEP 3: Summary & Submit -->
