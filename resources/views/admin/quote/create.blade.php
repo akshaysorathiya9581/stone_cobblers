@@ -3,7 +3,6 @@
 @section('title','Quote — Multi Step')
 
 @push('css')
-<!-- Combined CSS (kept your styles, simplified duplicates) -->
 <style>
 
   .header-row {
@@ -190,9 +189,11 @@
         <div class="error-message" id="welcome-error">Please select at least one quote type to continue.</div>
       </div>
     </div>
+
     <!-- Multi-step form (hidden initially) -->
-    <form id="multi-step-form" class="hidden" method="POST" action="{{ route('admin.kitchen-quotes.store') }}" style="width: 100%;">
+    <form id="multi-step-form" class="hidden" method="POST" action="{{ route('admin.quotes.store') }}" style="width: 100%;">
       @csrf
+
       <!-- STEP 1: Kitchen Top -->
       <div class="container step" data-step="1" id="step-1">
         <div class="header-row">
@@ -220,9 +221,9 @@
               {{-- each row uses data-cost attribute filled from DB --}}
               @php
               $kitchenLabels = [
-              'Kitchen - Sq Ft','Labor Charge','Edge - Lin Ft','4" BS - Lin Ft','UM Sink Cutout',
-              'Undermount Sink','small oval sink','Extra Sink Cutout','Cooktop Cutout','Electrical Cutouts',
-              'Arc Charges','Radius 6" - 12"','Bump-Outs','water fall','removal','Extra Labor'
+                'Kitchen - Sq Ft','Labor Charge','Edge - Lin Ft','4" BS - Lin Ft','UM Sink Cutout',
+                'Undermount Sink','small oval sink','Extra Sink Cutout','Cooktop Cutout','Electrical Cutouts',
+                'Arc Charges','Radius 6" - 12"','Bump-Outs','water fall','removal','Extra Labor'
               ];
               @endphp
 
@@ -230,12 +231,22 @@
               <tr data-name="{{ $label }}">
                 <td>{{ $label }}</td>
                 <td class="alpha-fill">{{ $label === 'Kitchen - Sq Ft' ? 'alpha fill' : '' }}</td>
-                <td><input type="number" class="qty-input num-fill" placeholder="0" min="0" step="0.01" value="0"></td>
+                <td>
+                  <input type="number"
+                         name="kitchen[qty][]"
+                         class="qty-input num-fill"
+                         placeholder="0"
+                         min="0"
+                         step="0.01"
+                         value="{{ old('kitchen.qty',0) }}">
+                </td>
+
                 <td class="cost-value" data-cost="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
                   ${{ number_format($kitchen_tops[$label] ?? 0, 2) }}
                   <input type="hidden" name="kitchen[name][]" value="{{ $label }}">
                   <input type="hidden" name="kitchen[unit_price][]" value="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
                 </td>
+
                 <td class="line-total empty-value">$ -</td>
                 <td class="taxed-t">{{ in_array($label, ['Kitchen - Sq Ft','Undermount Sink','small oval sink']) ? 'T' : '' }}</td>
               </tr>
@@ -255,11 +266,11 @@
         <div class="nav-footer">
           <button type="button" id="prev-tab-1" class="btn secondary" onclick="prevStep(1)" disabled><span>←</span> Previous</button>
           <div class="steps-indicator">Step 1 of 3</div>
-          <button type="button" id="next-tab-1" class="btn" onclick="nextStep(1)">Next <span>→</span></button>
+          <button type="button" id="next-tab-1" class="btn" data-current="1">Next <span>→</span></button>
         </div>
       </div>
 
-      <!-- STEP 2: Cabinet Manufacturer (updated: all inputs named for form submit) -->
+      <!-- STEP 2: Cabinet Manufacturer -->
       <div class="container step hidden" data-step="2" id="step-2">
         <div class="header-row">
           <h2 style="margin:0;color:#333">Kitchen Cabinet</h2>
@@ -270,11 +281,26 @@
         </div>
 
         <div class="table-container">
-          <!-- Cabinet Manufacturer Section -->
-          <div style="margin-bottom: 30px;">
-            <h3 style="background-color: #fff3cd; padding: 10px; margin: 0; border-bottom: 1px solid #e0e0e0;">CABINET MANUFACTURER</h3>
+          @php
+            $defaults = [
+              'bertch'=>0.4310,'mantra'=>0.4450,'CB'=>0.4520,'802/USCD FROM 2020'=>0.4680,
+              'KCD/USCD'=>0.4680,'dura'=>0.4680,'OMEGA'=>0.4850
+            ];
+            $manufacturers = $manufacturers ?? $defaults;
+            function fmtAuto($v) {
+                $v = (float)$v;
+                if (round($v, 2) != $v) {
+                    return number_format($v, 4, '.', '');
+                }
+                return number_format($v, 2, '.', '');
+            }
+          @endphp
 
-            <table style="margin-bottom: 20px; width:100%;">
+          <!-- CABINET MANUFACTURER -->
+          <div style="margin-bottom: 30px;">
+            <h3 style="background-color: #fff3cd; padding:10px; margin:0; border-bottom:1px solid #e0e0e0;">CABINET MANUFACTURER</h3>
+
+            <table style="width:100%; margin-bottom:20px;">
               <thead>
                 <tr>
                   <th style="text-align:left;width:40%;">Manufacturer</th>
@@ -285,51 +311,30 @@
               </thead>
 
               <tbody id="manufacturer-rows">
-                {{-- iterate manufacturers passed from controller --}}
-                @php
-                // fallback default list if $manufacturers not passed
-                $defaultManufacturers = [
-                'bertch'=>0.4310,'mantra'=>0.4450,'CB'=>0.4520,'802/USCD FROM 2020'=>0.4680,
-                'KCD/USCD'=>0.4680,'dura'=>0.4680,'OMEGA'=>0.4850
-                ];
-                $manufacturers = $manufacturers ?? $defaultManufacturers;
-                @endphp
-
-                @foreach($manufacturers as $name => $unitCost)
-                <tr data-name="{{ $name }}">
+                @foreach(['bertch','mantra','CB','802/USCD FROM 2020','KCD/USCD','dura','OMEGA'] as $i => $mfg)
+                <tr data-name="{{ $mfg }}">
                   <td style="padding:8px;border:1px solid #e0e0e0;">
-                    {{ $name }}
-                    <input type="hidden" name="manufacturer[name][]" value="{{ $name }}">
+                    {{ $mfg }}
+                    <input type="hidden" name="manufacturer[name][]" value="{{ $mfg }}">
                   </td>
 
                   <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
-                    {{-- show formatted unit price and add hidden input for unit price (4 decimals kept) --}}
-                    <span class="manufacturer-unit" data-unit="{{ number_format((float)$unitCost, 4, '.', '') }}">
-                      {{ number_format((float)$unitCost, 4, '.', '') }}
-                    </span>
-                    <input type="hidden" name="manufacturer[unit_price][]" value="{{ number_format((float)$unitCost, 4, '.', '') }}">
+                    {{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}
+                    <input type="hidden" name="manufacturer[unit_price][]" value="{{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}">
                   </td>
 
                   <td style="padding:8px;border:1px solid #e0e0e0;text-align:center;">
-                    {{-- qty input (user editable) --}}
-                    <input
-                      type="number"
-                      name="manufacturer[qty][]"
-                      class="qty-input manufacturer-qty"
-                      placeholder="0"
-                      min="0"
-                      step="0.01"
-                      value="0"
-                      style="width:100%;" />
+                    <input type="number" name="manufacturer[qty][]" class="qty-input manufacturer-qty" min="0" step="0.01" value="{{ old('manufacturer.qty.'.$i, 0) }}" style="width:100%;">
                   </td>
 
                   <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;" class="manufacturer-line empty-value">
                     $ -
+                    <input type="hidden" name="manufacturer[line_total][]" class="manufacturer-line-hidden" value="0">
                   </td>
                 </tr>
                 @endforeach
 
-                {{-- manufacturer subtotal row --}}
+                <!-- subtotal -->
                 <tr>
                   <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:center;font-weight:700">=</td>
                   <td id="manufacturer-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8">$ -</td>
@@ -338,7 +343,7 @@
             </table>
           </div>
 
-          <!-- Cost Calculation Section (named inputs) -->
+          <!-- Cost Calculation Section -->
           <div style="margin-bottom: 30px;">
             <table style="margin-bottom:20px;width:100%;">
               <tr>
@@ -352,7 +357,7 @@
             </table>
           </div>
 
-          <!-- Margin Markup Section (named inputs) -->
+          <!-- Margin Markup -->
           <div style="margin-bottom: 30px;">
             <h3 style="background-color:#f5f5f5;padding:10px;margin:0;border-bottom:1px solid #e0e0e0;">MARGIN MARKUP</h3>
             <table style="margin-bottom:20px;width:100%;">
@@ -363,21 +368,10 @@
                 </td>
                 <td id="markup-result" style="width:50%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
               </tr>
-              <!-- additional margin rows left static (no inputs) -->
-              <tr>
-                <td style="padding:8px;border:1px solid #e0e0e0;">1.5-1.55 CONTRACTOR</td>
-                <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-                <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-              </tr>
-              <tr>
-                <td style="padding:8px;border:1px solid #e0e0e0;">1.55-1.6, 1.66-1.7 RETAIL</td>
-                <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-                <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-              </tr>
             </table>
           </div>
 
-          <!-- Miscellaneous Items (named inputs) -->
+          <!-- Misc / Buffers -->
           <div style="margin-bottom: 30px;">
             <table style="margin-bottom:20px;width:100%;">
               <tr>
@@ -392,18 +386,6 @@
                   <input type="number" id="hardware-qty" name="hardware_qty" class="qty-input" placeholder="0.00" min="0" step="0.01" value="0.00">
                 </td>
                 <td id="hardware-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
-              </tr>
-
-              <tr>
-                <td style="padding:8px;border:1px solid #e0e0e0;">MISC ITEMS</td>
-                <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-                <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-              </tr>
-
-              <tr>
-                <td style="padding:8px;border:1px solid #e0e0e0;">802 FREIGHT SURCHARGE</td>
-                <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-                <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
               </tr>
 
               <tr>
@@ -436,13 +418,13 @@
             </table>
           </div>
 
-          <!-- Delivery Section (named inputs) -->
+          <!-- Delivery Section -->
           <div style="margin-bottom: 30px;">
             <h3 style="background-color:#fff3cd;padding:10px;margin:0;border-bottom:1px solid #e0e0e0;">DELIVERY</h3>
             <table style="margin-bottom:20px;width:100%;">
               <tr>
                 <td style="width:30%;padding:8px;border:1px solid #e0e0e0;">FULL KIT TAILGATE</td>
-                <td style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">300.00</td>
+                <td style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">{{ fmtAuto($manufacturers['FULL KIT TAILGATE'] ?? '300.00') }}</td>
                 <td style="width:20%;padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
                   <input type="number" id="delivery-full-kit" name="delivery_full_kit" class="qty-input" placeholder="" min="0" step="0.01" value="0">
                 </td>
@@ -451,7 +433,7 @@
 
               <tr>
                 <td style="padding:8px;border:1px solid #e0e0e0;">UP TO TEN ITEMS</td>
-                <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">175.00</td>
+                <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">{{ fmtAuto($manufacturers['UP TO TEN ITEMS'] ?? '175.00') }}</td>
                 <td style="padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
                   <input type="number" id="delivery-ten-items" name="delivery_ten_items" class="qty-input" placeholder="" min="0" step="0.01" value="0">
                 </td>
@@ -460,7 +442,7 @@
 
               <tr>
                 <td style="padding:8px;border:1px solid #e0e0e0;">SINGLE ITEM VAN</td>
-                <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">100.00</td>
+                <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">{{ fmtAuto($manufacturers['SINGLE ITEM VAN'] ?? '100.00') }}</td>
                 <td style="padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
                   <input type="number" id="delivery-single-van" name="delivery_single_van" class="qty-input" placeholder="" min="0" step="0.01" value="0">
                 </td>
@@ -491,12 +473,12 @@
                 <td style="width:20%;padding:8px;border:1px solid #e0e0e0;">
                   <input type="number" id="dba-surcharge" name="dba_surcharge" class="qty-input" placeholder="0.03" min="0" step="0.01" value="0.03">
                 </td>
-                <td id="dba-result" style="width:50%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+                <td id="step2-final-result" style="width:50%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
               </tr>
               <tr>
-                <td style="padding:8px;border:1px solid #e0e0e0;font-weight:bold;">final total DBA</td>
+                <td style="padding:8px;border:1px solid #e0e0e0;font-weight:bold;">step 2 subtotal</td>
                 <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-                <td id="final-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;font-weight:bold;">0.00</td>
+                <td id="step2-final-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;font-weight:bold;">0.00</td>
               </tr>
             </table>
           </div>
@@ -507,7 +489,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center">
             <button type="button" id="prev-tab-2" class="btn secondary" onclick="prevStep(2)"><span>←</span> Previous</button>
             <div style="font-size:14px;color:#666">Step 2 of 3</div>
-            <button type="button" id="next-tab-2" class="btn" onclick="nextStep(2)">Next <span>→</span></button>
+            <button type="button" id="next-tab-2" class="btn" data-current="2">Next <span>→</span></button>
           </div>
         </div>
       </div>
@@ -545,215 +527,388 @@
 
 @push('scripts')
 <script>
-  /* Multi-step form JS: no external deps */
-  document.addEventListener('DOMContentLoaded', function() {
-    const selected = {
-      kitchen: false,
-      vanity: false
+  jQuery(function($){
+    // Utilities
+    function el(id){ return document.getElementById(id); } // keep for fetch/form usage
+    function parseNum(v){
+      if (v === null || v === undefined) return 0;
+      v = String(v).replace(/\$/g,'').replace(/,/g,'').trim();
+      if (v === '') return 0;
+      return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+    }
+    function fmt2(n){ return (isNaN(n) ? 0 : n).toFixed(2); }
+    function fmt4(n){ return (isNaN(n) ? 0 : n).toFixed(4); }
+
+    // Welcome toggles
+    var selected = { kitchen: false, vanity: false };
+    window.toggleCheckbox = function(key){
+      selected[key] = !selected[key];
+      var chk = $('#' + key + '-quote');
+      if (chk.length) chk.prop('checked', selected[key]);
+      var box = $('#chk-' + key);
+      if (box.length) box.toggleClass('selected', selected[key]);
     };
 
-    function el(id) {
-      return document.getElementById(id);
-    }
-
-    window.toggleCheckbox = function(key) {
-      selected[key] = !selected[key];
-      const chk = document.getElementById(key + '-quote');
-      chk.checked = selected[key];
-      const box = document.getElementById('chk-' + key);
-      if (selected[key]) box.classList.add('selected');
-      else box.classList.remove('selected');
-    }
-
-    window.beginQuote = function() {
-      // require at least kitchen selected (vanity disabled)
+    window.beginQuote = function(){
       if (!selected.kitchen) {
-        el('welcome-error').style.display = 'block';
+        $('#welcome-error').show();
         return;
       }
-      el('welcome-panel').classList.add('hidden');
-      el('multi-step-form').classList.remove('hidden');
+      $('#welcome-panel').addClass('hidden');
+      $('#multi-step-form').removeClass('hidden');
       showStep(1);
-    }
+    };
 
-    // Step navigation
-    function showStep(step) {
-      document.querySelectorAll('.step').forEach(s => s.classList.add('hidden'));
-      const node = document.querySelector('.step[data-step="' + step + '"]');
-      if (node) node.classList.remove('hidden');
-
-      // initial recalc
+    // Navigation
+    function showStep(step){
+      $('.step').addClass('hidden');
+      $('.step[data-step="'+step+'"]').removeClass('hidden');
       recalcAll();
     }
-    window.nextStep = function(current) {
-      const next = current + 1;
+    window.nextStep = function(current){
+      if (!validateStep(current)) return;
+      var next = current + 1;
       showStep(next);
-    }
-    window.prevStep = function(current) {
-      const prev = current - 1;
-      if (prev < 1) {
-        return;
-      }
+      if (next === 3) buildSummary();
+    };
+    window.prevStep = function(current){
+      var prev = current - 1;
+      if (prev < 1) return;
       showStep(prev);
+    };
+
+    function validateStep(step){
+      if (step === 1){
+        var ok = true;
+        $('#kitchen-rows input[name="kitchen[qty][]"]').each(function(){
+          var v = parseNum($(this).val());
+          if (v < 0){ $(this).addClass('invalid'); ok = false; } else $(this).removeClass('invalid');
+        });
+        if (!ok) alert('Please correct kitchen quantities (numbers >= 0).');
+        return ok;
+      }
+      if (step === 2){
+        var ok = true;
+        $('#manufacturer-rows input[name="manufacturer[qty][]"]').each(function(){
+          var v = parseNum($(this).val());
+          if (v < 0){ $(this).addClass('invalid'); ok = false; } else $(this).removeClass('invalid');
+        });
+        var lp = $('#list-price');
+        if (lp.length){
+          var v = parseNum(lp.val());
+          if (v < 0){ lp.addClass('invalid'); ok = false; } else lp.removeClass('invalid');
+        }
+        if (!ok) alert('Please correct manufacturer quantities and list price (numbers >= 0).');
+        return ok;
+      }
+      return true;
     }
 
-    // Calculations for kitchen rows
-    function recalcKitchen() {
-      let grand = 0;
-      document.querySelectorAll('#kitchen-rows tr[data-name]').forEach(tr => {
-        const qty = parseFloat(tr.querySelector('.qty-input').value) || 0;
-        const cost = parseFloat(tr.querySelector('.cost-value').dataset.cost) || 0;
-        const line = qty * cost;
+    // --- calculations ---
+
+    // Kitchen
+    function recalcKitchen(){
+      var grand = 0;
+      $('#kitchen-rows tr[data-name]').each(function(){
+        var $tr = $(this);
+        var qty = parseNum($tr.find('input[name="kitchen[qty][]"]').val() || 0);
+        var unit = parseNum($tr.find('input[name="kitchen[unit_price][]"]').val() || $tr.find('.cost-value').data('cost') || 0);
+        var line = qty * unit;
         grand += line;
-        const lineCell = tr.querySelector('.line-total');
-        lineCell.textContent = line > 0 ? '$' + line.toFixed(2) : '$ -';
-        lineCell.classList.toggle('empty-value', line === 0);
+        var $lineCell = $tr.find('.line-total');
+        if (line > 0){
+          $lineCell.text('$' + fmt2(line)).removeClass('empty-value');
+        } else {
+          $lineCell.text('$ -').addClass('empty-value');
+        }
       });
-      el('grand-total-1').textContent = grand > 0 ? '$' + grand.toFixed(2) : '$ -';
-      el('header-total-1').textContent = grand > 0 ? '$' + grand.toFixed(2) : '$ -';
+      $('#grand-total-1').text(grand > 0 ? '$' + fmt2(grand) : '$ -');
+      $('#header-total-1').text(grand > 0 ? '$' + fmt2(grand) : '$ -');
       return grand;
     }
 
-    // Calculations for manufacturer rows
-    function recalcManufacturer() {
-      let total = 0;
-      document.querySelectorAll('#manufacturer-rows tr[data-name]').forEach(tr => {
-        const qty = parseFloat(tr.querySelector('.manufacturer-qty').value) || 0;
-        const unit = parseFloat(tr.querySelector('.manufacturer-unit').textContent) || 0;
-        const line = qty * unit;
+    // Manufacturer
+    function recalcManufacturer(){
+      var total = 0;
+      $('#manufacturer-rows tr[data-name]').each(function(){
+        var $tr = $(this);
+        var qty = parseNum($tr.find('input[name="manufacturer[qty][]"]').val() || 0);
+        var unit = parseNum($tr.find('input[name="manufacturer[unit_price][]"]').val() || $tr.find('td').eq(1).text() || 0);
+        var line = qty * unit;
         total += line;
-        const lineCell = tr.querySelector('.manufacturer-line');
-        lineCell.textContent = line > 0 ? '$' + line.toFixed(4) : '$ -';
-        lineCell.classList.toggle('empty-value', line === 0);
+        var $display = $tr.find('.manufacturer-line');
+        var $hiddenLine = $tr.find('input.manufacturer-line-hidden[name="manufacturer[line_total][]"]');
+        if (line > 0){
+          $display.text('$' + fmt4(line)).removeClass('empty-value');
+          if ($hiddenLine.length) $hiddenLine.val(fmt4(line));
+        } else {
+          $display.text('$ -').addClass('empty-value');
+          if ($hiddenLine.length) $hiddenLine.val('0');
+        }
       });
-      el('manufacturer-total').textContent = total > 0 ? '$' + total.toFixed(4) : '$ -';
-      el('header-total-2').textContent = total > 0 ? '$' + total.toFixed(4) : '$ -';
+      $('#manufacturer-total').text(total > 0 ? '$' + fmt4(total) : '$ -');
+      $('#header-total-2').text(total > 0 ? '$' + fmt4(total) : '$ -');
       return total;
     }
 
-    // multiplier and final aggregation
-    function recalcAll() {
-      const kitchenSum = recalcKitchen();
-      const manufacturerSum = recalcManufacturer();
-      const listPrice = parseFloat(el('list-price')?.value || 0) || 0;
-      const multiplierResult = listPrice * manufacturerSum;
-      el('multiplier-result').textContent = multiplierResult ? multiplierResult.toFixed(4) : '';
-      el('cost-total').textContent = multiplierResult ? '$' + multiplierResult.toFixed(2) : '';
+    // Delivery
+    function recalcDelivery(){
+      var deliveryTotal = 0;
 
-      const final = kitchenSum + multiplierResult + (manufacturerSum || 0);
-      el('final-total').textContent = final ? '$' + final.toFixed(2) : '$ -';
-      el('header-total-3').textContent = final ? '$' + final.toFixed(2) : '$ -';
-    }
-
-    // event listeners: delegate
-    document.addEventListener('input', function(e) {
-      if (e.target.matches('#kitchen-rows .qty-input') || e.target.matches('#manufacturer-rows .manufacturer-qty') || e.target.matches('#list-price')) {
-        recalcAll();
+      function readUnitByLabel(label, fallbackHiddenName){
+        if (fallbackHiddenName){
+          var hid = $('input[name="'+fallbackHiddenName+'"]');
+          if (hid.length) return parseNum(hid.val());
+        }
+        var row = $('#step-2 table tr').filter(function(){
+          return $(this).children().length && $(this).children().first().text().trim().toUpperCase().indexOf(label.toUpperCase()) === 0;
+        }).first();
+        if (row.length) return parseNum(row.children().eq(1).text() || row.children().eq(1).html() || 0);
+        return 0;
       }
-    });
 
-    // Summary building on navigate to step 3
-    document.querySelectorAll('[onclick^="nextStep"]').forEach(btn => {
-      btn.addEventListener('click', function() {
-        // If moving to step 3, build summary
-        const current = parseInt(this.getAttribute('onclick').match(/\d+/)?.[0] || 1);
-        if (current + 1 === 3) {
-          buildSummary();
-        }
-      });
-    });
+      var fullQty = parseNum($('#delivery-full-kit').val() || 0);
+      var fullUnit = readUnitByLabel('FULL KIT TAILGATE', 'delivery_unit_price[full_kit_tailgate]');
+      var fullLine = fullQty * fullUnit;
+      deliveryTotal += fullLine;
+      $('#delivery-full-kit-total').text(fullLine > 0 ? '$' + fmt2(fullLine) : '0.00');
 
-    function buildSummary() {
-      const list = el('summary-list');
-      list.innerHTML = '';
-      // kitchen non zero lines
-      document.querySelectorAll('#kitchen-rows tr[data-name]').forEach(tr => {
-        const name = tr.getAttribute('data-name');
-        const qty = parseFloat(tr.querySelector('.qty-input').value) || 0;
-        const unit = parseFloat(tr.querySelector('.cost-value').dataset.cost) || 0;
-        const line = qty * unit;
-        if (line > 0) {
-          const div = document.createElement('div');
-          div.className = 'summary-row';
-          div.innerHTML = `<div>${name} × ${qty}</div><div>$${line.toFixed(2)}</div>`;
-          list.appendChild(div);
-        }
-      });
-      // manufacturers non zero lines
-      document.querySelectorAll('#manufacturer-rows tr[data-name]').forEach(tr => {
-        const name = tr.getAttribute('data-name');
-        const qty = parseFloat(tr.querySelector('.manufacturer-qty').value) || 0;
-        const unit = parseFloat(tr.querySelector('.manufacturer-unit').textContent) || 0;
-        const line = qty * unit;
-        if (line > 0) {
-          const div = document.createElement('div');
-          div.className = 'summary-row';
-          div.innerHTML = `<div>${name} × ${qty}</div><div>$${line.toFixed(4)}</div>`;
-          list.appendChild(div);
-        }
-      });
+      var tenQty = parseNum($('#delivery-ten-items').val() || 0);
+      var tenUnit = readUnitByLabel('UP TO TEN ITEMS', 'delivery_unit_price[ten_items]');
+      var tenLine = tenQty * tenUnit;
+      deliveryTotal += tenLine;
+      $('#delivery-ten-items-total').text(tenLine > 0 ? '$' + fmt2(tenLine) : '0.00');
 
-      // footer totals
-      const finalText = el('final-total').textContent || '$ -';
-      el('final-total').textContent = finalText;
+      var vanQty = parseNum($('#delivery-single-van').val() || 0);
+      var vanUnit = readUnitByLabel('SINGLE ITEM VAN', 'delivery_unit_price[single_item_van]');
+      var vanLine = vanQty * vanUnit;
+      deliveryTotal += vanLine;
+      $('#delivery-single-van-total').text(vanLine > 0 ? '$' + fmt2(vanLine) : '0.00');
+
+      var puQty = parseNum($('#delivery-pickup').val() || 0);
+      var puUnit = readUnitByLabel('CUSTOMER PICKUP', 'delivery_unit_price[pickup]');
+      var puLine = puQty * puUnit;
+      deliveryTotal += puLine;
+      $('#delivery-pickup-total').text(puLine > 0 ? '$' + fmt2(puLine) : '0.00');
+
+      $('#delivery-total').text(deliveryTotal > 0 ? '$' + fmt2(deliveryTotal) : '0.00');
+      return deliveryTotal;
     }
 
-    // Form submit via AJAX
-    document.getElementById('multi-step-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      // gather data: kitchen names, qtys, unit_prices; manufacturer names, qtys, unit_prices
-      const fd = new FormData();
-      // kitchen
-      document.querySelectorAll('#kitchen-rows tr[data-name]').forEach((tr, idx) => {
-        const name = tr.getAttribute('data-name');
-        const qty = tr.querySelector('.qty-input').value || 0;
-        const unit = tr.querySelector('.cost-value').dataset.cost || 0;
-        fd.append('kitchen[name][]', name);
-        fd.append('kitchen[qty][]', qty);
-        fd.append('kitchen[unit_price][]', unit);
-      });
-      // manufacturers
-      document.querySelectorAll('#manufacturer-rows tr[data-name]').forEach((tr, idx) => {
-        const name = tr.getAttribute('data-name');
-        const qty = tr.querySelector('.manufacturer-qty').value || 0;
-        const unit = tr.querySelector('.manufacturer-unit').textContent || 0;
-        fd.append('manufacturer[name][]', name);
-        fd.append('manufacturer[qty][]', qty);
-        fd.append('manufacturer[unit_price][]', unit);
-      });
+    // Master recalc
+    function recalcAll(){
+      var kitchenSum = recalcKitchen();
+      var manufacturerSum = recalcManufacturer();
 
-      // add totals
-      fd.append('final_total', (el('final-total').textContent || '').replace('$', ''));
+      var listPrice = parseNum($('#list-price').val() || 0);
+      var multiplierResult = listPrice * manufacturerSum;
 
-      const btn = document.getElementById('save-quote');
-      btn.disabled = true;
-      btn.textContent = 'Saving...';
+      if ($('#multiplier-result').length) $('#multiplier-result').text(multiplierResult ? fmt4(multiplierResult) : '0.000');
+      if ($('#cost-total').length) $('#cost-total').text(multiplierResult ? ('$' + fmt2(multiplierResult)) : '$0.00');
 
-      fetch(this.action, {
-        method: 'POST',
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-        },
-        body: fd
-      }).then(r => r.json()).then(json => {
-        btn.disabled = false;
-        btn.textContent = 'Save & Finish';
-        if (json && json.success) {
-          alert(json.message || 'Saved successfully');
-          location.reload();
-        } else {
-          alert((json && json.message) ? json.message : 'Save failed');
-        }
-      }).catch(err => {
-        btn.disabled = false;
-        btn.textContent = 'Save & Finish';
-        alert('Save failed');
-        console.error(err);
-      });
+      var step2Subtotal = manufacturerSum + multiplierResult;
+      if ($('#step2-final-total').length) $('#step2-final-total').text(step2Subtotal ? ('$' + fmt4(step2Subtotal)) : '$0.00');
+      if ($('#step2-final-result').length) $('#step2-final-result').text(step2Subtotal ? ('$' + fmt4(step2Subtotal)) : '$0.00');
+
+      var deliverySum = recalcDelivery();
+
+      var priceBuffer = parseNum($('#price-buffer').val() || 0);
+      var phoneBuffer = parseNum($('#phone-call-buffer').val() || 0);
+      var hardwareQty = parseNum($('#hardware-qty').val() || 0);
+      var dba = parseNum($('#dba-surcharge').val() || 0);
+
+      var totalRetail = step2Subtotal + deliverySum + priceBuffer + phoneBuffer + hardwareQty;
+      $('#total-retail').text(totalRetail ? ('$' + fmt2(totalRetail)) : '0.00');
+
+      var taxAmount = 0;
+      $('#tax-amount').text(fmt2(taxAmount));
+
+      var step2FinalWithDba = step2Subtotal + dba;
+      $('#step2-final-result').text(step2FinalWithDba ? ('$' + fmt4(step2FinalWithDba)) : '$0.00');
+      $('#step2-final-total').text(step2FinalWithDba ? ('$' + fmt4(step2FinalWithDba)) : '$0.00');
+
+      var final = kitchenSum + step2Subtotal + deliverySum + priceBuffer + phoneBuffer + hardwareQty + dba + taxAmount;
+      $('#final-total').text(final ? ('$' + fmt2(final)) : '$ -');
+      $('#header-total-3').text(final ? ('$' + fmt2(final)) : '$ -');
+
+      return { kitchenSum: kitchenSum, manufacturerSum: manufacturerSum, multiplierResult: multiplierResult, step2Subtotal: step2Subtotal, deliverySum: deliverySum, final: final };
+    }
+
+    // Event delegation: recalc
+    $(document).on('input', [
+      '#kitchen-rows input[name="kitchen[qty][]"]',
+      '#manufacturer-rows input[name="manufacturer[qty][]"]',
+      '#list-price',
+      '#price-buffer',
+      '#phone-call-buffer',
+      '#hardware-qty',
+      '#delivery-full-kit',
+      '#delivery-ten-items',
+      '#delivery-single-van',
+      '#delivery-pickup',
+      '#dba-surcharge'
+    ].join(','), function(){
+      recalcAll();
     });
 
-    // initial recalc so header shows DB values properly
+    // Next buttons
+    $('#next-tab-1').on('click', function(){ nextStep(1); });
+    $('#next-tab-2').on('click', function(){ nextStep(2); });
+
+    // Build summary
+    function buildSummary(){
+      var $list = $('#summary-list');
+      if (!$list.length) return;
+      $list.empty();
+
+      $('#kitchen-rows tr[data-name]').each(function(){
+        var $tr = $(this);
+        var name = $tr.data('name');
+        var qty = parseNum($tr.find('input[name="kitchen[qty][]"]').val() || 0);
+        var unit = parseNum($tr.find('input[name="kitchen[unit_price][]"]').val() || $tr.find('.cost-value').data('cost') || 0);
+        var line = qty * unit;
+        if (line > 0){
+          var $div = $('<div class="summary-row"></div>');
+          $div.html('<div>'+name+' × '+qty+'</div><div>$'+fmt2(line)+'</div>');
+          $list.append($div);
+        }
+      });
+
+      $('#manufacturer-rows tr[data-name]').each(function(){
+        var $tr = $(this);
+        var name = $tr.data('name');
+        var qty = parseNum($tr.find('input[name="manufacturer[qty][]"]').val() || 0);
+        var unit = parseNum($tr.find('input[name="manufacturer[unit_price][]"]').val() || $tr.find('td').eq(1).text() || 0);
+        var line = qty * unit;
+        if (line > 0){
+          var $div = $('<div class="summary-row"></div>');
+          $div.html('<div>'+name+' × '+qty+'</div><div>$'+fmt4(line)+'</div>');
+          $list.append($div);
+        }
+      });
+
+      var deliveries = [
+        { id: 'delivery-full-kit', label: 'FULL KIT TAILGATE' },
+        { id: 'delivery-ten-items', label: 'UP TO TEN ITEMS' },
+        { id: 'delivery-single-van', label: 'SINGLE ITEM VAN' },
+        { id: 'delivery-pickup', label: 'CUSTOMER PICKUP' }
+      ];
+      $.each(deliveries, function(_, d){
+        var qty = parseNum($('#'+d.id).val() || 0);
+        var row = $('#step-2 table tr').filter(function(){
+          return $(this).children().length && $(this).children().first().text().trim().toUpperCase().indexOf(d.label) === 0;
+        }).first();
+        var unit = row.length ? parseNum(row.children().eq(1).text() || row.children().eq(1).html() || 0) : 0;
+        var line = qty * unit;
+        if (line > 0){
+          var $div = $('<div class="summary-row"></div>');
+          $div.html('<div>'+d.label+' × '+qty+'</div><div>$'+fmt2(line)+'</div>');
+          $list.append($div);
+        }
+      });
+
+      var state = recalcAll();
+      $('#final-total').text(state.final ? ('$' + fmt2(state.final)) : '$ -');
+      $('#header-total-3').text(state.final ? ('$' + fmt2(state.final)) : '$ -');
+    }
+
+    // Form submit
+    var $form = $('#multi-step-form');
+    if ($form.length){
+      $form.on('submit', function(e){
+        e.preventDefault();
+        var state = recalcAll();
+        if (!state.final || state.final <= 0){
+          if (!confirm('Final total is $0. Do you want to submit anyway?')) return;
+        }
+
+        var fd = new FormData();
+
+        // kitchen
+        $('#kitchen-rows tr[data-name]').each(function(){
+          var $tr = $(this);
+          var name = $tr.data('name');
+          var qty = parseNum($tr.find('input[name="kitchen[qty][]"]').val() || 0);
+          var unit = parseNum($tr.find('input[name="kitchen[unit_price][]"]').val() || $tr.find('.cost-value').data('cost') || 0);
+          fd.append('kitchen[name][]', name);
+          fd.append('kitchen[qty][]', qty);
+          fd.append('kitchen[unit_price][]', unit);
+        });
+
+        // manufacturers
+        $('#manufacturer-rows tr[data-name]').each(function(){
+          var $tr = $(this);
+          var name = $tr.data('name');
+          var qty = parseNum($tr.find('input[name="manufacturer[qty][]"]').val() || 0);
+          var unit = parseNum($tr.find('input[name="manufacturer[unit_price][]"]').val() || $tr.find('td').eq(1).text() || 0);
+          var line = qty * unit;
+          fd.append('manufacturer[name][]', name);
+          fd.append('manufacturer[qty][]', qty);
+          fd.append('manufacturer[unit_price][]', unit);
+          fd.append('manufacturer[line_total][]', fmt4(line));
+        });
+
+        // deliveries
+        var deliveryMappings = [
+          { id: 'delivery-full-kit', key: 'full_kit_tailgate', label: 'FULL KIT TAILGATE' },
+          { id: 'delivery-ten-items', key: 'ten_items', label: 'UP TO TEN ITEMS' },
+          { id: 'delivery-single-van', key: 'single_item_van', label: 'SINGLE ITEM VAN' },
+          { id: 'delivery-pickup', key: 'pickup', label: 'CUSTOMER PICKUP' }
+        ];
+        $.each(deliveryMappings, function(_, m){
+          var qty = parseNum($('#'+m.id).val() || 0);
+          var row = $('#step-2 table tr').filter(function(){
+            return $(this).children().length && $(this).children().first().text().trim().toUpperCase().indexOf(m.label) === 0;
+          }).first();
+          var unit = row.length ? parseNum(row.children().eq(1).text() || row.children().eq(1).html() || 0) : 0;
+          var line = qty * unit;
+          fd.append('delivery['+m.key+'][qty]', qty);
+          fd.append('delivery['+m.key+'][unit_price]', unit);
+          fd.append('delivery['+m.key+'][line_total]', fmt2(line));
+        });
+
+        // other named inputs
+        var named = ['list-price','margin-markup','hardware-qty','price-buffer','phone-call-buffer','dba-surcharge'];
+        $.each(named, function(_, id){
+          var node = $('#'+id);
+          if (!node.length) return;
+          fd.append(node.attr('name') || id, node.val());
+        });
+
+        fd.append('final_total', state.final ? state.final.toString() : '0');
+
+        var $btn = $('#save-quote');
+        if ($btn.length){ $btn.prop('disabled', true); var oldLabel = $btn.text(); $btn.text('Saving...'); }
+
+        fetch($form.attr('action'), {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': $('input[name="_token"]').val(),
+            'Accept': 'application/json'
+          },
+          body: fd
+        }).then(function(r){ return r.json().catch(function(){ return {}; }); })
+          .then(function(json){
+            if ($btn && $btn.length){ $btn.prop('disabled', false); $btn.text(oldLabel); }
+            if (json && json.success){
+              alert(json.message || 'Saved successfully');
+              if (json.redirect) window.location.href = json.redirect;
+              else window.location.reload();
+            } else {
+              alert((json && json.message) ? json.message : 'Save failed');
+              console.error('Save response:', json);
+            }
+          }).catch(function(err){
+            if ($btn && $btn.length){ $btn.prop('disabled', false); $btn.text(oldLabel); }
+            alert('Save failed (network or server error)');
+            console.error(err);
+          });
+      });
+    }
+
+    // initial recalc
     recalcAll();
   });
 </script>
 @endpush
+
