@@ -591,12 +591,12 @@
             <div class="content-header">
                 <h1 class="content-title">Quotes Management</h1>
                 <div class="action-buttons">
-                    <button class="btn secondary">
+                    <a href="" class="btn secondary">
                         <i>📊</i> Reports
-                    </button>
-                    <button class="btn primary">
+                    </a>
+                    <a href="{{ route('admin.quotes.create') }}" class="btn primary">
                         <i>➕</i> Create Quote
-                    </button>
+                    </a>
                 </div>
             </div>
 

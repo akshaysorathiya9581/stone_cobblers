@@ -20,7 +20,7 @@ class QuoteController extends Controller
      */
     public function create()
     {
-        //
+         return view('admin.quote.create');
     }
 
     /**
@@ -61,5 +61,10 @@ class QuoteController extends Controller
     public function destroy(Quote $quote)
     {
         //
+    }
+
+    public function quote_form_show($type = 'kitchen')
+    {
+        return view('admin.quote.kitchen_quote', compact('type'));
     }
 }

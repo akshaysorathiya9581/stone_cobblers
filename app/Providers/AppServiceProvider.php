@@ -39,6 +39,9 @@ class AppServiceProvider extends ServiceProvider
                 ['section'=>'Quick Access','title'=>'Starred','icon'=>'icon-starred','route'=>null,'module'=>null],
                 ['section'=>'Quick Access','title'=>'Pinned','icon'=>'icon-pinned','route'=>null,'module'=>null],
 
+                // Quotes Management
+                ['section'=>'Quotes Management','title'=>'Kitchen Quotes','icon'=>'icon-quotes','route'=>'admin.kitchen-quotes.index','module'=>'quotes'],
+
                 // Account (rendered separately too, but kept here for consistency)
                 ['section'=>'Account','title'=>'Logout','icon'=>'icon-logout','route'=>'logout','module'=>null,'is_logout'=>true],
             ]);
