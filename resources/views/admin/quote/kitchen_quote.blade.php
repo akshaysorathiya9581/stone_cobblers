@@ -3,7 +3,7 @@
 @section('title', 'Add Quote')
 
 @push('css')
- <style>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -21,7 +21,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -99,15 +99,18 @@
             border-radius: 4px;
             font-size: 12px;
             text-align: center;
-            background-color: #e6f3ff; /* Light blue background */
+            background-color: #e6f3ff;
+            /* Light blue background */
         }
 
         .qty-input.num-fill {
-            background-color: #e8f5e8; /* Light green background */
+            background-color: #e8f5e8;
+            /* Light green background */
         }
 
         .qty-input.yes-no {
-            background-color: #fff3cd; /* Light yellow background */
+            background-color: #fff3cd;
+            /* Light yellow background */
         }
 
         .qty-input::placeholder {
@@ -117,7 +120,8 @@
 
         /* Special styling for specific rows */
         .alpha-fill {
-            background-color: #ffebee; /* Light red background */
+            background-color: #ffebee;
+            /* Light red background */
         }
 
         .cost-value {
@@ -144,8 +148,9 @@
             .table-container {
                 font-size: 12px;
             }
-            
-            th, td {
+
+            th,
+            td {
                 padding: 6px 4px;
             }
         }
@@ -180,7 +185,7 @@
                         <td class="alpha-fill">alpha fill</td>
                         <td><input type="number" class="qty-input num-fill" placeholder="num fill" min="0"
                                 step="0.01"></td>
-                        <td class="cost-value">$25.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Kitchen - Sq Ft'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td class="taxed-t">T</td>
                     </tr>
@@ -188,7 +193,7 @@
                         <td>Labor Charge</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$30.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Labor Charge'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -197,7 +202,7 @@
                         <td>pencil</td>
                         <td><input type="number" class="qty-input num-fill" placeholder="num fill" min="0"
                                 step="0.01"></td>
-                        <td class="cost-value">$15.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Edge - Lin Ft'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -205,7 +210,7 @@
                         <td>4" BS - Lin Ft</td>
                         <td>included in Sq Ft</td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$0.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['4" BS - Lin Ft'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -213,7 +218,7 @@
                         <td>UM Sink Cutout</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$50.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['UM Sink Cutout'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -221,7 +226,7 @@
                         <td>Undermount Sink</td>
                         <td>choice</td>
                         <td><input type="text" class="qty-input yes-no" placeholder="y/n" maxlength="3"></td>
-                        <td class="cost-value">$399.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Undermount Sink'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td class="taxed-t">T</td>
                     </tr>
@@ -230,7 +235,7 @@
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="num fill" min="0" step="0.01">
                         </td>
-                        <td class="cost-value">$150.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['small oval sink'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td class="taxed-t">T</td>
                     </tr>
@@ -238,7 +243,7 @@
                         <td>Extra Sink Cutout</td>
                         <td></td>
                         <td><input type="text" class="qty-input" placeholder="or check?" maxlength="10"></td>
-                        <td class="cost-value">$25.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Extra Sink Cutout'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -246,7 +251,7 @@
                         <td>Cooktop Cutout</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$35.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Cooktop Cutout'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -254,7 +259,7 @@
                         <td>Electrical Cutouts</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$15.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Electrical Cutouts'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -262,7 +267,7 @@
                         <td>Arc Charges</td>
                         <td>per Linear Foot</td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$45.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Arc Charges'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -270,7 +275,7 @@
                         <td>Radius 6" - 12"</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$75.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Radius 6" - 12"'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -278,7 +283,7 @@
                         <td>Bump-Outs</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$60.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Bump-Outs'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -286,7 +291,7 @@
                         <td>water fall</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$40.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['water fall'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -294,7 +299,7 @@
                         <td>removal</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$20.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['removal'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
@@ -302,11 +307,12 @@
                         <td>Extra Labor</td>
                         <td></td>
                         <td><input type="number" class="qty-input" placeholder="" min="0" step="0.01"></td>
-                        <td class="cost-value">$45.00</td>
+                        <td class="cost-value">${{ number_format($kitchen_tops['Extra Labor'] ?? 0, 2) }}</td>
                         <td class="empty-value">$ -</td>
                         <td></td>
                     </tr>
                 </tbody>
+
                 <tfoot>
                     <tr>
                         <td colspan="4" style="text-align: right; font-weight: bold;">Total:</td>

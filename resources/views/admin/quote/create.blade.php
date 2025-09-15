@@ -1,274 +1,454 @@
 @extends('layouts.admin')
 
-@section('title', 'Add Quote')
+@section('title','Quote — Multi Step')
 
 @push('css')
-    <style>
-        .container {
-            max-width: 500px;
-            width: 100%;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            padding: 40px;
-            text-align: center;
-        }
+<!-- Combined CSS (kept your styles, simplified duplicates) -->
+<style>
+  *{box-sizing:border-box}
+  body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;background:#f0fdf4;padding:20px}
+  .app-wrapper{max-width:1200px;margin:0 auto}
+  .card{background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.06);overflow:hidden}
+  .centered {max-width:700px;margin:32px auto;padding:40px;text-align:center}
+  /* Welcome */
+  .welcome-container{max-width:700px;margin:24px auto}
+  .icon{width:80px;height:80px;border-radius:50%;background:rgb(22,163,74);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+  .icon::before{content:"🔨";font-size:40px;color:#fff}
+  .title{font-size:28px;font-weight:700;margin-bottom:8px}
+  .brand{color:rgb(22,163,74)}
+  .description{color:#666;margin-bottom:20px}
+  .quote-options{padding:16px;border-radius:8px;background:#f8f9fa;border:1px solid #e0e0e0;margin-bottom:20px}
+  .checkbox-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .checkbox-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer}
+  .checkbox-item.selected{border-color:rgb(22,163,74);background:#e8f5e8}
+  .btn{background:rgb(22,163,74);color:#fff;padding:12px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  .btn.secondary{background:#fff;color:#333;border:1px solid #ccc}
+  .time-estimate{color:#999;margin-top:8px}
+  .error-message{color:#d32f2f;display:none;margin-top:12px}
 
-        .icon {
-            width: 80px;
-            height: 80px;
-            background-color: rgb(22, 163, 74, 1);
-            border-radius: 50%;
-            margin: 0 auto 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+  /* Steps layout */
+  .step-container{max-width:1200px;margin:20px auto}
+  .container{background:#fff;border-radius:8px;overflow:hidden}
+  .header-row{display:flex;justify-content:space-between;align-items:center;padding:20px;border-bottom:1px solid #e0e0e0}
+  .table-container{padding:20px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{padding:12px 8px;border-bottom:1px solid #e0e0e0;text-align:left}
+  td{padding:8px;border-bottom:1px solid #e0e0e0;vertical-align:top}
+  .qty-input{width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;text-align:center;background:#e6f3ff}
+  .qty-input.num-fill{background:#e8f5e8}
+  .qty-input.yes-no{background:#fff3cd}
+  .alpha-fill{background:#ffebee}
+  .cost-value{color:#333;font-weight:500;text-align:right}
+  .empty-value{color:#999;text-align:right}
+  .taxed-t{color:#2e7d32;font-weight:700;text-align:center}
+  .project-col{width:25%}.scope-col{width:25%}.qty-col{width:12%}.cost-col{width:12%}.total-col{width:12%}.taxed-col{width:6%}
 
-        .icon::before {
-            content: "🔨";
-            font-size: 40px;
-            color: white;
-        }
-
-        .title {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .title .brand {
-            color: rgb(22, 163, 74, 1);
-        }
-
-        .description {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 40px;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .quote-options {
-            margin-bottom: 40px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .quote-options h3 {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .checkbox-group {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 140px;
-        }
-
-        .checkbox-item:hover {
-            border-color: rgb(22, 163, 74, 1);
-            background-color: #f0fdf4;
-        }
-
-        .checkbox-item.selected {
-            border-color: rgb(22, 163, 74, 1);
-            background-color: #e8f5e8;
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: rgb(22, 163, 74, 1);
-            cursor: pointer;
-        }
-
-        .checkbox-item label {
-            font-weight: 500;
-            color: #333;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .btn {
-            background-color: rgb(22, 163, 74, 1);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .btn:hover {
-            background-color: #1b5e20;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
-        }
-
-        .btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .time-estimate {
-            font-size: 14px;
-            color: #999;
-            margin-top: 8px;
-        }
-
-        .error-message {
-            color: #d32f2f;
-            font-size: 14px;
-            margin-top: 12px;
-            display: none;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            .title {
-                font-size: 28px;
-            }
-            
-            .checkbox-group {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .checkbox-item {
-                width: 100%;
-                max-width: 200px;
-            }
-        }
-    </style>
+  .nav-footer{padding:20px;border-top:1px solid #e0e0e0;background:#f8f9fa;display:flex;justify-content:space-between;align-items:center}
+  .steps-indicator{font-size:14px;color:#666}
+  .hidden{display:none}
+  .summary-box{padding:20px}
+  .summary-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #eee}
+  .summary-row.total{font-weight:700}
+  @media (max-width:768px){.header-row{flex-direction:column;align-items:flex-start} .project-col,.scope-col{width:35%}}
+</style>
 @endpush
 
 @section('content')
-    <div class="container">
-        <div class="icon"></div>
+<div class="app-wrapper">
+  <!-- Welcome / Quote Type -->
+  <div class="welcome-container card" id="welcome-panel">
+    <div class="icon"></div>
+    <h1 class="title">Welcome to <span class="brand">The Stone Cobblers</span></h1>
+    <p class="description">Transform your outdoor space with our premium stone cobbling services. Let's gather some details to provide you with a personalized quote.</p>
 
-        <h1 class="title">
-            Welcome to<br><span class="brand">The Stone Cobblers</span>
-        </h1>
-
-        <p class="description">
-            Transform your outdoor space with our premium stone cobbling services.
-            Let's gather some details to provide you with a personalized quote.
-        </p>
-
-        <div class="quote-options">
-            <h3>Select Quote Type</h3>
-            <div class="checkbox-group">
-                <div class="checkbox-item" onclick="toggleCheckbox('kitchen')">
-                    <input type="checkbox" id="kitchen-quote" name="quote-type" value="kitchen">
-                    <label for="kitchen-quote">Kitchen Quote</label>
-                </div>
-                <div class="checkbox-item" onclick="toggleCheckbox('vanity')">
-                    <input type="checkbox" id="vanity-quote" name="quote-type" value="vanity" disabled>
-                    <label for="vanity-quote">Vanity Quote</label>
-                </div>
-            </div>
+    <div class="quote-options">
+      <h3 style="margin:0 0 12px 0">Select Quote Type</h3>
+      <div class="checkbox-group" id="quote-types">
+        <div class="checkbox-item" id="chk-kitchen" data-value="kitchen" onclick="toggleCheckbox('kitchen')">
+          <input type="checkbox" id="kitchen-quote" name="quote-type" value="kitchen" style="pointer-events:none">
+          <label for="kitchen-quote">Kitchen Quote</label>
         </div>
-
-        <button class="btn" id="begin-btn" onclick="beginQuote()">
-            Let's Begin <span>→</span>
-        </button>
-
-        <div class="time-estimate">Takes about 3 minutes to complete</div>
-
-        <div class="error-message" id="error-message">
-            Please select at least one quote type to continue.
+        <div class="checkbox-item" id="chk-vanity" data-value="vanity" onclick="toggleCheckbox('vanity')">
+          <input type="checkbox" id="vanity-quote" name="quote-type" value="vanity" disabled style="pointer-events:none">
+          <label for="vanity-quote">Vanity Quote (disabled)</label>
         </div>
+      </div>
     </div>
+
+    <button class="btn" id="begin-btn" onclick="beginQuote()">Let's Begin <span style="margin-left:8px">→</span></button>
+    <div class="time-estimate">Takes about 3 minutes to complete</div>
+    <div class="error-message" id="welcome-error">Please select at least one quote type to continue.</div>
+  </div>
+
+  <!-- Multi-step form (hidden initially) -->
+  <form id="multi-step-form" class="hidden" method="POST" action="{{ route('admin.kitchen-quotes.store') }}">
+    @csrf
+
+    <!-- STEP 1: Kitchen Top -->
+    <div class="container step" data-step="1" id="step-1">
+      <div class="header-row">
+        <h2 style="margin:0;color:#333">Kitchen Top</h2>
+        <div style="text-align:right">
+          <div style="font-size:14px;color:#666;margin-bottom:5px">Accumulative Cost Total:</div>
+          <div id="header-total-1" style="font-size:24px;font-weight:700;color:#2e7d32">$ -</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="project-col">Project</th>
+              <th class="scope-col">Scope/Material</th>
+              <th class="qty-col">QTY</th>
+              <th class="cost-col">COST</th>
+              <th class="total-col">TOTAL</th>
+              <th class="taxed-col">TAXED 'T'</th>
+            </tr>
+          </thead>
+
+          <tbody id="kitchen-rows">
+            {{-- each row uses data-cost attribute filled from DB --}}
+            @php
+              $kitchenLabels = [
+                'Kitchen - Sq Ft','Labor Charge','Edge - Lin Ft','4" BS - Lin Ft','UM Sink Cutout',
+                'Undermount Sink','small oval sink','Extra Sink Cutout','Cooktop Cutout','Electrical Cutouts',
+                'Arc Charges','Radius 6" - 12"','Bump-Outs','water fall','removal','Extra Labor'
+              ];
+            @endphp
+
+            @foreach($kitchenLabels as $label)
+            <tr data-name="{{ $label }}">
+              <td>{{ $label }}</td>
+              <td class="alpha-fill">{{ $label === 'Kitchen - Sq Ft' ? 'alpha fill' : '' }}</td>
+              <td><input type="number" class="qty-input num-fill" placeholder="0" min="0" step="0.01" value="0"></td>
+              <td class="cost-value" data-cost="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
+                ${{ number_format($kitchen_tops[$label] ?? 0, 2) }}
+                <input type="hidden" name="kitchen[name][]" value="{{ $label }}">
+                <input type="hidden" name="kitchen[unit_price][]" value="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
+              </td>
+              <td class="line-total empty-value">$ -</td>
+              <td class="taxed-t">{{ in_array($label, ['Kitchen - Sq Ft','Undermount Sink','small oval sink']) ? 'T' : '' }}</td>
+            </tr>
+            @endforeach
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="4" style="text-align:right;font-weight:700">Total:</td>
+              <td id="grand-total-1" class="empty-value">$ -</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="nav-footer">
+        <button type="button" id="prev-tab-1" class="btn secondary" onclick="prevStep(1)" disabled><span>←</span> Previous</button>
+        <div class="steps-indicator">Step 1 of 3</div>
+        <button type="button" id="next-tab-1" class="btn" onclick="nextStep(1)">Next <span>→</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Cabinet Manufacturer -->
+    <div class="container step hidden" data-step="2" id="step-2">
+      <div class="header-row">
+        <h2 style="margin:0;color:#333">Kitchen Cabinet</h2>
+        <div style="text-align:right">
+          <div style="font-size:14px;color:#666;margin-bottom:5px">Accumulative Cost Total:</div>
+          <div id="header-total-2" style="font-size:24px;font-weight:700;color:#2e7d32">$ -</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <h3 style="background:#fff3cd;padding:10px;margin:0;border-bottom:1px solid #e0e0e0">CABINET MANUFACTURER</h3>
+        <table style="margin-top:12px">
+          <thead>
+            <tr>
+              <th style="text-align:left;width:40%">Manufacturer</th>
+              <th style="text-align:right;width:20%">Unit</th>
+              <th style="text-align:center;width:20%">Qty</th>
+              <th style="text-align:right;width:20%">Total</th>
+            </tr>
+          </thead>
+          <tbody id="manufacturer-rows">
+            @php
+              $manufacturerLabels = array_keys($manufacturers ?? [
+                'bertch'=>0.4310,'mantra'=>0.4450,'CB'=>0.4520,'802/USCD FROM 2020'=>0.4680,
+                'KCD/USCD'=>0.4680,'dura'=>0.4680,'OMEGA'=>0.4850
+              ]);
+            @endphp
+
+            @foreach($manufacturerLabels as $m)
+            <tr data-name="{{ $m }}">
+              <td>{{ $m }}<input type="hidden" name="manufacturer[name][]" value="{{ $m }}"></td>
+              @php $unit = $manufacturers[$m] ?? 0; @endphp
+              <td style="text-align:right">
+                <span class="manufacturer-unit">{{ number_format($unit, 4, '.', '') }}</span>
+                <input type="hidden" name="manufacturer[unit_price][]" value="{{ number_format($unit, 4, '.', '') }}">
+              </td>
+              <td style="text-align:center">
+                <input type="number" class="qty-input manufacturer-qty" placeholder="0" min="0" step="0.01" value="0">
+              </td>
+              <td style="text-align:right" class="manufacturer-line empty-value">$ -</td>
+            </tr>
+            @endforeach
+
+            <tr>
+              <td colspan="3" style="text-align:center;font-weight:700">=</td>
+              <td id="manufacturer-total" style="text-align:right;background:#e8f5e8">$ -</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- small cost row -->
+        <div style="margin-top:18px">
+          <table style="width:100%">
+            <tr>
+              <td style="width:30%">20/20 LIST PRICE</td>
+              <td style="width:20%"><input type="number" id="list-price" class="qty-input" placeholder="0" min="0" step="0.01" value="0"></td>
+              <td id="multiplier-result" style="text-align:right;width:25%"></td>
+              <td id="cost-total" style="text-align:right;width:25%"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="nav-footer">
+        <button type="button" class="btn secondary" onclick="prevStep(2)"><span>←</span> Previous</button>
+        <div class="steps-indicator">Step 2 of 3</div>
+        <button type="button" class="btn" onclick="nextStep(2)">Next <span>→</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Summary & Submit -->
+    <div class="container step hidden" data-step="3" id="step-3">
+      <div class="header-row">
+        <h2 style="margin:0;color:#333">Summary</h2>
+        <div style="text-align:right">
+          <div style="font-size:14px;color:#666;margin-bottom:5px">Final Total</div>
+          <div id="header-total-3" style="font-size:24px;font-weight:700;color:#2e7d32">$ -</div>
+        </div>
+      </div>
+
+      <div class="table-container summary-box">
+        <div id="summary-list"></div>
+
+        <div class="summary-row total" style="margin-top:12px">
+          <div>Total</div>
+          <div id="final-total" style="font-weight:700">$ -</div>
+        </div>
+      </div>
+
+      <div class="nav-footer">
+        <button type="button" class="btn secondary" onclick="prevStep(3)"><span>←</span> Previous</button>
+        <div class="steps-indicator">Step 3 of 3</div>
+        <button type="submit" class="btn" id="save-quote">Save & Finish</button>
+      </div>
+    </div>
+  </form>
+</div>
 @endsection
 
 @push('scripts')
-    <script>
-        function toggleCheckbox(type) {
-            const checkbox = document.getElementById(type + '-quote');
-            const item = checkbox.closest('.checkbox-item');
+<script>
+/* Multi-step form JS: no external deps */
+document.addEventListener('DOMContentLoaded', function(){
+  const selected = { kitchen:false, vanity:false };
+  function el(id){ return document.getElementById(id); }
 
-            checkbox.checked = !checkbox.checked;
+  window.toggleCheckbox = function(key){
+    selected[key] = !selected[key];
+    const chk = document.getElementById(key+'-quote');
+    chk.checked = selected[key];
+    const box = document.getElementById('chk-'+key);
+    if(selected[key]) box.classList.add('selected'); else box.classList.remove('selected');
+  }
 
-            if (checkbox.checked) {
-                item.classList.add('selected');
-            } else {
-                item.classList.remove('selected');
-            }
+  window.beginQuote = function(){
+    // require at least kitchen selected (vanity disabled)
+    if(!selected.kitchen){
+      el('welcome-error').style.display = 'block';
+      return;
+    }
+    el('welcome-panel').classList.add('hidden');
+    el('multi-step-form').classList.remove('hidden');
+    showStep(1);
+  }
 
-            updateButtonState();
-        }
+  // Step navigation
+  function showStep(step){
+    document.querySelectorAll('.step').forEach(s => s.classList.add('hidden'));
+    const node = document.querySelector('.step[data-step="'+step+'"]');
+    if(node) node.classList.remove('hidden');
 
-        function updateButtonState() {
-            const kitchenChecked = document.getElementById('kitchen-quote').checked;
-            const vanityChecked = document.getElementById('vanity-quote').checked;
-            const beginBtn = document.getElementById('begin-btn');
-            const errorMessage = document.getElementById('error-message');
+    // initial recalc
+    recalcAll();
+  }
+  window.nextStep = function(current){
+    const next = current + 1;
+    showStep(next);
+  }
+  window.prevStep = function(current){
+    const prev = current - 1;
+    if(prev < 1){ return; }
+    showStep(prev);
+  }
 
-            if (kitchenChecked || vanityChecked) {
-                beginBtn.disabled = false;
-                errorMessage.style.display = 'none';
-            } else {
-                beginBtn.disabled = true;
-                errorMessage.style.display = 'block';
-            }
-        }
+  // Calculations for kitchen rows
+  function recalcKitchen(){
+    let grand = 0;
+    document.querySelectorAll('#kitchen-rows tr[data-name]').forEach(tr => {
+      const qty = parseFloat(tr.querySelector('.qty-input').value) || 0;
+      const cost = parseFloat(tr.querySelector('.cost-value').dataset.cost) || 0;
+      const line = qty * cost;
+      grand += line;
+      const lineCell = tr.querySelector('.line-total');
+      lineCell.textContent = line > 0 ? '$' + line.toFixed(2) : '$ -';
+      lineCell.classList.toggle('empty-value', line === 0);
+    });
+    el('grand-total-1').textContent = grand > 0 ? '$' + grand.toFixed(2) : '$ -';
+    el('header-total-1').textContent = grand > 0 ? '$' + grand.toFixed(2) : '$ -';
+    return grand;
+  }
 
-        function beginQuote() {
-            const kitchenChecked = document.getElementById('kitchen-quote').checked;
-            const vanityChecked = document.getElementById('vanity-quote').checked;
+  // Calculations for manufacturer rows
+  function recalcManufacturer(){
+    let total = 0;
+    document.querySelectorAll('#manufacturer-rows tr[data-name]').forEach(tr => {
+      const qty = parseFloat(tr.querySelector('.manufacturer-qty').value) || 0;
+      const unit = parseFloat(tr.querySelector('.manufacturer-unit').textContent) || 0;
+      const line = qty * unit;
+      total += line;
+      const lineCell = tr.querySelector('.manufacturer-line');
+      lineCell.textContent = line > 0 ? '$' + line.toFixed(4) : '$ -';
+      lineCell.classList.toggle('empty-value', line === 0);
+    });
+    el('manufacturer-total').textContent = total > 0 ? '$' + total.toFixed(4) : '$ -';
+    el('header-total-2').textContent = total > 0 ? '$' + total.toFixed(4) : '$ -';
+    return total;
+  }
 
-            // Save selection to localStorage
-            const quoteTypes = [];
-            if (kitchenChecked) quoteTypes.push('kitchen');
-            if (vanityChecked) quoteTypes.push('vanity');
+  // multiplier and final aggregation
+  function recalcAll(){
+    const kitchenSum = recalcKitchen();
+    const manufacturerSum = recalcManufacturer();
+    const listPrice = parseFloat(el('list-price')?.value || 0) || 0;
+    const multiplierResult = listPrice * manufacturerSum;
+    el('multiplier-result').textContent = multiplierResult ? multiplierResult.toFixed(4) : '';
+    el('cost-total').textContent = multiplierResult ? '$' + multiplierResult.toFixed(2) : '';
 
-            localStorage.setItem('selectedQuoteTypes', JSON.stringify(quoteTypes));
+    const final = kitchenSum + multiplierResult + (manufacturerSum || 0);
+    el('final-total').textContent = final ? '$' + final.toFixed(2) : '$ -';
+    el('header-total-3').textContent = final ? '$' + final.toFixed(2) : '$ -';
+  }
 
-            // Navigate to the first selected quote type
-            if (kitchenChecked) {
-                window.location.href = "{{ route('admin.quote.form.show', ['type' => 'kitchen']) }}";
-            } else if (vanityChecked) {
-                window.location.href = 'vanity-form.html';
-            }
-        }
+  // event listeners: delegate
+  document.addEventListener('input', function(e){
+    if(e.target.matches('#kitchen-rows .qty-input') || e.target.matches('#manufacturer-rows .manufacturer-qty') || e.target.matches('#list-price')){
+      recalcAll();
+    }
+  });
 
-        // Initialize button state
-        document.addEventListener('DOMContentLoaded', function() {
-            updateButtonState();
-        });
-    </script>
+  // Summary building on navigate to step 3
+  document.querySelectorAll('[onclick^="nextStep"]').forEach(btn => {
+    btn.addEventListener('click', function(){
+      // If moving to step 3, build summary
+      const current = parseInt(this.getAttribute('onclick').match(/\d+/)?.[0] || 1);
+      if(current + 1 === 3){
+        buildSummary();
+      }
+    });
+  });
+  function buildSummary(){
+    const list = el('summary-list');
+    list.innerHTML = '';
+    // kitchen non zero lines
+    document.querySelectorAll('#kitchen-rows tr[data-name]').forEach(tr => {
+      const name = tr.getAttribute('data-name');
+      const qty = parseFloat(tr.querySelector('.qty-input').value) || 0;
+      const unit = parseFloat(tr.querySelector('.cost-value').dataset.cost) || 0;
+      const line = qty * unit;
+      if(line > 0){
+        const div = document.createElement('div');
+        div.className = 'summary-row';
+        div.innerHTML = `<div>${name} × ${qty}</div><div>$${line.toFixed(2)}</div>`;
+        list.appendChild(div);
+      }
+    });
+    // manufacturers non zero lines
+    document.querySelectorAll('#manufacturer-rows tr[data-name]').forEach(tr => {
+      const name = tr.getAttribute('data-name');
+      const qty = parseFloat(tr.querySelector('.manufacturer-qty').value) || 0;
+      const unit = parseFloat(tr.querySelector('.manufacturer-unit').textContent) || 0;
+      const line = qty * unit;
+      if(line > 0){
+        const div = document.createElement('div');
+        div.className = 'summary-row';
+        div.innerHTML = `<div>${name} × ${qty}</div><div>$${line.toFixed(4)}</div>`;
+        list.appendChild(div);
+      }
+    });
+
+    // footer totals
+    const finalText = el('final-total').textContent || '$ -';
+    el('final-total').textContent = finalText;
+  }
+
+  // Form submit via AJAX
+  document.getElementById('multi-step-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    // gather data: kitchen names, qtys, unit_prices; manufacturer names, qtys, unit_prices
+    const fd = new FormData();
+    // kitchen
+    document.querySelectorAll('#kitchen-rows tr[data-name]').forEach((tr, idx) => {
+      const name = tr.getAttribute('data-name');
+      const qty = tr.querySelector('.qty-input').value || 0;
+      const unit = tr.querySelector('.cost-value').dataset.cost || 0;
+      fd.append('kitchen[name][]', name);
+      fd.append('kitchen[qty][]', qty);
+      fd.append('kitchen[unit_price][]', unit);
+    });
+    // manufacturers
+    document.querySelectorAll('#manufacturer-rows tr[data-name]').forEach((tr, idx) => {
+      const name = tr.getAttribute('data-name');
+      const qty = tr.querySelector('.manufacturer-qty').value || 0;
+      const unit = tr.querySelector('.manufacturer-unit').textContent || 0;
+      fd.append('manufacturer[name][]', name);
+      fd.append('manufacturer[qty][]', qty);
+      fd.append('manufacturer[unit_price][]', unit);
+    });
+
+    // add totals
+    fd.append('final_total', (el('final-total').textContent || '').replace('$',''));
+
+    const btn = document.getElementById('save-quote');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    fetch(this.action, {
+      method:'POST',
+      headers: { 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value },
+      body: fd
+    }).then(r => r.json()).then(json => {
+      btn.disabled = false;
+      btn.textContent = 'Save & Finish';
+      if(json && json.success){
+        alert(json.message || 'Saved successfully');
+        location.reload();
+      } else {
+        alert((json && json.message) ? json.message : 'Save failed');
+      }
+    }).catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Save & Finish';
+      alert('Save failed');
+      console.error(err);
+    });
+  });
+
+  // initial recalc so header shows DB values properly
+  recalcAll();
+});
+</script>
 @endpush

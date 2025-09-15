@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quote;
+use App\Models\KitchenQuote;
+
 use Illuminate\Http\Request;
 
 class QuoteController extends Controller
@@ -65,6 +67,14 @@ class QuoteController extends Controller
 
     public function quote_form_show($type = 'kitchen')
     {
-        return view('admin.quote.kitchen_quote', compact('type'));
+        $kitchen_tops = KitchenQuote::where('type', 'KITCHEN_TOP')
+            ->pluck('cost', 'project')
+            ->toArray();
+
+        $manufacturers = KitchenQuote::where('type', 'KITCHEN_CABINET')
+            ->pluck('cost', 'project')
+            ->toArray();
+
+        return view('admin.quote.kitchen_quote', compact('type', 'kitchen_tops', 'manufacturers'));
     }
 }
