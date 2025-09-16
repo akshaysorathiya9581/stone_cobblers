@@ -843,13 +843,13 @@
               // If server passed pdf_url or redirect, honor it
               if (json.redirect) { window.location.href = json.redirect; return; }
               if (json.pdf_path) {
-                alert(json.message || 'Saved and PDF generated');
+                // alert(json.message || 'Saved and PDF generated');
                 // optionally navigate to quote show page
-                // window.location.href = '/quotes/' + json.quote_id;
+                window.location.href = '/admin/quotes/';
                 return;
               }
-              alert(json.message || 'Saved successfully');
-              // window.location.reload();
+              // alert(json.message || 'Saved successfully');
+              window.location.reload();
             } else {
               alert((json && json.message) ? json.message : 'Save failed');
               console.error('Save response:', json);

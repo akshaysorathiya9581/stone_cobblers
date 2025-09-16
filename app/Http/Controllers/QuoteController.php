@@ -28,17 +28,29 @@ class QuoteController extends Controller
      */
     public function index(Request $request)
     {
-        // optional status filter
+        $user = Auth::user();
         $status = $request->query('status');
 
         $query = Quote::with(['project.customer', 'creator'])
             ->orderBy('created_at', 'desc');
 
+        if ($user && $user->role === 'admin') {
+            // Admin: see all quotes
+        } else {
+            // Non-admin: show only quotes related to their projects or created by them
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                ->orWhereHas('project', function ($qp) use ($user) {
+                    $qp->where('user_id', $user->id);
+                });
+            });
+        }
+
         if ($status) {
             $query->where('status', $status);
         }
 
-        // fetch all quotes (no pagination)
+        // fetch all (no pagination)
         $quotes = $query->get();
 
         return view('admin.quote.index', compact('quotes'));
@@ -269,7 +281,7 @@ class QuoteController extends Controller
             $items = $quote->items()->get();
 
             // company logo — if exists, convert to base64 for DOMPDF
-            $logoPath = public_path('images/logo.png'); // adjust path to your logo
+            $logoPath = public_path('images/logo.jpeg'); // adjust path to your logo
             $companyLogo = null;
             if (file_exists($logoPath)) {
                 $type = pathinfo($logoPath, PATHINFO_EXTENSION);
@@ -282,7 +294,7 @@ class QuoteController extends Controller
                 'quote' => $quote,
                 'items' => $items,
                 'companyName' => config('app.name'),
-                'companyAddress' => config('app.company_address', ''),
+                'companyAddress' => "317 West Boylston St, West Boylston, MA 01583 774-261-4445",
                 'companyLogo' => $companyLogo,
             ];
 
@@ -353,7 +365,7 @@ class QuoteController extends Controller
             return $this->streamPrivateFile($quote);
         }
 
-        $project = $quote->project()->with('client')->first();
+        $project = $quote->project()->with('customer')->first();
         if ($project && $project->client) {
             $clientOwnerId = $project->client->created_by ?? null;
             if ($clientOwnerId && $user && $user->id === (int)$clientOwnerId) {
