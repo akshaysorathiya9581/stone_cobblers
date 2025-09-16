@@ -23,6 +23,10 @@ body {
     color: #333;
 }
 
+.hidden {
+    display: none;
+}
+
 a {
     text-decoration: none;
 }
@@ -92,7 +96,8 @@ a {
     font-style: normal;
 }
 
-input:focus-visible {
+input:focus-visible,
+select:focus-visible {
     outline: none;
 }
 
@@ -1378,7 +1383,8 @@ input:focus-visible {
     display: flex;
     gap: 20px;
     justify-content: center;
-    flex-wrap: wrap;
+    /* flex-wrap: wrap; */
+    flex-wrap: nowrap;
 }
 
 .quote-type .checkbox-item {
@@ -1392,6 +1398,7 @@ input:focus-visible {
     cursor: pointer;
     transition: all 0.2s ease;
     min-width: 140px;
+    width: 100%;
 }
 
 .quote-type .checkbox-item:hover {
@@ -1419,13 +1426,10 @@ input:focus-visible {
 }
 
 .quote-type .btn {
-    /* background: var(--primary-color);
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600 */
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 auto 12px;
 }
 
 .quote-type .time-estimate {
@@ -1435,6 +1439,11 @@ input:focus-visible {
 .quote-type .error-message {
     display: none;
     margin-top: 12px;
+}
+
+.quote-type .selector-group select {
+    padding: 14px 15px;
+    font-weight: 500;
 }
 
 .customer-quotes {
@@ -1497,7 +1506,28 @@ input:focus-visible {
 
 .taxed-t {
     color: #2e7d32;
-    font-weight: bold;
+    font-weight: 700;
+}
+
+.steps-indicator {
+    font-size: 14px;
+    color: #666
+}
+
+.summary-box {
+    /* padding: 20px */
+    border-top: 1px dashed #eee
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee
+}
+
+.summary-row.total {
+    font-weight: 700
 }
 
 .quote-item {
@@ -1576,6 +1606,76 @@ input:focus-visible {
 
 .quote-details td:last-child {
     border-right: none;
+}
+
+.quote-details .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* border-bottom: 1px solid #e0e0e0; */
+    padding-bottom: 20px;
+}
+
+@media (max-width:768px) {
+    .quote-details .header-row {
+        flex-direction: column;
+        align-items: flex-start
+    }
+}
+
+.quote-details .header-row__right {
+    text-align: right;
+}
+
+.quote-details .title-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.quote-details .title-span {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+.quote-details .project-col {
+    width: 25%
+}
+
+.quote-details .scope-col {
+    width: 25%
+}
+
+.quote-details .qty-col {
+    width: 12%
+}
+
+.quote-details .cost-col {
+    width: 12%
+}
+
+.quote-details .total-col {
+    width: 12%
+}
+
+.quote-details .taxed-col {
+    width: 6%
+}
+
+@media (max-width:768px) {
+
+    .quote-details .project-col,
+    .quote-details .scope-col {
+        width: 35%
+    }
+}
+
+.quote-details .nav-footer {
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center
 }
 
 .login-main {
