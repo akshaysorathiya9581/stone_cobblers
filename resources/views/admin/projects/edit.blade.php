@@ -3,11 +3,7 @@
 @section('title', isset($project) ? 'Edit Project' : 'Add Project')
 
 @push('css')
-    {{-- You can move CSS to a separate file. Keep minimal inline for demo. --}}
-    <style>
-        /* minimal styles (you can keep your full CSS here) */
-
-    </style>
+    
 @endpush
 
 @section('content')
