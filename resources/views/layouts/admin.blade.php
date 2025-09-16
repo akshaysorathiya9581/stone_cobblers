@@ -15,9 +15,8 @@
         @endif -->
         @include('partials.admin.sidebar')
         
-        <div class="main-content">
-            @yield('content')
-        </div>
+        @yield('content')
+        
     </div>
     
     <script src="{{ asset('js/app.js') }}"></script>
