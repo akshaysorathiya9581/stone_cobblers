@@ -6,6 +6,8 @@
 @endpush
 
 @section('content')
+<!-- Main Content -->
+<div class="main-content">
     <!-- Header -->
     <div class="header">
         <div class="search-bar">
@@ -141,6 +143,7 @@
 
 
     </div>
+</div>
 @endsection
 
 @push('scripts')
