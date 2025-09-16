@@ -3,7 +3,6 @@
 @section('title', 'Quote — Multi Step')
 
 @push('css')
-
 @endpush
 
 @section('content')
@@ -36,8 +35,12 @@
             <div>
               <h3 style="margin:0 0 12px 0">Select Project</h3>
               <div class="selector-group">
-                <select id="" name="">
-                  <option value="">All Projects</option>
+                {{-- FIX: add name so project_id is submitted --}}
+                <select id="project-select" name="project_id">
+                  <option value="">Select Project</option>
+                  @foreach($projects as $project)
+                    <option value="{{ $project->id }}">{{ $project->name }}</option>
+                  @endforeach
                 </select>
               </div>
             </div>
@@ -45,11 +48,11 @@
             <h3 style="margin:0 0 12px 0">Select Quote Type</h3>
             <div class="checkbox-group" id="quote-types">
               <div class="checkbox-item" id="chk-kitchen" data-value="kitchen" onclick="toggleCheckbox('kitchen')">
-                <input type="checkbox" id="kitchen-quote" name="quote-type" value="kitchen">
+                <input type="checkbox" id="kitchen-quote" name="quote-type-kitchen" value="kitchen" />
                 <label for="kitchen-quote">Kitchen Quote</label>
               </div>
               <div class="checkbox-item" id="chk-vanity" data-value="vanity" onclick="toggleCheckbox('vanity')">
-                <input type="checkbox" id="vanity-quote" name="quote-type" value="vanity">
+                <input type="checkbox" id="vanity-quote" name="quote-type-vanity" value="vanity" />
                 <label for="vanity-quote">Vanity Quote</label>
               </div>
             </div>
@@ -58,13 +61,16 @@
           <button class="btn theme" id="begin-btn" onclick="beginQuote()">Let's Begin <span
               style="margin-left:8px">→</span></button>
           <div class="time-estimate">Takes about 3 minutes to complete</div>
-          <div class="error-message" id="welcome-error">Please select at least one quote type to continue.</div>
+          <div class="error-message" id="welcome-error" style="display:none;color:#c62828;margin-top:8px">
+            Please select at least one quote type and a project to continue.
+          </div>
         </div>
       </div>
 
       <!-- Multi-step form (hidden initially) -->
       <form id="multi-step-form" class="hidden quote-details" method="POST" action="{{ route('admin.quotes.store') }}">
         @csrf
+        {{-- We do not rely on normal submit: AJAX will POST FormData --}}
         <!-- STEP 1: Kitchen Top -->
         <div class="container step" data-step="1" id="step-1">
           <div class="header-row">
@@ -93,7 +99,7 @@
                   'Kitchen - Sq Ft',
                   'Labor Charge',
                   'Edge - Lin Ft',
-                  '4" BS - Lin Ft',
+                  '4\" BS - Lin Ft',
                   'UM Sink Cutout',
                   'Undermount Sink',
                   'small oval sink',
@@ -101,7 +107,7 @@
                   'Cooktop Cutout',
                   'Electrical Cutouts',
                   'Arc Charges',
-                  'Radius 6" - 12"',
+                  'Radius 6\" - 12\"',
                   'Bump-Outs',
                   'water fall',
                   'removal',
@@ -114,15 +120,15 @@
                   <td>{{ $label }}</td>
                   <td class="alpha-fill">{{ $label === 'Kitchen - Sq Ft' ? 'alpha fill' : '' }}</td>
                   <td>
-                    <input type="number" name="kitchen[qty][]" class="qty-input num-fill" placeholder="0" min="0"
+                    <input type="number" name="kitchen[qty][]" class="qty-input num-fill kitchen-qty" placeholder="0" min="0"
                       step="0.01" value="{{ old('kitchen.qty', 0) }}">
                   </td>
 
-                  <td class="cost-value" data-cost="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
+                  <td class="cost-value"
+                      data-cost="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
                     ${{ number_format($kitchen_tops[$label] ?? 0, 2) }}
                     <input type="hidden" name="kitchen[name][]" value="{{ $label }}">
-                    <input type="hidden" name="kitchen[unit_price][]"
-                      value="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
+                    <input type="hidden" name="kitchen[unit_price][]" value="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
                   </td>
 
                   <td class="line-total empty-value">$ -</td>
@@ -156,7 +162,8 @@
             <h2 class="title">Kitchen Cabinet</h2>
             <div class="header-row__right">
               <div class="title-label">Accumulative Cost Total:</div>
-              <div class="title-span" id="header-total-1">$ -</div>
+              {{-- FIX: unique ID for step2 header --}}
+              <div class="title-span" id="header-total-2">$ -</div>
             </div>
           </div>
 
@@ -207,8 +214,7 @@
 
                       <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
                         {{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}
-                        <input type="hidden" name="manufacturer[unit_price][]"
-                          value="{{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}">
+                        <input type="hidden" name="manufacturer[unit_price][]" value="{{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}">
                       </td>
 
                       <td style="padding:8px;border:1px solid #e0e0e0;text-align:center;">
@@ -218,7 +224,7 @@
 
                       <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;"
                         class="manufacturer-line empty-value">
-                        $ -
+                        $ - 
                         <input type="hidden" name="manufacturer[line_total][]" class="manufacturer-line-hidden" value="0">
                       </td>
                     </tr>
@@ -227,8 +233,7 @@
                   <!-- subtotal -->
                   <tr>
                     <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:center;font-weight:700">=</td>
-                    <td id="manufacturer-total"
-                      style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8">$ -</td>
+                    <td id="manufacturer-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8">$ -</td>
                   </tr>
                 </tbody>
               </table>
@@ -328,11 +333,11 @@
                     {{ fmtAuto($manufacturers['FULL KIT TAILGATE'] ?? '300.00') }}
                   </td>
                   <td style="width:20%;padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;">
+                    {{-- keep unique ids for JS but JS will append proper delivery[...] keys --}}
                     <input type="number" id="delivery-full-kit" name="delivery_full_kit" class="qty-input" placeholder=""
                       min="0" step="0.01" value="0">
                   </td>
-                  <td id="delivery-full-kit-total"
-                    style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+                  <td id="delivery-full-kit-total" style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
                 </tr>
 
                 <tr>
@@ -446,51 +451,56 @@
   <script>
     jQuery(function ($) {
       // Utilities
-      function el(id) { return document.getElementById(id); } // keep for fetch/form usage
+      function el(id) { return document.getElementById(id); }
       function parseNum(v) {
         if (v === null || v === undefined) return 0;
         v = String(v).replace(/\$/g, '').replace(/,/g, '').trim();
         if (v === '') return 0;
-        return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+        // handle parentheses negatives
+        if (/^\(.*\)$/.test(v)) v = '-' + v.replace(/[()]/g, '');
+        var n = parseFloat(v);
+        return isNaN(n) ? 0 : n;
       }
       function fmt2(n) { return (isNaN(n) ? 0 : n).toFixed(2); }
       function fmt4(n) { return (isNaN(n) ? 0 : n).toFixed(4); }
 
-      // Welcome toggles
+      // Welcome toggles (track selection)
       var selected = { kitchen: false, vanity: false };
 
+      // Ensure checkboxes reflect initial state
+      $('#kitchen-quote').prop('checked', selected.kitchen);
+      $('#vanity-quote').prop('checked', selected.vanity);
+
       window.toggleCheckbox = function (key) {
-        // toggle state
         selected[key] = !selected[key];
-
-        // update checkbox checked property
         var chk = $('#' + key + '-quote');
-        if (chk.length) {
-          chk.prop('checked', selected[key]);
-        }
+        if (chk.length) chk.prop('checked', selected[key]);
 
-        // update box UI
         var box = $('#chk-' + key);
         if (box.length) {
-          if (selected[key]) {
-            box.addClass('selected');
-          } else {
-            box.removeClass('selected');
-          }
+          if (selected[key]) box.addClass('selected');
+          else box.removeClass('selected');
         }
       };
 
+      // Begin — require at least one quote type and a project
       window.beginQuote = function () {
-        if (!selected.kitchen) {
-          $('#welcome-error').show();
+        var projectId = $('#project-select').val();
+        if (!selected.kitchen && !selected.vanity) {
+          $('#welcome-error').text('Please select at least one quote type to continue.').show();
           return;
         }
+        if (!projectId) {
+          $('#welcome-error').text('Please select a project to continue.').show();
+          return;
+        }
+        $('#welcome-error').hide();
         $('#welcome-panel').addClass('hidden');
         $('#multi-step-form').removeClass('hidden');
         showStep(1);
       };
 
-      // Navigation
+      // Navigation helpers
       function showStep(step) {
         $('.step').addClass('hidden');
         $('.step[data-step="' + step + '"]').removeClass('hidden');
@@ -511,7 +521,7 @@
       function validateStep(step) {
         if (step === 1) {
           var ok = true;
-          $('#kitchen-rows input[name="kitchen[qty][]"]').each(function () {
+          $('#kitchen-rows input.kitchen-qty').each(function () {
             var v = parseNum($(this).val());
             if (v < 0) { $(this).addClass('invalid'); ok = false; } else $(this).removeClass('invalid');
           });
@@ -520,7 +530,7 @@
         }
         if (step === 2) {
           var ok = true;
-          $('#manufacturer-rows input[name="manufacturer[qty][]"]').each(function () {
+          $('#manufacturer-rows input.manufacturer-qty').each(function () {
             var v = parseNum($(this).val());
             if (v < 0) { $(this).addClass('invalid'); ok = false; } else $(this).removeClass('invalid');
           });
@@ -535,9 +545,7 @@
         return true;
       }
 
-      // --- calculations ---
-
-      // Kitchen
+      // Calculations (kitchen/manufacturer/delivery/master)
       function recalcKitchen() {
         var grand = 0;
         $('#kitchen-rows tr[data-name]').each(function () {
@@ -558,7 +566,6 @@
         return grand;
       }
 
-      // Manufacturer
       function recalcManufacturer() {
         var total = 0;
         $('#manufacturer-rows tr[data-name]').each(function () {
@@ -582,7 +589,6 @@
         return total;
       }
 
-      // Delivery
       function recalcDelivery() {
         var deliveryTotal = 0;
 
@@ -599,25 +605,25 @@
         }
 
         var fullQty = parseNum($('#delivery-full-kit').val() || 0);
-        var fullUnit = readUnitByLabel('FULL KIT TAILGATE', 'delivery_unit_price[full_kit_tailgate]');
+        var fullUnit = readUnitByLabel('FULL KIT TAILGATE', null);
         var fullLine = fullQty * fullUnit;
         deliveryTotal += fullLine;
         $('#delivery-full-kit-total').text(fullLine > 0 ? '$' + fmt2(fullLine) : '0.00');
 
         var tenQty = parseNum($('#delivery-ten-items').val() || 0);
-        var tenUnit = readUnitByLabel('UP TO TEN ITEMS', 'delivery_unit_price[ten_items]');
+        var tenUnit = readUnitByLabel('UP TO TEN ITEMS', null);
         var tenLine = tenQty * tenUnit;
         deliveryTotal += tenLine;
         $('#delivery-ten-items-total').text(tenLine > 0 ? '$' + fmt2(tenLine) : '0.00');
 
         var vanQty = parseNum($('#delivery-single-van').val() || 0);
-        var vanUnit = readUnitByLabel('SINGLE ITEM VAN', 'delivery_unit_price[single_item_van]');
+        var vanUnit = readUnitByLabel('SINGLE ITEM VAN', null);
         var vanLine = vanQty * vanUnit;
         deliveryTotal += vanLine;
         $('#delivery-single-van-total').text(vanLine > 0 ? '$' + fmt2(vanLine) : '0.00');
 
         var puQty = parseNum($('#delivery-pickup').val() || 0);
-        var puUnit = readUnitByLabel('CUSTOMER PICKUP', 'delivery_unit_price[pickup]');
+        var puUnit = readUnitByLabel('CUSTOMER PICKUP', null);
         var puLine = puQty * puUnit;
         deliveryTotal += puLine;
         $('#delivery-pickup-total').text(puLine > 0 ? '$' + fmt2(puLine) : '0.00');
@@ -626,7 +632,6 @@
         return deliveryTotal;
       }
 
-      // Master recalc
       function recalcAll() {
         var kitchenSum = recalcKitchen();
         var manufacturerSum = recalcManufacturer();
@@ -665,8 +670,8 @@
         return { kitchenSum: kitchenSum, manufacturerSum: manufacturerSum, multiplierResult: multiplierResult, step2Subtotal: step2Subtotal, deliverySum: deliverySum, final: final };
       }
 
-      // Event delegation: recalc
-      $(document).on('input', [
+      // Event delegation: recalc on input/change across form
+      $(document).on('input change', [
         '#kitchen-rows input[name="kitchen[qty][]"]',
         '#manufacturer-rows input[name="manufacturer[qty][]"]',
         '#list-price',
@@ -677,12 +682,13 @@
         '#delivery-ten-items',
         '#delivery-single-van',
         '#delivery-pickup',
-        '#dba-surcharge'
+        '#dba-surcharge',
+        '#margin-markup'
       ].join(','), function () {
         recalcAll();
       });
 
-      // Next buttons
+      // Next buttons wiring
       $('#next-tab-1').on('click', function () { nextStep(1); });
       $('#next-tab-2').on('click', function () { nextStep(2); });
 
@@ -719,10 +725,10 @@
         });
 
         var deliveries = [
-          { id: 'delivery-full-kit', label: 'FULL KIT TAILGATE' },
-          { id: 'delivery-ten-items', label: 'UP TO TEN ITEMS' },
-          { id: 'delivery-single-van', label: 'SINGLE ITEM VAN' },
-          { id: 'delivery-pickup', label: 'CUSTOMER PICKUP' }
+          { id: 'delivery-full-kit', label: 'FULL KIT TAILGATE', key: 'full_kit_tailgate' },
+          { id: 'delivery-ten-items', label: 'UP TO TEN ITEMS', key: 'ten_items' },
+          { id: 'delivery-single-van', label: 'SINGLE ITEM VAN', key: 'single_item_van' },
+          { id: 'delivery-pickup', label: 'CUSTOMER PICKUP', key: 'pickup' }
         ];
         $.each(deliveries, function (_, d) {
           var qty = parseNum($('#' + d.id).val() || 0);
@@ -743,7 +749,7 @@
         $('#header-total-3').text(state.final ? ('$' + fmt2(state.final)) : '$ -');
       }
 
-      // Form submit
+      // Form submit (AJAX)
       var $form = $('#multi-step-form');
       if ($form.length) {
         $form.on('submit', function (e) {
@@ -755,7 +761,10 @@
 
           var fd = new FormData();
 
-          // kitchen
+          // project
+          fd.append('project_id', $('#project-select').val() || '');
+
+          // kitchen rows
           $('#kitchen-rows tr[data-name]').each(function () {
             var $tr = $(this);
             var name = $tr.data('name');
@@ -766,7 +775,7 @@
             fd.append('kitchen[unit_price][]', unit);
           });
 
-          // manufacturers
+          // manufacturer rows
           $('#manufacturer-rows tr[data-name]').each(function () {
             var $tr = $(this);
             var name = $tr.data('name');
@@ -779,7 +788,7 @@
             fd.append('manufacturer[line_total][]', fmt4(line));
           });
 
-          // deliveries
+          // deliveries (nested)
           var deliveryMappings = [
             { id: 'delivery-full-kit', key: 'full_kit_tailgate', label: 'FULL KIT TAILGATE' },
             { id: 'delivery-ten-items', key: 'ten_items', label: 'UP TO TEN ITEMS' },
@@ -798,16 +807,24 @@
             fd.append('delivery[' + m.key + '][line_total]', fmt2(line));
           });
 
-          // other named inputs
+          // simple named inputs
           var named = ['list-price', 'margin-markup', 'hardware-qty', 'price-buffer', 'phone-call-buffer', 'dba-surcharge'];
           $.each(named, function (_, id) {
             var node = $('#' + id);
             if (!node.length) return;
-            fd.append(node.attr('name') || id, node.val());
+            // append with server-friendly field names
+            var serverName = node.attr('name') || id.replace(/-/g, '_');
+            fd.append(serverName, node.val());
           });
 
+          // final_total
           fd.append('final_total', state.final ? state.final.toString() : '0');
 
+          // booleans
+          fd.append('is_kitchen', selected.kitchen ? '1' : '0');
+          fd.append('is_vanity', selected.vanity ? '1' : '0');
+
+          // CSRF token header (fetch will include this header)
           var $btn = $('#save-quote');
           if ($btn.length) { $btn.prop('disabled', true); var oldLabel = $btn.text(); $btn.text('Saving...'); }
 
@@ -818,22 +835,30 @@
               'Accept': 'application/json'
             },
             body: fd
-          }).then(function (r) { return r.json().catch(function () { return {}; }); })
-            .then(function (json) {
-              if ($btn && $btn.length) { $btn.prop('disabled', false); $btn.text(oldLabel); }
-              if (json && json.success) {
-                alert(json.message || 'Saved successfully');
-                if (json.redirect) window.location.href = json.redirect;
-                else window.location.reload();
-              } else {
-                alert((json && json.message) ? json.message : 'Save failed');
-                console.error('Save response:', json);
+          }).then(function (r) {
+            return r.json().catch(function () { return {}; });
+          }).then(function (json) {
+            if ($btn && $btn.length) { $btn.prop('disabled', false); $btn.text(oldLabel); }
+            if (json && json.success) {
+              // If server passed pdf_url or redirect, honor it
+              if (json.redirect) { window.location.href = json.redirect; return; }
+              if (json.pdf_path) {
+                alert(json.message || 'Saved and PDF generated');
+                // optionally navigate to quote show page
+                // window.location.href = '/quotes/' + json.quote_id;
+                return;
               }
-            }).catch(function (err) {
-              if ($btn && $btn.length) { $btn.prop('disabled', false); $btn.text(oldLabel); }
-              alert('Save failed (network or server error)');
-              console.error(err);
-            });
+              alert(json.message || 'Saved successfully');
+              // window.location.reload();
+            } else {
+              alert((json && json.message) ? json.message : 'Save failed');
+              console.error('Save response:', json);
+            }
+          }).catch(function (err) {
+            if ($btn && $btn.length) { $btn.prop('disabled', false); $btn.text(oldLabel); }
+            alert('Save failed (network or server error)');
+            console.error(err);
+          });
         });
       }
 

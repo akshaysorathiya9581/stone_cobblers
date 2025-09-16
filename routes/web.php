@@ -48,10 +48,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->middleware('module:projects');
 
     // Quotes
-    Route::resource('quotes', QuoteController::class)
-        ->middleware('module:quotes');
-    Route::get('/quote/{type?}', [QuoteController::class, 'quote_form_show'])
-     ->name('quote.form.show');
+    Route::resource('quotes', QuoteController::class)->middleware('module:quotes');
+    Route::get('/quote/{type?}', [QuoteController::class, 'quote_form_show'])->name('quote.form.show');
+    Route::get('/quotes/{quote}/download', [QuoteController::class, 'download'])->name('quotes.download');
 
     // Files
     Route::resource('files', FileController::class)

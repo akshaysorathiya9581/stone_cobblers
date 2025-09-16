@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');           // linked to auth user (customer or staff)
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('project_id');        // linked to auth user (customer or staff)
             $table->string('quote_number');        // e.g. QT-2024-001
-            $table->string('customer_name')->nullable();     // optional free text
-            $table->string('project_name')->nullable();      // optional project label
-            $table->decimal('final_total', 15, 2)->default(0);
+            $table->decimal('subtotal', 12, 2)->default(0);
+            $table->decimal('tax', 12, 2)->default(0);
+            $table->decimal('discount', 12, 2)->default(0);
+            $table->decimal('total', 12, 2)->default(0);
+            $table->string('pdf_path')->nullable();
+            $table->boolean('is_kitchen')->default(false);
+            $table->boolean('is_vanity')->default(false);
             $table->enum('status', ['Draft', 'Sent', 'Approved', 'Rejected', 'Expired'])->default('Draft');
             $table->date('expires_at')->nullable(); // Expiry date of the quote
             $table->timestamps();

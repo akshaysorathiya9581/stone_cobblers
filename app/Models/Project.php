@@ -19,6 +19,12 @@ class Project extends Model
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
+    public function quotes()
+    {
+        return $this->hasMany(\App\Models\Quote::class);
+    }
+
+
     public function scopeActive($q)
     {
         return $q->whereNotIn('status', ['Completed', 'Cancelled']);

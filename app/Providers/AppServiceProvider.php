@@ -31,9 +31,9 @@ class AppServiceProvider extends ServiceProvider
                 ['section'=>'Main','title'=>'Quotes','icon'=>'icon-quotes','route'=>'admin.quotes.index','module'=>'quotes'],
 
                 // Management
-                ['section'=>'Management','title'=>'Reports','icon'=>'icon-reports','route'=>null,'module'=>'reports'],
+                // ['section'=>'Management','title'=>'Reports','icon'=>'icon-reports','route'=>null,'module'=>'reports'],
                 ['section'=>'Management','title'=>'Settings','icon'=>'icon-settings','route'=>null,'module'=>'settings'],
-                ['section'=>'Management','title'=>'Files','icon'=>'icon-files','route'=>'admin.files.index','module'=>'files'],
+                // ['section'=>'Management','title'=>'Files','icon'=>'icon-files','route'=>'admin.files.index','module'=>'files'],
 
                 // Quick Access
                 ['section'=>'Quick Access','title'=>'Starred','icon'=>'icon-starred','route'=>null,'module'=>null],
