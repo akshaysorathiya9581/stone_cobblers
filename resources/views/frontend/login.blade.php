@@ -90,7 +90,33 @@
 </div>
 
 <!-- Forgot Password Modal (hidden) -->
-<div id="forgotPasswordModal" class="modal" style="display:none;">
+<div class="modal" id="forgotPasswordModal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Reset your password</h2>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="login-modal__content">
+            <p>Enter the email address associated with your account. We'll send a link to reset your password.</p>
+            <br>
+            <form id="forgotForm">
+                @csrf
+                <div class="form-group">
+                    <label for="forgot-email" class="form-label">Email</label>
+                    <input type="email" name="email" id="forgot-email" class="form-input" placeholder="Enter your email" required>
+                    <div class="error-message" id="forgotEmailError" style="display:none"></div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn primary" id="forgotSubmit">Send reset link</button>
+                    <button type="button" class="btn secondary" data-close-modal>Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- <div id="forgotPasswordModal" class="modal" style="display:none;">
   <div class="modal-inner">
     <button class="close-modal" data-close-modal>&times;</button>
     <h3>Reset your password</h3>
@@ -112,7 +138,7 @@
       </div>
     </form>
   </div>
-</div>
+</div> -->
 
 @endsection
 
@@ -293,6 +319,20 @@
         if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = 'dashboard.html';
         }
+
     });
+
+    function closeModal() {
+        document.getElementById('forgotPasswordModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('forgotPasswordModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
 </script>
 @endpush

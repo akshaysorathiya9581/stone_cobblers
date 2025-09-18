@@ -24,7 +24,7 @@
                     <i>➕</i> New Customer
                 </a>
 
-                <a href="/account" class="user-avatar" aria-label="Open profile">BM</a>
+                <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
             </div>
         </div>
 
