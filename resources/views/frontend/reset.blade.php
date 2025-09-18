@@ -1,41 +1,53 @@
 @extends('layouts.frontend')
 
-@section('title','Reset password')
+@section('title', 'Reset password')
+
+@push('css')
+
+@endpush
 
 @section('content')
-<div class="main-content">
-  <div class="reset-container">
-    <h1>Reset Password</h1>
 
-    @if(session('status'))
-      <div class="alert success">{{ session('status') }}</div>
-    @endif
+  <div class="main-content">
+    <div class="login-main">
+      <div class="login-container">
+        <div class="logo-section">
+          <div class="logo-icon">SC</div>
+          <h1 class="company-name">Reset Password</h1>
+        </div>
 
-    <form method="POST" action="{{ route('password.update') }}">
-      @csrf
-      <input type="hidden" name="token" value="{{ $token }}">
+        @if(session('status'))
+          <div class="alert success">{{ session('status') }}</div>
+        @endif
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required autofocus>
-        @error('email') <div class="error-message">{{ $message }}</div> @enderror
+
+        <form class="login-form" method="POST" action="{{ route('password.update') }}">
+          @csrf
+          <input type="hidden" name="token" value="{{ $token }}">
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input id="email" type="email" name="email" value="{{ old('email', $email) }}"  class="form-input" placeholder="Enter your email" required autofocus>
+            @error('email') <div class="error-message">{{ $message }}</div> @enderror
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">New password</label>
+            <input id="password" type="password" name="password" class="form-input" required>
+            @error('password') <div class="error-message">{{ $message }}</div> @enderror
+          </div>
+
+          <div class="form-group">
+            <label for="password_confirmation" class="form-label">Confirm password</label>
+            <input id="password_confirmation" type="password" name="password_confirmation" class="form-input" required>
+          </div>
+
+          <div style="margin-top:12px;">
+            <button type="submit" class="btn theme">Reset password</button>
+          </div>
+        </form>
       </div>
-
-      <div class="form-group">
-        <label for="password">New password</label>
-        <input id="password" type="password" name="password" required>
-        @error('password') <div class="error-message">{{ $message }}</div> @enderror
-      </div>
-
-      <div class="form-group">
-        <label for="password_confirmation">Confirm password</label>
-        <input id="password_confirmation" type="password" name="password_confirmation" required>
-      </div>
-
-      <div style="margin-top:12px;">
-        <button type="submit" class="btn primary">Reset password</button>
-      </div>
-    </form>
+    </div>
   </div>
-</div>
+
 @endsection

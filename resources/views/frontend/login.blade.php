@@ -67,11 +67,11 @@
                 </div>
             </form>
         
-            <div class="divider">
+            <!-- <div class="divider">
                 <span>or continue with</span>
-            </div>
+            </div> -->
         
-            <div class="social-login">
+            <!-- <div class="social-login">
                 <button class="social-button" id="googleLogin">
                     <span>🔍</span>
                     Google
@@ -80,11 +80,11 @@
                     <span>🪟</span>
                     Microsoft
                 </button>
-            </div>
+            </div> -->
         
-            <div class="footer-text">
+            <!-- <div class="footer-text">
                 Don't have an account? <a href="#" id="signupLink">Sign up</a>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -107,38 +107,14 @@
                     <input type="email" name="email" id="forgot-email" class="form-input" placeholder="Enter your email" required>
                     <div class="error-message" id="forgotEmailError" style="display:none"></div>
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="btn primary" id="forgotSubmit">Send reset link</button>
+                <div class="form__btn-group">
                     <button type="button" class="btn secondary" data-close-modal>Cancel</button>
+                    <button type="submit" class="btn theme" id="forgotSubmit">Send reset link</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<!-- <div id="forgotPasswordModal" class="modal" style="display:none;">
-  <div class="modal-inner">
-    <button class="close-modal" data-close-modal>&times;</button>
-    <h3>Reset your password</h3>
-    <p>Enter the email address associated with your account. We'll send a link to reset your password.</p>
-
-    <div id="forgot-msg" style="display:none;" class="muted"></div>
-
-    <form id="forgotForm">
-      @csrf
-      <div class="form-group">
-        <label for="forgot-email">Email</label>
-        <input type="email" name="email" id="forgot-email" class="form-input" required>
-        <div class="error-message" id="forgotEmailError" style="display:none"></div>
-      </div>
-
-      <div style="margin-top:12px;">
-        <button type="submit" class="btn primary" id="forgotSubmit">Send reset link</button>
-        <button type="button" class="btn secondary" data-close-modal>Cancel</button>
-      </div>
-    </form>
-  </div>
-</div> -->
 
 @endsection
 
