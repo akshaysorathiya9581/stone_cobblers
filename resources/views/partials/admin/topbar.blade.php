@@ -5,6 +5,6 @@
     <div class="header-actions">
         <button class="header-btn secondary">📤 Export</button>
         <button class="header-btn primary">➕ Add</button>
-        <div class="user-avatar">AD</div>
+        <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
     </div>
 </div>

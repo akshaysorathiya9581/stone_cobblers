@@ -23,7 +23,7 @@
                 <a href="{{ route('admin.projects.create') }}" class="header-btn primary">
                     <i>➕</i> New Project
                 </a>
-                <div class="user-avatar">BM</div>
+                <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
             </div>
         </div>
 

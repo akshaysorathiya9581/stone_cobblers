@@ -19,7 +19,7 @@
             <div class="header-actions">
                 <a href="#export" class="header-btn secondary" role="button"><i>📤</i> Export</a>
                 <a href="{{ route('admin.projects.create') }}" class="header-btn primary" role="button"><i>➕</i> New Project</a>
-                <div class="user-avatar">BM</div>
+                <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
             </div>
         </div>
 
