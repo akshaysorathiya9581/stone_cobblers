@@ -12,28 +12,31 @@ class UserSeeder extends Seeder
         // Admin
         User::create([
             'name' => 'Admin User',
+            'first_name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
-            'modules' => json_encode(['dashboard', 'customers', 'projects', 'reports', 'settings']),
+            'modules' => null,
         ]);
 
         // Customer
         User::create([
             'name' => 'Customer User',
+            'first_name' => 'Customer',
             'email' => 'customer@example.com',
             'password' => Hash::make('password'),
             'role' => 'customer',
-            'modules' => json_encode(['dashboard', 'projects']),
+            'modules' => json_encode(['dashboard', 'projects','files','quotes']),
         ]);
-
+        
         // Designer
         User::create([
             'name' => 'Designer User',
+            'first_name' => 'Designer',
             'email' => 'designer@example.com',
             'password' => Hash::make('password'),
             'role' => 'designer',
-            'modules' => json_encode(['dashboard', 'projects', 'files']),
+            'modules' => json_encode(['dashboard', 'projects']),
         ]);
     }
 }

@@ -61,13 +61,18 @@ class User extends Authenticatable
      */
     public function hasModule(string $module): bool
     {
-        // dd(json_decode($this->modules));
         if (empty($this->modules)) {
-            // echo "DSds"; die();
             return true; // full access for admins
         }
 
-        return in_array($module, json_decode($this->modules) ?? []);
+        $decoded = json_decode($this->modules, true);
+
+        // Handle double-encoded strings
+        if (is_string($decoded)) {
+            $decoded = json_decode($decoded, true);
+        }
+
+        return in_array($module, $decoded ?? []);
     }
 
     public function projects()

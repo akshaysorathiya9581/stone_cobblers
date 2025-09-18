@@ -55,7 +55,7 @@
                         <input type="checkbox" id="rememberMe" name="remember">
                         <span>Remember me</span>
                     </label>
-                    <a href="#" class="forgot-password">Forgot password?</a>
+                    <a href="#" class="forgot-password" id="forgotPasswordLink">Forgot password?</a>
                 </div>
         
                 <button type="submit" class="login-button" id="loginButton">
@@ -89,6 +89,31 @@
     </div>
 </div>
 
+<!-- Forgot Password Modal (hidden) -->
+<div id="forgotPasswordModal" class="modal" style="display:none;">
+  <div class="modal-inner">
+    <button class="close-modal" data-close-modal>&times;</button>
+    <h3>Reset your password</h3>
+    <p>Enter the email address associated with your account. We'll send a link to reset your password.</p>
+
+    <div id="forgot-msg" style="display:none;" class="muted"></div>
+
+    <form id="forgotForm">
+      @csrf
+      <div class="form-group">
+        <label for="forgot-email">Email</label>
+        <input type="email" name="email" id="forgot-email" class="form-input" required>
+        <div class="error-message" id="forgotEmailError" style="display:none"></div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button type="submit" class="btn primary" id="forgotSubmit">Send reset link</button>
+        <button type="button" class="btn secondary" data-close-modal>Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -97,119 +122,177 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
 
 <script>
-$(function () {
-    const loginForm = $('#loginForm');
-    const emailInput = $('#email');
-    const passwordInput = $('#password');
-    const loginButton = $('#loginButton');
+    $(function () {
 
-    // ✅ Password toggle
-    $('#passwordToggle').on('click', function () {
-        let type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
-        passwordInput.attr('type', type);
-        $(this).text(type === 'password' ? '👁️' : '🙈');
-    });
+        // show modal
+        $('#forgotPasswordLink').on('click', function(e){
+            e.preventDefault();
+            $('#forgotPasswordModal').show().attr('aria-hidden','false');
+            $('#forgot-msg').hide();
+            $('#forgot-email').val('');
+            $('#forgotEmailError').hide();
+        });
 
-    // ✅ Validate email
-    function validateEmail(email) {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    }
+        // close modal
+        $(document).on('click', '[data-close-modal]', function(){
+            $(this).closest('.modal').hide().attr('aria-hidden','true');
+        });
 
-    // ✅ Show/Hide error
-    function showError(selector, message) {
-        $(selector).text(message).show();
-    }
-    function hideError(selector) {
-        $(selector).text('').hide();
-    }
+        // submit forgot password
+        $('#forgotForm').on('submit', function(e){
+            e.preventDefault();
 
-    // ✅ Real-time validation
-    emailInput.on('input', function () {
-        if ($(this).val() && !validateEmail($(this).val())) {
-            showError('#emailError', 'Please enter a valid email address');
-        } else {
-            hideError('#emailError');
-        }
-    });
+            var $btn = $('#forgotSubmit');
+            $btn.prop('disabled', true).text('Sending...');
 
-    passwordInput.on('input', function () {
-        if ($(this).val() && $(this).val().length < 6) {
-            showError('#passwordError', 'Password must be at least 6 characters');
-        } else {
-            hideError('#passwordError');
-        }
-    });
-
-    // ✅ Submit form with AJAX
-    loginForm.on('submit', function (e) {
-        e.preventDefault();
-
-        let email = emailInput.val().trim();
-        let password = passwordInput.val().trim();
-        let isValid = true;
-
-        hideError('#emailError');
-        hideError('#passwordError');
-
-        if (!email) {
-            showError('#emailError', 'Email is required');
-            isValid = false;
-        } else if (!validateEmail(email)) {
-            showError('#emailError', 'Please enter a valid email address');
-            isValid = false;
-        }
-
-        if (!password) {
-            showError('#passwordError', 'Password is required');
-            isValid = false;
-        } else if (password.length < 6) {
-            showError('#passwordError', 'Password must be at least 6 characters');
-            isValid = false;
-        }
-
-        if (isValid) {
-            loginButton.prop('disabled', true).text('Signing in...');
+            var data = $(this).serialize();
 
             $.ajax({
-                url: "{{ route('login.post') }}",
-                type: "POST",
+                url: "{{ route('password.email') }}",
+                method: "POST",
                 dataType: "json",
-                data: loginForm.serialize(),
-                success: function (res) {
-                    if(res.status) {
-                        toastr.success(res.message);
-                        setTimeout(() => window.location.href = res.redirect, 200);
-                    } else {
-                        toastr.error(res.message || "Login failed. Please try again.");
-                    }
-                    loginButton.prop('disabled', false).text('Sign In');
-                },
-                error: function (xhr) {
-                    loginButton.prop('disabled', false).text('Sign In');
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        $.each(errors, function (key, val) {
-                            $('#' + key + 'Error').text(val[0]).show();
-                        });
-                    } else {
-                        toastr.error("Login failed. Please try again.");
+                data: data
+            }).done(function(res){
+                if (res && res.status) {
+                    toastr.success(res.message || 'Email sent. Check your inbox.');
+                    $('#forgot-msg').text(res.message || 'Email sent.').show();
+                    // optionally auto-close after a few seconds
+                    setTimeout(function(){ $('#forgotPasswordModal').hide(); }, 1800);
+                } else {
+                    toastr.error(res && res.message ? res.message : 'Failed to send reset email.');
+                    if (res && res.errors && res.errors.email) {
+                        $('#forgotEmailError').text(res.errors.email[0]).show();
                     }
                 }
+            }).fail(function(xhr){
+                if (xhr.status === 422) {
+                    var json = xhr.responseJSON || {};
+                    var errs = json.errors || {};
+                    if (errs.email) {
+                        $('#forgotEmailError').text(errs.email[0]).show();
+                    } else {
+                        toastr.error('Validation error.');
+                    }
+                } else {
+                    toastr.error('Failed to send reset email.');
+                }
+            }).always(function(){
+                $btn.prop('disabled', false).text('Send reset link');
             });
+        });
+    
+        const loginForm = $('#loginForm');
+        const emailInput = $('#email');
+        const passwordInput = $('#password');
+        const loginButton = $('#loginButton');
+
+        // ✅ Password toggle
+        $('#passwordToggle').on('click', function () {
+            let type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+            passwordInput.attr('type', type);
+            $(this).text(type === 'password' ? '👁️' : '🙈');
+        });
+
+        // ✅ Validate email
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        // ✅ Show/Hide error
+        function showError(selector, message) {
+            $(selector).text(message).show();
+        }
+        function hideError(selector) {
+            $(selector).text('').hide();
+        }
+
+        // ✅ Real-time validation
+        emailInput.on('input', function () {
+            if ($(this).val() && !validateEmail($(this).val())) {
+                showError('#emailError', 'Please enter a valid email address');
+            } else {
+                hideError('#emailError');
+            }
+        });
+
+        passwordInput.on('input', function () {
+            if ($(this).val() && $(this).val().length < 6) {
+                showError('#passwordError', 'Password must be at least 6 characters');
+            } else {
+                hideError('#passwordError');
+            }
+        });
+
+        // ✅ Submit form with AJAX
+        loginForm.on('submit', function (e) {
+            e.preventDefault();
+
+            let email = emailInput.val().trim();
+            let password = passwordInput.val().trim();
+            let isValid = true;
+
+            hideError('#emailError');
+            hideError('#passwordError');
+
+            if (!email) {
+                showError('#emailError', 'Email is required');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                showError('#emailError', 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            if (!password) {
+                showError('#passwordError', 'Password is required');
+                isValid = false;
+            } else if (password.length < 6) {
+                showError('#passwordError', 'Password must be at least 6 characters');
+                isValid = false;
+            }
+
+            if (isValid) {
+                loginButton.prop('disabled', true).text('Signing in...');
+
+                $.ajax({
+                    url: "{{ route('login.post') }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: loginForm.serialize(),
+                    success: function (res) {
+                        if(res.status) {
+                            toastr.success(res.message);
+                            setTimeout(() => window.location.href = res.redirect, 200);
+                        } else {
+                            toastr.error(res.message || "Login failed. Please try again.");
+                        }
+                        loginButton.prop('disabled', false).text('Sign In');
+                    },
+                    error: function (xhr) {
+                        loginButton.prop('disabled', false).text('Sign In');
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, val) {
+                                $('#' + key + 'Error').text(val[0]).show();
+                            });
+                        } else {
+                            toastr.error("Login failed. Please try again.");
+                        }
+                    }
+                });
+            }
+        });
+
+        // ✅ Social login placeholders
+        $('#googleLogin').on('click', () => alert('Google login functionality would be implemented here'));
+        $('#microsoftLogin').on('click', () => alert('Microsoft login functionality would be implemented here'));
+        $('#signupLink').on('click', (e) => { e.preventDefault(); alert('Sign up functionality would be implemented here'); });
+        // $('.forgot-password').on('click', (e) => { e.preventDefault(); alert('Password reset functionality would be implemented here'); });
+
+        // ✅ Redirect if already logged in (localStorage dummy check)
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'dashboard.html';
         }
     });
-
-    // ✅ Social login placeholders
-    $('#googleLogin').on('click', () => alert('Google login functionality would be implemented here'));
-    $('#microsoftLogin').on('click', () => alert('Microsoft login functionality would be implemented here'));
-    $('#signupLink').on('click', (e) => { e.preventDefault(); alert('Sign up functionality would be implemented here'); });
-    $('.forgot-password').on('click', (e) => { e.preventDefault(); alert('Password reset functionality would be implemented here'); });
-
-    // ✅ Redirect if already logged in (localStorage dummy check)
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-        window.location.href = 'dashboard.html';
-    }
-});
 </script>
 @endpush
