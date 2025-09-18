@@ -10,6 +10,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\KitchenQuoteController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\ProfileController;
 
 
 use Illuminate\Support\Facades\Artisan;
@@ -38,6 +39,10 @@ Route::get('/clear-cache', function () {
 
 // Admin Routes
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    
     // Dashboard (module: dashboard)
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard')
