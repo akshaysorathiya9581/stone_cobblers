@@ -19,7 +19,7 @@ class ResetPasswordController extends Controller
     public function showResetForm(Request $request, $token = null)
     {
         // Render a blade that includes token + email fields
-        return view('auth.passwords.reset')->with(
+        return view('frontend.reset')->with(
             ['token' => $token, 'email' => $request->query('email', '')]
         );
     }
