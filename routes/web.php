@@ -66,8 +66,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/quotes/{quote}/download', [QuoteController::class, 'download'])->name('quotes.download');
 
     // Files
-    Route::resource('files', FileController::class)
-        ->middleware('module:files');
+    Route::resource('files', FileController::class)->middleware('module:files');
+    Route::get('files/{file}/image', [FileController::class, 'image'])->name('files.image')->middleware('module:files');
+    Route::get('files/{file}/download', [FileController::class, 'download'])->name('files.download')->middleware('module:files');
+    // Route::delete('files/{file}', [FileController::class, 'destroy'])->name('files.destroy');
 
     // kitchen quotes
     // Route::resource('kitchen-quotes', KitchenQuoteController::class)
