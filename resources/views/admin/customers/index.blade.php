@@ -10,24 +10,13 @@
 <!-- Main Content -->
 <div class="main-content">
     <!-- Header -->
-    <div class="header">
-        <div class="search-bar">
-            <i>🔍</i>
-            <input type="text" placeholder="Search customers, email, phone...">
-        </div>
+   <x-header
+    :export-url="null"
+    :create-url="route('admin.customers.create')"
+    export-label="Export Customers"
+    create-label="New Customer"
+/>
 
-        <div class="header-actions">
-            <a href="#export" class="header-btn secondary" role="button">
-                <i>📤</i> Export
-            </a>
-
-            <a href="{{ route('admin.customers.create') }}" class="header-btn primary" role="button">
-                <i>➕</i> New Customer
-            </a>
-
-            <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
-        </div>
-    </div>
 
     <!-- Content -->
     <div class="content">

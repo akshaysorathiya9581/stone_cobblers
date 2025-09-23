@@ -8,7 +8,6 @@
 
 @section('content')
   <div class="main-content">
-
     <!-- Header -->
     <div class="header">
       <div class="search-bar">
@@ -17,13 +16,13 @@
       </div>
 
       <div class="header-actions">
-        <button class="header-btn secondary">
+        {{-- <button class="header-btn secondary">
           <i>📤</i> Export
         </button>
         <button class="header-btn primary">
           <i>➕</i> New Quote
-        </button>
-        <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
+        </button> --}}
+        <a href="{{ route('admin.profile.edit') }}" class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U',0,2)) : 'U' }}</a>
       </div>
     </div>
 

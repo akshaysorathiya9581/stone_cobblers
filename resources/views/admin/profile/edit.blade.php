@@ -13,13 +13,7 @@
         </div>
 
         <div class="header-actions">
-            <a href="#" class="header-btn secondary">
-                <i>📤</i> Export
-            </a>
-            <a href="{{ route('admin.quotes.create') }}" class="header-btn primary">
-                <i>➕</i> New Quote
-            </a>
-            <div class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U',0,2)) : 'U' }}</div>
+            <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U',0,2)) : 'U' }}</a>
         </div>
     </div>
 
@@ -49,15 +43,15 @@
                 <div class="form-group__grp">
                     <div class="form-group">
                         <label class="form-label">City</label>
-                        <input type="text" name="" class="form-input">
+                        <input type="text" name="city" class="form-input" value="{{ old('city', $user->city) }}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">State</label>
-                        <input type="text" name="" class="form-input">
+                        <input type="text" name="state" class="form-input" value="{{ old('state', $user->state) }}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Country</label>
-                        <input type="text" name="" class="form-input">
+                        <label class="form-label">zipCode</label>
+                        <input type="text" name="zipCode" class="form-input" value="{{ old('zipCode', $user->zipCode) }}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Phone</label>

@@ -12,22 +12,12 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <div class="header">
-            <div class="search-bar">
-                <i>🔍</i>
-                <input id="quote-search" type="text" placeholder="Search quotes, customers...">
-            </div>
-
-            <div class="header-actions">
-                <a href="#" class="header-btn secondary">
-                    <i>📤</i> Export
-                </a>
-                <a href="{{ route('admin.quotes.create') }}" class="header-btn primary">
-                    <i>➕</i> New Quote
-                </a>
-                <div class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U',0,2)) : 'U' }}</div>
-            </div>
-        </div>
+        <x-header
+		:export-url="null"
+		:create-url="route('admin.quotes.create')"
+		export-label="Export Quote"
+		create-label="New Quote"
+	/>
 
         <!-- Content -->
         <div class="content">

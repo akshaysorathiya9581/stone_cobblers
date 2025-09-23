@@ -33,12 +33,12 @@
         </div>
     </div>
 
-    {{-- <div class="header">
+    <div class="header">
         <h1 class="content-title">Upload New Files</h1>
         <div class="header-actions">
             <a href="{{ route('admin.files.index') }}" class="header-btn secondary">📂 View All Files</a>
         </div>
-    </div> --}}
+    </div>
 
     <div class="content">
 

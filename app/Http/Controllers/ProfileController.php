@@ -25,11 +25,14 @@ class ProfileController extends Controller
             'email'  => 'required|email|unique:users,email,' . $user->id,
             'phone'  => 'nullable|string|max:20',
             'address'=> 'nullable|string|max:255',
+            'city'   => 'nullable|string|max:100',
+            'state'  => 'nullable|string|max:100',
+            'zipCode'=> 'nullable|max:20',
         ]);
 
-        $user->update($request->only(['name', 'email', 'phone', 'address']));
+        $user->update($request->only(['name', 'email', 'phone', 'address', 'city', 'state', 'zipCode']));
 
-        return redirect()->back()->with('success', 'Profile updated successfully.');
+        return redirect()->back()->with('message', 'Profile updated successfully.');
     }
 
     // Update password
@@ -48,6 +51,6 @@ class ProfileController extends Controller
 
         $user->update(['password' => Hash::make($request->new_password)]);
 
-        return back()->with('success', 'Password changed successfully.');
+        return back()->with('message', 'Password changed successfully.');
     }
 }

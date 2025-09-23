@@ -10,22 +10,12 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <div class="header">
-            <div class="search-bar">
-                <i>🔍</i>
-                <input type="text" placeholder="Search projects, customers, status...">
-            </div>
-
-            <div class="header-actions">
-                <button class="header-btn secondary">
-                    <i>📤</i> Export
-                </button>
-                <a href="{{ route('admin.projects.create') }}" class="header-btn primary">
-                    <i>➕</i> New Project
-                </a>
-                <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
-            </div>
-        </div>
+        <x-header
+            :export-url="null"
+            :create-url="route('admin.projects.create')"
+            export-label="Export Project"
+            create-label="New Project"
+        />
 
         <!-- Content -->
         <div class="content bg-content">
