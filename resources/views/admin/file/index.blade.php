@@ -25,7 +25,22 @@
 
 @section('content')
 <div class="main-content">
-    <div class="header" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+     <!-- Header -->
+        <div class="header">
+            <div class="search-bar">
+                <i>🔍</i>
+                <input type="text" placeholder="Search projects, customers, status..." id="global-search">
+            </div>
+
+            <div class="header-actions">
+                <button class="header-btn secondary">
+                    <i>📤</i> Export
+                </button>
+                <a href="{{ route('admin.files.create') }}" class="header-btn primary">➕ Upload Files</a>
+                <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
+            </div>
+        </div>
+    {{-- <div class="header" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
         <div class="search-bar">
             <i>🔍</i>
             <input type="text" placeholder="Search files..." id="global-search">
@@ -34,7 +49,7 @@
         <div class="header-actions">
             <a href="{{ route('admin.files.create') }}" class="header-btn primary">➕ Upload Files</a>
         </div>
-    </div>
+    </div> --}}
 
     <div class="content" style="margin-top:16px;">
         <div class="content-header" style="display:flex; justify-content:space-between; align-items:center;">

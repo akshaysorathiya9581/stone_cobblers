@@ -19,11 +19,26 @@
 @section('content')
 <div class="main-content">
     <div class="header">
+        <div class="search-bar">
+            <i>🔍</i>
+            <input type="text" placeholder="Search projects, customers, status..." id="global-search">
+        </div>
+
+        <div class="header-actions">
+            <button class="header-btn secondary">
+                <i>📤</i> Export
+            </button>
+            <a href="{{ route('admin.files.index') }}" class="header-btn primary">📂 View All Files</a>
+            <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
+        </div>
+    </div>
+
+    {{-- <div class="header">
         <h1 class="content-title">Upload New Files</h1>
         <div class="header-actions">
             <a href="{{ route('admin.files.index') }}" class="header-btn secondary">📂 View All Files</a>
         </div>
-    </div>
+    </div> --}}
 
     <div class="content">
 

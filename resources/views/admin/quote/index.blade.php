@@ -123,7 +123,7 @@
                                     @endif
 
                                     @if($quote->status === 'Draft')
-                                        <a href="#" class="action-btn edit">Edit</a>
+                                        {{-- <a href="#" class="action-btn edit">Edit</a> --}}
                                         <a href="#" class="action-btn send">Send</a>
                                     @endif
                                 </td>
