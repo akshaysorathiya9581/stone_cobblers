@@ -101,3 +101,48 @@ if (!function_exists('get_progress_list')) {
         return $data;
     }
 }
+
+if (! function_exists('format_money_short')) {
+    /**
+     * Format a number as compact currency string (e.g. $2.4M, ₹1.2K).
+     *
+     * @param  float|int|null  $value
+     * @param  string $currency  Currency symbol (default: '₹')
+     * @param  int    $precision Decimal precision for abbreviated number (default: 1)
+     * @return string
+     */
+    function format_money_short($value, $currency = '₹', $precision = 1)
+    {
+        if ($value === null) {
+            return $currency . '0';
+        }
+
+        $neg = $value < 0;
+        $value = abs((float) $value);
+
+        if ($value < 1000) {
+            // show whole number if integer, otherwise show with precision
+            $dec = ($value == floor($value)) ? 0 : $precision;
+            $formatted = number_format($value, $dec, '.', ',');
+            return ($neg ? '-' : '') . $currency . $formatted;
+        }
+
+        $units = ['', 'K', 'M', 'B', 'T'];
+        foreach ($units as $i => $suffix) {
+            $unitValue = pow(1000, $i);
+            $nextUnitValue = $unitValue * 1000;
+            if ($value < $nextUnitValue) {
+                $short = $value / $unitValue;
+                $short = number_format($short, $precision, '.', ',');
+                // remove trailing zeros like 2.0 -> 2
+                $short = rtrim(rtrim($short, '0'), '.');
+                return ($neg ? '-' : '') . $currency . $short . $suffix;
+            }
+        }
+
+        // Fallback (very large numbers)
+        $short = number_format($value, $precision, '.', ',');
+        $short = rtrim(rtrim($short, '0'), '.');
+        return ($neg ? '-' : '') . $currency . $short;
+    }
+}

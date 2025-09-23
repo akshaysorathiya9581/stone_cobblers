@@ -63,7 +63,7 @@
             </div>
             <div class="stat-card">
                 <h3>Total Revenue</h3>
-                <div class="value">$2.4M</div>
+                <div class="value">{{ format_money_short($totalRevenue ?? 0, '$') }}</div>
                 <div class="change">+18% vs last year</div>
             </div>
         </div>
@@ -119,7 +119,7 @@
 
                         <!-- Total Value -->
                         <td class="total-value">
-                            ${{ number_format($customer->total_value ?? 0, 2) }}
+                            ${{ number_format($customer->quotes_sum_total ?? 0, 2) }}
                         </td>
 
                         <!-- Projects Count -->
@@ -142,7 +142,7 @@
                         <!-- Actions -->
                         <td class="actions">
                             <button class="action-btn view">View</button>
-                            <button class="action-btn contact">Contact</button>
+                            <button class="action-btn contact-btn" data-id="{{ $customer->id }}">Contact</button>
                         </td>
                     </tr>
                     @endforeach
@@ -162,6 +162,86 @@
 @push('scripts')
 <script>
     $(function() {
+       // ensure CSRF header for all ajax requests
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+    $(document).on('click', '.contact-btn', function () {
+        var $btn = $(this);
+        var userId = $btn.data('id');
+        var $row = $('#row-' + userId);
+
+        // prevent if already processing
+        if ($btn.data('processing')) return;
+
+        // store original state so we can restore later
+        var originalHtml = $btn.html();
+        $btn.data('original-html', originalHtml);
+
+        // set processing flag
+        $btn.data('processing', true);
+
+        // disable button and show spinner + text
+        // using Bootstrap spinner markup; if you don't use bootstrap, the spinner span will still show plain text
+        $btn.prop('disabled', true).html(
+            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...'
+        );
+
+        // build URL using Laravel named route template
+        var urlTemplate = "{{ route('admin.customers.updateLastContact', ':id') }}";
+        var requestUrl = urlTemplate.replace(':id', userId);
+
+        $.ajax({
+            url: requestUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                // token not required here because header is set, but harmless:
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    // update DOM
+                    $row.find('.last-contact').text(res.last_contact);
+
+                    if (window.toastr) {
+                        toastr.success(res.message);
+                    } else {
+                        alert(res.message);
+                    }
+                } else {
+                    var msg = res.message || 'Something went wrong.';
+                    if (window.toastr) {
+                        toastr.error(msg);
+                    } else {
+                        alert(msg);
+                    }
+                }
+            },
+            error: function (xhr) {
+                var msg = 'Server error.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                if (window.toastr) {
+                    toastr.error(msg);
+                } else {
+                    alert(msg);
+                }
+            },
+            complete: function () {
+                // restore button state
+                var orig = $btn.data('original-html') || originalHtml;
+                $btn.prop('disabled', false).html(orig);
+                $btn.data('processing', false);
+                $btn.removeData('original-html');
+            }
+        });
+    });
+
         var $tabs = $('.tabs .tab'),
             $rows = $('.customers-table table tbody tr'), // ✅ changed selector
             $empty = $('.no-customers');

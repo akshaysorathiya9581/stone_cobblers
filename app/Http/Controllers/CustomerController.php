@@ -4,23 +4,39 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CustomerContactedMail;
+
 use App\Models\User;
+use App\Models\Quote;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+
         // Get all users with customer role
         $customers = User::where('role', 'customer')
         ->withCount('projects')
-        ->withSum('projects', 'budget') // assuming projects table has `budget`
+        ->withSum('quotes', 'total') // assuming quotes table has `total`
+        ->orderBy('created_at', 'desc')
         ->get();
-
+        
+        // dd($customers);
         $totalCustomers   = User::count();
         $activeCustomers  = User::where('status', 'Active')->count();
         $vipCustomers     = User::where('status', 'VIP')->count();
 
-        return view('admin.customers.index', compact('customers', 'totalCustomers', 'activeCustomers', 'vipCustomers'));
+        if ($user->role === 'admin') {
+            $totalRevenue = Quote::sum('total');
+        } elseif ($user->role === 'customer') {
+            $totalRevenue = Quote::where('user_id', $user->id)->sum('total');
+        }
+
+        return view('admin.customers.index', compact('customers', 'totalCustomers', 'activeCustomers', 'vipCustomers', 'totalRevenue'));
     }
 
     public function create()
@@ -125,5 +141,29 @@ class CustomerController extends Controller
         }
 
         return response()->json(['unique' => true, 'message' => '']);
+    }
+
+    public function updateLastContact($id, Request $request)
+    {
+        $customer = User::find($id);
+
+        if (! $customer) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Customer not found.'
+            ], 404);
+        }
+
+        $customer->last_contact = now();
+        $customer->save();
+
+        // Send mail to customer
+        Mail::to($customer->email)->send(new CustomerContactedMail($customer));
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Last contact updated and email sent successfully.',
+            'last_contact' => $customer->last_contact->toDateTimeString()
+        ]);
     }
 }

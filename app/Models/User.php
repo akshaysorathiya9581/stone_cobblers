@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Project;
+use App\Models\Quote;
 
 class User extends Authenticatable
 {
@@ -78,6 +80,12 @@ class User extends Authenticatable
     public function projects()
     {
         return $this->hasMany(Project::class, 'user_id');
+    }
+
+    public function quotes()
+    {
+        // quotes table should have `user_id` FK referring to users.id
+        return $this->hasMany(Quote::class, 'user_id', 'id');
     }
 
     /**

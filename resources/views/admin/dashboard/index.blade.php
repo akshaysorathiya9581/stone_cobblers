@@ -56,7 +56,7 @@
             </div>
             <div class="stat-card">
                 <h3>Pending Quotes</h3>
-                <div class="value">23</div>
+                <div class="value">{{ ($pendingQuotes) ? $pendingQuotes['total'] : 0 }}</div>
                 <div class="change">-3% this week</div>
             </div>
             <div class="stat-card">

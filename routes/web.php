@@ -53,8 +53,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->name('customers.check-email')
         ->middleware('module:customers');
 
-    Route::resource('customers', CustomerController::class)
-        ->middleware('module:customers');
+    Route::resource('customers', CustomerController::class)->middleware('module:customers');
+    Route::post('/customers/{id}/contact', [CustomerController::class, 'updateLastContact'])->name('customers.updateLastContact');
+
 
     // Projects
     Route::resource('projects', ProjectController::class)

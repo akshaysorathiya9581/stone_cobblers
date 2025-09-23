@@ -117,7 +117,7 @@
                                 <td class="date">{{ optional($quote->expires_at)->format('M d, Y') }}</td>
                                 <td class="actions">
                                     @if($quote->pdf_path)
-                                        <button type="button" class="action-btn view" onclick="openPdf('{{ $pdfRoute }}')">View</button>
+                                        <button type="button" class="action-btn view" onclick="openPdf('{{ $pdfRoute }}')">Download</button>
                                     @else
                                         <span class="muted">No PDF</span>
                                     @endif

@@ -139,6 +139,7 @@ $(function(){
             success: function(res){
                 toastr.clear();
                 toastr.success(res.message || 'Uploaded successfully');
+                window.location.href = "{{ route('admin.files.index') }}";
             },
             error: function(xhr){
                 toastr.clear();

@@ -90,7 +90,7 @@
                         <th>Progress</th>
                         <th>Status</th>
                         <th>Timeline</th>
-                        <th>Team</th>
+                        {{-- <th>Team</th> --}}
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -164,7 +164,7 @@
                         </td>
 
                         {{-- Team --}}
-                        <td>{{ $project->team ?? 'Unassigned' }}</td>
+                        {{-- <td>{{ $project->team ?? 'Unassigned' }}</td> --}}
 
                         {{-- Actions --}}
                         <td class="actions">
