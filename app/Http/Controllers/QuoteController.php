@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Mail\QuoteSentMail;
+use App\Mail\QuoteStatusChangedMail;
+use Illuminate\Support\Facades\Mail;
 
 class QuoteController extends Controller
 {
@@ -405,5 +408,107 @@ class QuoteController extends Controller
         $count = DB::table('quotes')->where('quote_number', 'like', $prefix . '%')->count();
         $seq = $count + 1;
         return $prefix . str_pad($seq, 3, '0', STR_PAD_LEFT);
+    }
+
+    // Send quote to customer (mark Sent and email)
+    public function send(Request $request, Quote $quote)
+    {
+        // authorize if needed: $this->authorize('send', $quote);
+
+        if ($quote->status === 'Sent') {
+            return response()->json(['status' => 'error', 'message' => 'Quote already sent.'], 422);
+        }
+
+        $quote->status = 'Sent';
+        $quote->sent_at = now(); // optional timestamp column
+        $quote->save();
+
+        // send mail (wrap in try/catch)
+        try {
+            $customer = optional($quote->project)->customer;
+            if ($customer && $customer->email) {
+                Mail::to($customer->email)->send(new QuoteSentMail($quote));
+            }
+        } catch (\Throwable $e) {
+            Log::error('Quote send mail failed: '.$e->getMessage());
+            // still return success but indicate email failed
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Quote marked as Sent but email failed to send.',
+                'status_label' => $quote->status,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Quote sent to customer.',
+            'status_label' => $quote->status,
+        ]);
+    }
+
+    // Approve quote (mark Approved and email)
+    public function approve(Request $request, Quote $quote)
+    {
+        // authorize if needed
+        if ($quote->status === 'Approved') {
+            return response()->json(['status' => 'error', 'message' => 'Quote already approved.'], 422);
+        }
+
+        $quote->status = 'Approved';
+        $quote->approved_at = now(); // optional timestamp
+        $quote->save();
+
+        try {
+            $customer = optional($quote->project)->customer;
+            if ($customer && $customer->email) {
+                Mail::to($customer->email)->send(new QuoteStatusChangedMail($quote, 'Approved'));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Quote approve mail failed: '.$e->getMessage());
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Quote approved but email failed to send.',
+                'status_label' => $quote->status,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Quote approved and customer notified.',
+            'status_label' => $quote->status,
+        ]);
+    }
+
+    // Reject quote (mark Rejected and email)
+    public function reject(Request $request, Quote $quote)
+    {
+        // authorize if needed
+        if ($quote->status === 'Rejected') {
+            return response()->json(['status' => 'error', 'message' => 'Quote already rejected.'], 422);
+        }
+
+        $quote->status = 'Rejected';
+        $quote->rejected_at = now(); // optional
+        $quote->save();
+
+        try {
+            $customer = optional($quote->project)->customer;
+            if ($customer && $customer->email) {
+                Mail::to($customer->email)->send(new QuoteStatusChangedMail($quote, 'Rejected'));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Quote reject mail failed: '.$e->getMessage());
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Quote rejected but email failed to send.',
+                'status_label' => $quote->status,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Quote rejected and customer notified.',
+            'status_label' => $quote->status,
+        ]);
     }
 }

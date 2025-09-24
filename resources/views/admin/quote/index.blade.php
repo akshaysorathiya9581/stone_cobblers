@@ -92,7 +92,7 @@
                                 $projectTitle = optional($quote->project)->name ?? ($quote->project_name ?? '-');
                                 $pdfRoute = route('admin.quotes.download', $quote->id);
                             @endphp
-                            <tr class="table-row">
+                            <tr class="table-row" id="quote-{{ $quote->id }}" data-quote-id="{{ $quote->id }}">
                                 <td class="customer-info">
                                     <div class="customer-avatar">{{ Str::upper(Str::substr($clientName,0,2)) }}</div>
                                     <div class="customer-details">
@@ -114,7 +114,12 @@
 
                                     @if($quote->status === 'Draft')
                                         {{-- <a href="#" class="action-btn edit">Edit</a> --}}
-                                        <a href="#" class="action-btn send">Send</a>
+                                        <button class="action-btn send">Send</button>
+                                    @endif
+
+                                    @if(in_array($quote->status, ['Sent', 'Draft']))
+                                        <button class="action-btn approve-btn">Approve</button>
+                                        <button class="action-btn reject-btn">Reject</button>
                                     @endif
                                 </td>
                             </tr>
@@ -152,6 +157,79 @@
 
 @push('scripts')
     <script>
+        // CSRF setup once
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
+        function ajaxAction(btn, url, successCallback) {
+            var $btn = $(btn);
+            if ($btn.data('processing')) return;
+            $btn.data('processing', true);
+
+            var original = $btn.html();
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+
+            $.post(url)
+                .done(function(res) {
+                    if (res.status === 'success') {
+                        if (window.toastr) toastr.success(res.message);
+                        if (typeof successCallback === 'function') successCallback(res);
+                    } else {
+                        if (window.toastr) toastr.error(res.message || 'Error');
+                    }
+                })
+                .fail(function(xhr) {
+                    var msg = 'Server error.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                    if (window.toastr) toastr.error(msg);
+                })
+                .always(function() {
+                    $btn.prop('disabled', false).html(original);
+                    $btn.removeData('processing');
+                });
+        }
+
+        // Send quote
+        $(document).on('click', '.send', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $row = $btn.closest('tr');
+            var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop(); // support id="quote-123"
+            var url = "{{ url('admin/quotes') }}/" + quoteId + "/send"; // or use route template
+
+            ajaxAction($btn, url, function(res){
+                // update status cell
+                $row.find('.status-tag').removeClass().addClass('status-tag status-'+res.status_label.toLowerCase()).text(res.status_label);
+            });
+        });
+
+        // Approve quote
+        $(document).on('click', '.approve-btn', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $row = $btn.closest('tr');
+            var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop();
+            var url = "{{ url('admin/quotes') }}/" + quoteId + "/approve";
+
+            ajaxAction($btn, url, function(res){
+                $row.find('.status-tag').removeClass().addClass('status-tag status-'+res.status_label.toLowerCase()).text(res.status_label);
+            });
+        });
+
+        // Reject quote
+        $(document).on('click', '.reject-btn', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $row = $btn.closest('tr');
+            var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop();
+            var url = "{{ url('admin/quotes') }}/" + quoteId + "/reject";
+
+            ajaxAction($btn, url, function(res){
+                $row.find('.status-tag').removeClass().addClass('status-tag status-'+res.status_label.toLowerCase()).text(res.status_label);
+            });
+        });
+
         function openPdf(url) {
             // open the download route in a new tab; browser will display inline if content-disposition = inline
             window.open(url, '_blank', 'noopener');

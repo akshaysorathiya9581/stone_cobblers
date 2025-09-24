@@ -24,6 +24,9 @@ class Quote extends Model
         'status',
         'expires_at',
         'final_total',
+        'sent_at',
+        'approved_at',
+        'rejected_at',
     ];
 
     protected $casts = [
@@ -35,6 +38,9 @@ class Quote extends Model
         'is_kitchen'     => 'boolean',
         'is_vanity'      => 'boolean',
         'expires_at'     => 'date',
+        'sent_at'    => 'datetime',
+        'approved_at'=> 'datetime',
+        'rejected_at'=> 'datetime',
     ];
 
     // -----------------------
