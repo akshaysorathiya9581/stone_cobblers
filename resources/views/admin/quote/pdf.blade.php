@@ -254,7 +254,15 @@
             </thead>
 
             <tbody>
-                @forelse($items as $item)
+                {{-- Filter only non-zero items --}}
+                @php
+                    $visibleItems = collect($items)->filter(function($item) {
+                        return (float)$item->qty > 0 && (float)$item->line_total > 0;
+                    });
+                @endphp
+                
+                {{-- If no visible items, show all items --}}
+                @forelse($visibleItems as $item)
                     <tr>
                         <td>{{ $item->name }}</td>
 

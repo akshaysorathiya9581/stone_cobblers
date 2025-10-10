@@ -40,11 +40,11 @@ class AppServiceProvider extends ServiceProvider
                 ['section'=>'Management','title'=>'Files','icon'=>'icon-files','route'=>'admin.files.index','module'=>'files'],
 
                 // Quick Access
-                ['section'=>'Quick Access','title'=>'Starred','icon'=>'icon-starred','route'=>null,'module'=>null],
-                ['section'=>'Quick Access','title'=>'Pinned','icon'=>'icon-pinned','route'=>null,'module'=>null],
+                // ['section'=>'Quick Access','title'=>'Starred','icon'=>'icon-starred','route'=>null,'module'=>null],
+                // ['section'=>'Quick Access','title'=>'Pinned','icon'=>'icon-pinned','route'=>null,'module'=>null],
 
                 // Quotes Management
-                ['section'=>'Quotes Management','title'=>'Kitchen Quotes','icon'=>'icon-quotes','route'=>'admin.kitchen-quotes.index','module'=>'kitchen_quotes'],
+                ['section'=>'Price Management','title'=>'Kitchen Quotes','icon'=>'icon-quotes','route'=>'admin.kitchen-quotes.index','module'=>'kitchen_quotes'],
 
                 // Account (rendered separately too, but kept here for consistency)
                 ['section'=>'Account','title'=>'Logout','icon'=>'icon-logout','route'=>'logout','module'=>null,'is_logout'=>true],
