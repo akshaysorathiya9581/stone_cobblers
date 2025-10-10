@@ -130,7 +130,7 @@
 
                         <!-- Actions -->
                         <td class="actions">
-                            <button class="action-btn view">View</button>
+                            <a href="{{ route('admin.customers.show', ['customer' => $customer->id]) }}" class="action-btn view">View</a>
                             <button class="action-btn contact-btn" data-id="{{ $customer->id }}">Contact</button>
                         </td>
                     </tr>
