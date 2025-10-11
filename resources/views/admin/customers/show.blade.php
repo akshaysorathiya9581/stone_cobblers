@@ -215,10 +215,7 @@
 
                                 </tbody>
                             </table>
-                            <div class="no-projects"
-                                style="padding: 20px; text-align: center; color: rgb(102, 102, 102); font-size: 14px;">
-                                No projects found for this status.
-                            </div>
+                            <div class="no-records">No projects found for this status.</div>
                         </div>
                     </div>
                     <div class="nested-content" id="subtab-hold" style="display:none;">
@@ -239,10 +236,7 @@
 
                                 </tbody>
                             </table>
-                            <div class="no-projects"
-                                style="padding: 20px; text-align: center; color: rgb(102, 102, 102); font-size: 14px;">
-                                No projects found for this status.
-                            </div>
+                            <div class="no-records">No projects found for this status.</div>
                         </div>
                     </div>
                     <div class="nested-content" id="subtab-completed" style="display:none;">
@@ -263,10 +257,7 @@
 
                                 </tbody>
                             </table>
-                            <div class="no-projects"
-                                style="padding: 20px; text-align: center; color: rgb(102, 102, 102); font-size: 14px;">
-                                No projects found for this status.
-                            </div>
+                            <div class="no-records">No projects found for this status.</div>
                         </div>
                     </div>
                     <div class="nested-content" id="subtab-cancelled" style="display:none;">
@@ -287,10 +278,7 @@
 
                                 </tbody>
                             </table>
-                            <div class="no-projects"
-                                style="padding: 20px; text-align: center; color: rgb(102, 102, 102); font-size: 14px;">
-                                No projects found for this status.
-                            </div>
+                            <div class="no-records">No projects found for this status.</div>
                         </div>
                     </div>
                 </div>
@@ -301,6 +289,7 @@
 @endsection
 
 @push('scripts')
+   
     <script>
         $(document).ready(function () {
             // 🔹 Main Tabs
@@ -342,4 +331,5 @@
             });
         });
     </script>
+
 @endpush
