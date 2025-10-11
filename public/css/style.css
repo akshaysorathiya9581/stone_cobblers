@@ -101,6 +101,14 @@ select:focus-visible {
     outline: none;
 }
 
+.mb-15 {
+    margin-bottom: 15px !important;
+}
+
+.mb-20 {
+    margin-bottom: 20px !important;
+}
+
 .breadcrumb {
     display: flex;
     align-items: center;
@@ -713,6 +721,13 @@ select:focus-visible {
     margin-bottom: 30px;
 }
 
+.nested-tabs {
+    padding-top: 2px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .tab {
     padding: 12px 24px;
     border: none;
@@ -843,6 +858,10 @@ select:focus-visible {
 .contact-info .email {
     color: var(--primary-color);
     text-decoration: none;
+}
+
+.contact-info > div:not(:last-child) {
+    margin-bottom: 3px;
 }
 
 .total-value {
@@ -1027,37 +1046,107 @@ select:focus-visible {
 }
 
 .action-btn {
-    padding: 6px 12px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.2s;
+    border-radius: 50%;
 }
 
 .action-btn.edit {
-    background-color: #e8f5e8;
-    color: var(--primary-color);
+    background-color: #d4f3e0;
+    color: #218838;
+    border-color: #c3e6cb;
+}
+
+.action-btn.edit:hover {
+    background-color: #bdeacb;
 }
 
 .action-btn.view {
-    background-color: #f8f9fa;
-    color: #666;
+    background-color: #d6ecff;
+    color: #007bff;
+    border-color: #cce5ff;
 }
 
-.action-btn.update {
-    background-color: #d1ecf1;
-    color: #0c5460;
+.action-btn.view:hover {
+    background-color: #b8daff;
 }
 
 .action-btn.contact {
-    background-color: #d1ecf1;
-    color: #0c5460;
+    background-color: #ffe8cc;
+    color: #ff9800;
+    border-color: #ffe0b2;
+}
+
+.action-btn.contact:hover {
+    background-color: #ffd699;
+}
+
+.action-btn.delete {
+    background-color: #f8d7da;
+    color: #d32f2f;
+    border-color: #f8d7da;
+}
+
+.action-btn.delete:hover {
+    background-color: #f5b7b9;
+}
+
+.action-btn.update {
+    background-color: #d1f0e8;
+    color: #117a65;
+    border-color: #b2dfdb;
+}
+
+.action-btn.update:hover {
+    background-color: #a8e6cf;
 }
 
 .action-btn.send {
-    background-color: #d1ecf1;
-    color: #0c5460;
+    background-color: #e6e0f8;
+    color: #5a2d91;
+    border-color: #d1c4e9;
+}
+
+.action-btn.send:hover {
+    background-color: #d4c7f7;
+}
+
+.action-btn.approve {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.action-btn.approve:hover {
+    background-color: #b7e4c7;
+}
+
+.action-btn.reject {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.action-btn.reject:hover {
+    background-color: #f1b0b7;
+}
+
+.action-btn.download {
+    background-color: #e2f0fb;
+    color: #0056b3;
+    border-color: #b6e0fe;
+}
+
+.action-btn.download:hover {
+    background-color: #cce5ff;
 }
 
 /* Stats Cards */
@@ -2080,4 +2169,69 @@ select:focus-visible {
     font-size: 16px;
     font-weight: 600;
     margin-top: 30px;
+}
+
+/* Customer View */
+.view-details {
+    width: 100%;
+    text-align: left;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: var(--white-color);
+}
+
+.view-details .list-view .table {
+    width: 100%;
+    font-size: 14px;
+}
+
+.view-details .list-view thead {
+    border-top: 1px solid #e0e0e0;
+}
+
+.view-details .list-view th {
+    background-color: white;
+    color: black;
+    font-weight: bold;
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+}
+
+.view-details .list-view th:first-child,
+.view-details .list-view td:first-child {
+    width: 25%;
+}
+
+/* .view-details .list-view th:first-child {
+    border-right: none;
+} */
+
+.view-details .list-view th:last-child {
+    border-right: none;
+}
+
+.view-details .list-view td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    vertical-align: top;
+}
+
+/* .view-details .list-view td:first-child {
+    border-right: none;
+} */
+
+.view-details .list-view td:last-child {
+    border-right: none;
+}
+
+.view-details .list-view tr:last-child th,
+.view-details .list-view tr:last-child td {
+    border-bottom: 0;
+}
+
+.view-details .list-view .contact-info {
+    font-size: 14px;
 }
