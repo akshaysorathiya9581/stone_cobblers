@@ -42,7 +42,7 @@
             <input id="password_confirmation" type="password" name="password_confirmation" class="form-input" required>
           </div>
 
-          <div style="margin-top:12px;">
+          <div class="mt-12">
             <button type="submit" class="btn theme">Reset password</button>
           </div>
         </form>

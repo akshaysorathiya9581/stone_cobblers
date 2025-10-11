@@ -101,12 +101,40 @@ select:focus-visible {
     outline: none;
 }
 
+.mt-12 {
+    margin-top: 12px !important;
+}
+
+.mt-16 {
+    margin-top: 16px !important;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.mb-8 {
+    margin-bottom: 8px !important;
+}
+
 .mb-15 {
     margin-bottom: 15px !important;
 }
 
 .mb-20 {
     margin-bottom: 20px !important;
+}
+
+.text-align-left {
+    text-align: left !important;
+}
+
+.text-align-center {
+    text-align: center !important;
+}
+
+.text-align-right {
+    text-align: right !important;
 }
 
 .breadcrumb {
@@ -523,6 +551,19 @@ select:focus-visible {
     background-color: var(--white-color);
 }
 
+.files .selector-grid {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.files .selector-group select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    min-width: 180px;
+}
+
 /* File Categories */
 .categories {
     display: flex;
@@ -552,7 +593,7 @@ select:focus-visible {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 30px;
+    /* margin-bottom: 30px; */
 }
 
 .file-card {
@@ -607,9 +648,25 @@ select:focus-visible {
     word-break: break-word;
 }
 
+.files .file-name {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.file-thumb .icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
 .file-meta {
     font-size: 12px;
     color: #666;
+    margin-bottom: 8px;
+}
+
+.files .file-meta {
+    color: #666;
+    font-size: 13px;
     margin-bottom: 8px;
 }
 
@@ -618,28 +675,17 @@ select:focus-visible {
     gap: 8px;
 }
 
-.file-action-btn {
-    padding: 4px 8px;
-    border: none;
+.page-btn {
+    margin: 0 4px;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
     border-radius: 4px;
+    background: #fff;
     cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.2s;
 }
 
-.file-action-btn.download {
-    background-color: #e8f5e8;
-    color: var(--primary-color);
-}
-
-.file-action-btn.delete {
-    background-color: #f8d7da;
-    color: #dc3545;
-}
-
-.file-action-btn.share {
-    background-color: #d1ecf1;
-    color: #0c5460;
+.page-btn:hover {
+    background: #f1f1f1;
 }
 
 /* File Details Modal */
@@ -734,8 +780,8 @@ select:focus-visible {
     background: none;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
-    color: #666;
+    font-weight: 600;
+    color: #363636;
     border-bottom: 2px solid transparent;
     transition: all 0.2s;
 }
@@ -743,6 +789,10 @@ select:focus-visible {
 .tab.active {
     color: var(--primary-color);
     border-bottom-color: var(--primary-color);
+}
+
+.tab:hover {
+    color: var(--primary-color);
 }
 
 /* CRM Table */
@@ -813,6 +863,13 @@ select:focus-visible {
     vertical-align: middle;
 }
 
+.no-records {
+    font-size: 14px;
+    padding: 20px;
+    text-align: center;
+    color: rgb(102, 102, 102);
+}
+
 .customer-info {
     display: flex;
     align-items: center;
@@ -860,7 +917,7 @@ select:focus-visible {
     text-decoration: none;
 }
 
-.contact-info > div:not(:last-child) {
+.contact-info>div:not(:last-child) {
     margin-bottom: 3px;
 }
 
@@ -1397,6 +1454,16 @@ select:focus-visible {
     color: #333;
 }
 
+.name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.name span {
+    color: var(--primary-color);
+}
+
 .project-info {
     display: flex;
     align-items: center;
@@ -1591,6 +1658,16 @@ select:focus-visible {
 
 .empty-value {
     color: #999;
+}
+
+.files-grid:has(.empty) {
+    grid-template-columns: 1fr;
+}
+
+.empty {
+    font-size: 14px;
+    text-align: center;
+    color: #333;
 }
 
 .taxed-t {
@@ -2234,4 +2311,23 @@ select:focus-visible {
 
 .view-details .list-view .contact-info {
     font-size: 14px;
+}
+
+.view-details .list-view .timeline {
+    font-size: 14px;
+}
+
+.project-files {
+    width: 100%;
+}
+
+.project-files:not(:last-child) {
+    padding-bottom: 25px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.project-files .files-grid {
+    margin-top: 12px;
+    margin-bottom: 0;
 }

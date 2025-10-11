@@ -126,9 +126,12 @@
 
                                 <!-- Actions -->
                                 <td class="actions">
-                                    <button class="action-btn contact" data-id="{{ $customer->id }}" title="Contact"><i class="fa-solid fa-address-card"></i></button>
-                                    <a href="{{ route('admin.customers.show', ['customer' => $customer->id]) }}" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
-                                    <a href="#" class="action-btn edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <button class="action-btn contact" data-id="{{ $customer->id }}" title="Contact"><i
+                                            class="fa-solid fa-address-card"></i></button>
+                                    <a href="{{ route('admin.customers.show', ['customer' => $customer->id]) }}"
+                                        class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
+                                    <a href="#" class="action-btn edit" title="Edit"><i
+                                            class="fa-solid fa-pen-to-square"></i></a>
                                     <a href="#" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>
@@ -137,9 +140,7 @@
                 </table>
 
                 <!-- Empty state -->
-                <div class="no-customers" style="display:none; padding:18px; text-align:center; color:#666;">
-                    No customers found for this status.
-                </div>
+                <div class="no-records">No customers found for this status.</div>
             </div>
         </div>
     </div>
@@ -149,131 +150,73 @@
 @push('scripts')
     <script>
         $(function () {
-            // ensure CSRF header for all ajax requests
+            // CSRF setup for all AJAX
             $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
             });
 
+            // Contact button AJAX
             $(document).on('click', '.contact-btn', function () {
-                var $btn = $(this);
-                var userId = $btn.data('id');
-                var $row = $('#row-' + userId);
+                const $btn = $(this),
+                    userId = $btn.data('id'),
+                    $row = $('#row-' + userId);
 
-                // prevent if already processing
                 if ($btn.data('processing')) return;
 
-                // store original state so we can restore later
-                var originalHtml = $btn.html();
-                $btn.data('original-html', originalHtml);
+                const orig = $btn.html();
+                $btn.data('processing', true).prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
 
-                // set processing flag
-                $btn.data('processing', true);
-
-                // disable button and show spinner + text
-                // using Bootstrap spinner markup; if you don't use bootstrap, the spinner span will still show plain text
-                $btn.prop('disabled', true).html(
-                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...'
-                );
-
-                // build URL using Laravel named route template
-                var urlTemplate = "{{ route('admin.customers.updateLastContact', ':id') }}";
-                var requestUrl = urlTemplate.replace(':id', userId);
-
-                $.ajax({
-                    url: requestUrl,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        // token not required here because header is set, but harmless:
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (res) {
+                $.post(
+                    `{{ route('admin.customers.updateLastContact', ':id') }}`.replace(':id', userId),
+                    {},
+                    function (res) {
                         if (res.status === 'success') {
-                            // update DOM
                             $row.find('.last-contact').text(res.last_contact);
-
-                            if (window.toastr) {
-                                toastr.success(res.message);
-                            } else {
-                                alert(res.message);
-                            }
+                            window.toastr ? toastr.success(res.message) : alert(res.message);
                         } else {
-                            var msg = res.message || 'Something went wrong.';
-                            if (window.toastr) {
-                                toastr.error(msg);
-                            } else {
-                                alert(msg);
-                            }
+                            window.toastr ? toastr.error(res.message || 'Something went wrong.') : alert(res.message || 'Something went wrong.');
                         }
                     },
-                    error: function (xhr) {
-                        var msg = 'Server error.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            msg = xhr.responseJSON.message;
-                        }
-                        if (window.toastr) {
-                            toastr.error(msg);
-                        } else {
-                            alert(msg);
-                        }
-                    },
-                    complete: function () {
-                        // restore button state
-                        var orig = $btn.data('original-html') || originalHtml;
-                        $btn.prop('disabled', false).html(orig);
-                        $btn.data('processing', false);
-                        $btn.removeData('original-html');
-                    }
+                    'json'
+                ).fail(function (xhr) {
+                    const msg = xhr.responseJSON?.message || 'Server error.';
+                    window.toastr ? toastr.error(msg) : alert(msg);
+                }).always(function () {
+                    $btn.prop('disabled', false).html(orig).removeData('processing');
                 });
             });
 
-            var $tabs = $('.tabs .tab'),
-                $rows = $('.customers-table table tbody tr'), // ✅ changed selector
-                $empty = $('.no-customers');
+            // Tabs filtering
+            const $tabs = $('.tabs .tab'),
+                $rows = $('.customers-table table tbody tr'),
+                $empty = $('.no-records');
 
-            function norm(s) {
-                return (s || '').toString().trim();
-            }
+            const norm = s => (s || '').toString().trim();
 
-            // compute badges
             function updateBadges() {
-                var counts = {
-                    all: 0
-                };
-                $rows.each(function () {
-                    var st = norm($(this).data('status'));
-                    counts.all = (counts.all || 0) + 1;
+                const counts = { all: $rows.length };
+                $rows.each((_, r) => {
+                    const st = norm($(r).data('status'));
                     counts[st] = (counts[st] || 0) + 1;
                 });
-                $tabs.each(function () {
-                    var st = $(this).data('status') || 'all';
-                    $(this).find('.tab-badge').text(counts[st] || 0)
-                        .css({
-                            'margin-left': '8px',
-                            'font-size': '0.85em',
-                            'padding': '2px 6px',
-                            'border-radius': '999px',
-                            'background': '#fff'
-                        });
+                $tabs.each((_, t) => {
+                    const st = $(t).data('status') || 'all';
+                    $(t).find('.tab-badge').text(counts[st] || 0)
+                        .css({ 'margin-left': '8px', 'font-size': '0.85em', 'padding': '2px 6px', 'border-radius': '999px', 'background': '#fff' });
                 });
             }
 
-            // show/hide rows by status and update empty state
             function showStatus(status) {
                 status = norm(status);
-                if (status === 'all') $rows.show();
-                else $rows.each(function () {
-                    $(this).toggle(norm($(this).data('status')) === status);
+                $rows.each(function () {
+                    $(this).toggle(status === 'all' || norm($(this).data('status')) === status);
                 });
-                // empty state
                 $empty.toggle($rows.filter(':visible').length === 0);
             }
 
-            // tab click
             $tabs.on('click', function () {
-                var $t = $(this),
+                const $t = $(this),
                     status = $t.data('status') || norm($t.text());
                 $tabs.removeClass('active');
                 $t.addClass('active');
@@ -281,15 +224,11 @@
                 localStorage.setItem('customerTab', status);
             });
 
-            // init
+            // Init
             updateBadges();
-            var saved = localStorage.getItem('customerTab') || 'all';
-            var $init = $tabs.filter('[data-status="' + saved + '"]').first();
-            if ($init.length) {
-                $init.addClass('active').trigger('click');
-            } else {
-                $tabs.first().trigger('click');
-            }
+            const saved = localStorage.getItem('customerTab') || 'all';
+            ($tabs.filter('[data-status="' + saved + '"]').first() || $tabs.first()).addClass('active').trigger('click');
         });
     </script>
+
 @endpush

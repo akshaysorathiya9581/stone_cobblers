@@ -24,6 +24,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/toastr.min.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
     <script>
         @if(session('message'))
             toastr.success("{{ session('message') }}");
