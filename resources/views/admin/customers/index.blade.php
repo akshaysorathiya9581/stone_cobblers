@@ -126,10 +126,10 @@
 
                                 <!-- Actions -->
                                 <td class="actions">
-                                    <button class="action-btn contact" data-id="{{ $customer->id }}"><i class="fa-solid fa-address-card"></i></button>
-                                    <a href="{{ route('admin.customers.show', ['customer' => $customer->id]) }}" class="action-btn view"><i class="fa-solid fa-eye"></i></a>
-                                    <a href="#" class="action-btn edit"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    <a href="#" class="action-btn delete"><i class="fa-solid fa-trash"></i></a>
+                                    <button class="action-btn contact" data-id="{{ $customer->id }}" title="Contact"><i class="fa-solid fa-address-card"></i></button>
+                                    <a href="{{ route('admin.customers.show', ['customer' => $customer->id]) }}" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
+                                    <a href="#" class="action-btn edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a href="#" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>
                         @endforeach

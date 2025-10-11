@@ -143,10 +143,8 @@
                                         </td>
                                         <td class="timeline on-track">1-2 weeks</td>
                                         <td class="actions">
-                                            <a href="http://127.0.0.1:8000/admin/projects/1"
-                                                class="action-btn view">View</a>
-                                            <a href="http://127.0.0.1:8000/admin/projects/1/edit"
-                                                class="action-btn update">Edit</a>
+                                            <a href="#" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
+                                            <a href="#" class="action-btn edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -190,10 +188,8 @@
                                         </td>
                                         <td class="timeline on-track">1-2 weeks</td>
                                         <td class="actions">
-                                            <a href="http://127.0.0.1:8000/admin/projects/1"
-                                                class="action-btn view">View</a>
-                                            <a href="http://127.0.0.1:8000/admin/projects/1/edit"
-                                                class="action-btn update">Edit</a>
+                                            <a href="#" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
+                                            <a href="#" class="action-btn edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                                         </td>
                                     </tr>
                                 </tbody>

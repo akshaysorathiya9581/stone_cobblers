@@ -158,8 +158,8 @@
 
                         {{-- Actions --}}
                         <td class="actions">
-                            <a href="{{ route('admin.projects.show', $project) }}" class="action-btn view">View</a>
-                            <a href="{{ route('admin.projects.edit', $project) }}" class="action-btn update">Edit</a>
+                            <a href="{{ route('admin.projects.show', $project) }}" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
+                            <a href="{{ route('admin.projects.edit', $project) }}" class="action-btn edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                         </td>
                     </tr>
                     @endforeach

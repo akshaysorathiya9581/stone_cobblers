@@ -12,12 +12,8 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <x-header
-		:export-url="null"
-		:create-url="route('admin.quotes.create')"
-		export-label="Export Quote"
-		create-label="New Quote"
-	/>
+        <x-header :export-url="null" :create-url="route('admin.quotes.create')" export-label="Export Quote"
+            create-label="New Quote" />
 
         <!-- Content -->
         <div class="content">
@@ -48,11 +44,11 @@
                 </div>
                 <div class="stat-card">
                     <h3>Draft</h3>
-                    <div class="value">{{ $quotes->where('status','Draft')->count() }}</div>
+                    <div class="value">{{ $quotes->where('status', 'Draft')->count() }}</div>
                 </div>
                 <div class="stat-card">
                     <h3>Approved</h3>
-                    <div class="value">{{ $quotes->where('status','Approved')->count() }}</div>
+                    <div class="value">{{ $quotes->where('status', 'Approved')->count() }}</div>
                 </div>
                 <div class="stat-card">
                     <h3>Total Value</h3>
@@ -64,11 +60,16 @@
             <div class="tabs" style="margin-bottom:16px;">
                 @php $current = request('status'); @endphp
                 <a href="{{ route('admin.quotes.index') }}" class="tab {{ $current ? '' : 'active' }}">All Quotes</a>
-                <a href="{{ route('admin.quotes.index', ['status' => 'Draft']) }}" class="tab {{ $current === 'Draft' ? 'active' : '' }}">Draft</a>
-                <a href="{{ route('admin.quotes.index', ['status' => 'Sent']) }}" class="tab {{ $current === 'Sent' ? 'active' : '' }}">Sent</a>
-                <a href="{{ route('admin.quotes.index', ['status' => 'Approved']) }}" class="tab {{ $current === 'Approved' ? 'active' : '' }}">Approved</a>
-                <a href="{{ route('admin.quotes.index', ['status' => 'Rejected']) }}" class="tab {{ $current === 'Rejected' ? 'active' : '' }}">Rejected</a>
-                <a href="{{ route('admin.quotes.index', ['status' => 'Expired']) }}" class="tab {{ $current === 'Expired' ? 'active' : '' }}">Expired</a>
+                <a href="{{ route('admin.quotes.index', ['status' => 'Draft']) }}"
+                    class="tab {{ $current === 'Draft' ? 'active' : '' }}">Draft</a>
+                <a href="{{ route('admin.quotes.index', ['status' => 'Sent']) }}"
+                    class="tab {{ $current === 'Sent' ? 'active' : '' }}">Sent</a>
+                <a href="{{ route('admin.quotes.index', ['status' => 'Approved']) }}"
+                    class="tab {{ $current === 'Approved' ? 'active' : '' }}">Approved</a>
+                <a href="{{ route('admin.quotes.index', ['status' => 'Rejected']) }}"
+                    class="tab {{ $current === 'Rejected' ? 'active' : '' }}">Rejected</a>
+                <a href="{{ route('admin.quotes.index', ['status' => 'Expired']) }}"
+                    class="tab {{ $current === 'Expired' ? 'active' : '' }}">Expired</a>
             </div>
 
             <!-- Quotes Table -->
@@ -94,32 +95,32 @@
                             @endphp
                             <tr class="table-row" id="quote-{{ $quote->id }}" data-quote-id="{{ $quote->id }}">
                                 <td class="customer-info">
-                                    <div class="customer-avatar">{{ Str::upper(Str::substr($clientName,0,2)) }}</div>
+                                    <div class="customer-avatar">{{ Str::upper(Str::substr($clientName, 0, 2)) }}</div>
                                     <div class="customer-details">
                                         <h4>{{ $clientName }}</h4>
                                         <p>{{ $projectTitle }}</p>
                                     </div>
                                 </td>
                                 <td class="quote-number">{{ $quote->quote_number }}</td>
-                                <td class="amount">{{ $quote->total ? '$' . number_format($quote->total,2) : '$0.00' }}</td>
-                                <td><span class="status-tag status-{{ Str::lower($quote->status) }}">{{ $quote->status }}</span></td>
+                                <td class="amount">{{ $quote->total ? '$' . number_format($quote->total, 2) : '$0.00' }}</td>
+                                <td><span class="status-tag status-{{ Str::lower($quote->status) }}">{{ $quote->status }}</span>
+                                </td>
                                 <td class="date">{{ optional($quote->created_at)->format('M d, Y') }}</td>
                                 <td class="date">{{ optional($quote->expires_at)->format('M d, Y') }}</td>
                                 <td class="actions">
                                     @if($quote->pdf_path)
-                                        <button type="button" class="action-btn view" onclick="openPdf('{{ $pdfRoute }}')">Download</button>
+                                        <button type="button" class="action-btn download" title="Download" onclick="openPdf('{{ $pdfRoute }}')"><i class="fa-solid fa-download"></i></button>
                                     @else
                                         <span class="muted">No PDF</span>
                                     @endif
 
                                     @if($quote->status === 'Draft')
-                                        {{-- <a href="#" class="action-btn edit">Edit</a> --}}
-                                        <button class="action-btn send">Send</button>
+                                        <button class="action-btn send" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
                                     @endif
 
                                     @if(in_array($quote->status, ['Sent', 'Draft']))
-                                        <button class="action-btn approve-btn">Approve</button>
-                                        <button class="action-btn reject-btn">Reject</button>
+                                        <button class="action-btn approve" title="Approve"><i class="fa-regular fa-square-check"></i></button>
+                                        <button class="action-btn reject" title="Reject"><i class="fa-solid fa-square-xmark"></i></button>
                                     @endif
                                 </td>
                             </tr>
@@ -171,7 +172,7 @@
             $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
 
             $.post(url)
-                .done(function(res) {
+                .done(function (res) {
                     if (res.status === 'success') {
                         if (window.toastr) toastr.success(res.message);
                         if (typeof successCallback === 'function') successCallback(res);
@@ -179,12 +180,12 @@
                         if (window.toastr) toastr.error(res.message || 'Error');
                     }
                 })
-                .fail(function(xhr) {
+                .fail(function (xhr) {
                     var msg = 'Server error.';
                     if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
                     if (window.toastr) toastr.error(msg);
                 })
-                .always(function() {
+                .always(function () {
                     $btn.prop('disabled', false).html(original);
                     $btn.removeData('processing');
                 });
@@ -198,9 +199,9 @@
             var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop(); // support id="quote-123"
             var url = "{{ url('admin/quotes') }}/" + quoteId + "/send"; // or use route template
 
-            ajaxAction($btn, url, function(res){
+            ajaxAction($btn, url, function (res) {
                 // update status cell
-                $row.find('.status-tag').removeClass().addClass('status-tag status-'+res.status_label.toLowerCase()).text(res.status_label);
+                $row.find('.status-tag').removeClass().addClass('status-tag status-' + res.status_label.toLowerCase()).text(res.status_label);
             });
         });
 
@@ -212,8 +213,8 @@
             var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop();
             var url = "{{ url('admin/quotes') }}/" + quoteId + "/approve";
 
-            ajaxAction($btn, url, function(res){
-                $row.find('.status-tag').removeClass().addClass('status-tag status-'+res.status_label.toLowerCase()).text(res.status_label);
+            ajaxAction($btn, url, function (res) {
+                $row.find('.status-tag').removeClass().addClass('status-tag status-' + res.status_label.toLowerCase()).text(res.status_label);
             });
         });
 
@@ -225,8 +226,8 @@
             var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop();
             var url = "{{ url('admin/quotes') }}/" + quoteId + "/reject";
 
-            ajaxAction($btn, url, function(res){
-                $row.find('.status-tag').removeClass().addClass('status-tag status-'+res.status_label.toLowerCase()).text(res.status_label);
+            ajaxAction($btn, url, function (res) {
+                $row.find('.status-tag').removeClass().addClass('status-tag status-' + res.status_label.toLowerCase()).text(res.status_label);
             });
         });
 
@@ -252,10 +253,10 @@
         }
 
         // Client-side search (simple filter)
-        document.getElementById('quote-search').addEventListener('input', function(e){
+        document.getElementById('quote-search').addEventListener('input', function (e) {
             var q = e.target.value.trim().toLowerCase();
             var rows = document.querySelectorAll('#quotes-tbody tr.table-row');
-            rows.forEach(function(row){
+            rows.forEach(function (row) {
                 var txt = row.textContent.toLowerCase();
                 row.style.display = txt.indexOf(q) !== -1 ? '' : 'none';
             });

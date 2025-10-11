@@ -127,8 +127,8 @@
 
                             <!-- Actions -->
                             <td class="actions">
-                                <a href="{{ route('admin.customers.show', $customer->id) }}" class="action-btn view">View</a>
-                                <a href="{{ route('admin.customers.edit', $customer->id) }}" class="action-btn update">Edit</a>
+                                <a href="{{ route('admin.customers.show', $customer->id) }}" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
+                                <a href="{{ route('admin.customers.edit', $customer->id) }}" class="action-btn edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                             </td>
                         </tr>
                     @endforeach
