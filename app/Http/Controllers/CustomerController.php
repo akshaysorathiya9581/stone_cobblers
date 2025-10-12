@@ -75,7 +75,61 @@ class CustomerController extends Controller
 
     public function show($id)
     {
-        return view('admin.customers.show', compact('id'));
+// load customer (or 404)
+        $customer = User::findOrFail($id);
+
+        // load projects related to customer
+        $customerProjects = $customer->projects()
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // derived values
+        $projectsCount = $customerProjects->count();
+
+        // compute a numeric total value if project has budget/budget_min/budget_max
+        $totalValue = $customerProjects->reduce(function ($carry, $p) {
+            $val = 0.0;
+
+            // primary: explicit numeric budget
+            if (isset($p->budget) && is_numeric($p->budget)) {
+                $val = (float) $p->budget;
+            } else {
+                // fallback: range min/max
+                $min = (isset($p->budget_min) && is_numeric($p->budget_min)) ? (float)$p->budget_min : 0.0;
+                $max = (isset($p->budget_max) && is_numeric($p->budget_max)) ? (float)$p->budget_max : $min;
+                $val = ($min + $max) / 2.0;
+            }
+
+            return $carry + $val;
+        }, 0.0);
+
+        // group projects by normalized status for nested tabs
+        $projectsByStatus = $customerProjects->groupBy(function ($p) {
+            $s = strtolower(trim((string)($p->status ?? 'planning')));
+            // normalize a few common statuses
+            if (in_array($s, ['planning', 'planned'])) return 'planning';
+            if (in_array($s, ['in progress','progress','ongoing'])) return 'progress';
+            if (in_array($s, ['on hold','hold'])) return 'hold';
+            if (in_array($s, ['completed','complete','done'])) return 'completed';
+            if (in_array($s, ['cancelled','canceled'])) return 'cancelled';
+            return $s;
+        });
+
+        // available main tabs
+        $tabs = [
+            ['id' => 1, 'text' => 'Customer Info'],
+            ['id' => 2, 'text' => 'Projects'],
+        ];
+
+        return view('admin.customers.show', compact(
+            'id',
+            'customer',
+            'customerProjects',
+            'projectsCount',
+            'totalValue',
+            'projectsByStatus',
+            'tabs'
+        ));
     }
 
     public function edit($id)
