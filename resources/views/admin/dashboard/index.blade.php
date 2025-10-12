@@ -136,18 +136,13 @@
             </table>
 
             <!-- Empty state -->
-            <div class="no-customers" style="display:none; padding:18px; text-align:center; color:#666;">
-                No customers found for this status.
-            </div>
+            <div class="no-records">No customers found for this status.</div>
         </div>
-
 
     </div>
 </div>
 @endsection
 
 @push('scripts')
-    <script>
-        // Tab functionality
-    </script>
+
 @endpush

@@ -57,7 +57,7 @@
             </div>
 
             <!-- Tabs -->
-            <div class="tabs" style="margin-bottom:16px;">
+            <div class="tabs mb-15">
                 @php $current = request('status'); @endphp
                 <a href="{{ route('admin.quotes.index') }}" class="tab {{ $current ? '' : 'active' }}">All Quotes</a>
                 <a href="{{ route('admin.quotes.index', ['status' => 'Draft']) }}"
@@ -126,7 +126,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" style="text-align:center">No quotes found.</td>
+                                <td colspan="7" class="text-align-center">No quotes found.</td>
                             </tr>
                         @endforelse
                     </tbody>

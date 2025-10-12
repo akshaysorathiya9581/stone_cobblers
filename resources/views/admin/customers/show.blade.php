@@ -164,6 +164,10 @@
                                                     $budgetText = '—';
                                                 }
 
+                                </tbody>
+                            </table>
+                            <div class="no-records">No projects found for this status.</div>
+                        </div>
                                                 // timeline
                                                 $timeline = $project->timeline ?? ($project->start_date && $project->end_date ? \Carbon\Carbon::parse($project->start_date)->format('M d, Y').' - '.\Carbon\Carbon::parse($project->end_date)->format('M d, Y') : ($project->timeline_text ?? '—'));
                                                 // project url (assumes you have admin.projects.show)
@@ -208,6 +212,51 @@
                         @endif
                     </div>
 
+                                </tbody>
+                            </table>
+                            <div class="no-records">No projects found for this status.</div>
+                        </div>
+                    </div>
+                    <div class="nested-content" id="subtab-completed" style="display:none;">
+                        <div class="projects-table custom-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Customer</th>
+                                        <th>Budget</th>
+                                        <th>Progress</th>
+                                        <th>Status</th>
+                                        <th>Timeline</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                            <div class="no-records">No projects found for this status.</div>
+                        </div>
+                    </div>
+                    <div class="nested-content" id="subtab-cancelled" style="display:none;">
+                        <div class="projects-table custom-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Customer</th>
+                                        <th>Budget</th>
+                                        <th>Progress</th>
+                                        <th>Status</th>
+                                        <th>Timeline</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                            <div class="no-records">No projects found for this status.</div>
                     {{-- Subtabs: plan/progress/hold/completed/cancelled --}}
                     @foreach (['planning','progress','hold','completed','cancelled'] as $sub)
                         <div class="nested-content" id="subtab-{{ $sub }}" style="display: none;">
@@ -288,6 +337,12 @@
 @endsection
 
 @push('scripts')
+   
+    <script>
+        $(document).ready(function () {
+            // 🔹 Main Tabs
+            $('.tabs .tab').click(function () {
+                if ($(this).closest('.nested-tabs').length) return;
 <script>
     $(document).ready(function () {
         // 🔹 Main Tabs
@@ -326,6 +381,9 @@
                 parent.find('#subtab-' + subtab).show();
             }
         });
+    </script>
+
+@endpush
     });
 </script>
 @endpush
