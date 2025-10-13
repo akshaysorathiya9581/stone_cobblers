@@ -32,39 +32,8 @@
                         <div class="progress-percentage"></div>
                     </div>
 
-                    <!-- Step 1 -->
+                    <!-- Step 1 (MOVED) - Customer selection (2 inputs) -->
                     <div class="form-container-view active">
-                        <div class="form-header">
-                            <div class="form-icon icon-project"></div>
-                            <h1 class="form-title">Let's start with your project details</h1>
-                            <p class="form-subtitle">We'll use this information to set up your project</p>
-                        </div>
-
-                        <div class="form-fields">
-                            <div class="field-row">
-                                <div class="form-field">
-                                    <label class="form-label required">Project Name</label>
-                                    <input type="text" name="name" class="form-input" placeholder="Enter project name" required>
-                                    <div class="error-msg" data-for="name"></div>
-                                </div>
-                                <div class="form-field">
-                                    <label class="form-label">Project Subtitle</label>
-                                    <input type="text" name="subtitle" class="form-input" placeholder="Enter project subtitle">
-                                    <div class="error-msg" data-for="subtitle"></div>
-                                </div>
-                            </div>
-                            <div class="field-row single">
-                                <div class="form-field">
-                                    <label class="form-label">Description</label>
-                                    <textarea name="description" class="form-input" placeholder="Describe your project in detail..." rows="4"></textarea>
-                                    <div class="error-msg" data-for="description"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="form-container-view">
                         <div class="form-header">
                             <div class="form-icon icon-customer"></div>
                             <h1 class="form-title">Which customer is this for?</h1>
@@ -78,7 +47,7 @@
                                     <select class="form-input" name="customer_id" required>
                                         <option value="">Select Customer</option>
                                         @foreach($customers as $c)
-                                            <option value="{{ $c->id }}">{{ $c->first_name }} {{ $c->last_name }}</option>
+                                            <option value="{{ $c->id }}" @if(old('customer_id') == $c->id) selected @endif>{{ $c->first_name }} {{ $c->last_name }}</option>
                                         @endforeach
                                     </select>
                                     <div class="error-msg" data-for="customer_id"></div>
@@ -87,14 +56,57 @@
                                 <div class="form-field ">
                                     <label class="form-label ">Customer Notes</label>
                                     <input type="text" name="customer_notes" class="form-input"
-                                        placeholder="Any specific customer requirements or notes...">
+                                        placeholder="Any specific customer requirements or notes..." value="{{ old('customer_notes') }}">
                                     <div class="error-msg" data-for="customer_notes"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Step 3 -->
+                    <!-- Step 2 (MOVED) - Project basic info (2 inputs) -->
+                    <div class="form-container-view">
+                        <div class="form-header">
+                            <div class="form-icon icon-project"></div>
+                            <h1 class="form-title">Let's start with your project details</h1>
+                            <p class="form-subtitle">We'll use this information to set up your project</p>
+                        </div>
+
+                        <div class="form-fields">
+                            <div class="field-row">
+                                <div class="form-field">
+                                    <label class="form-label required">Project Name</label>
+                                    <input type="text" name="name" class="form-input" placeholder="Enter project name" required value="{{ old('name') }}">
+                                    <div class="error-msg" data-for="name"></div>
+                                </div>
+                                <div class="form-field">
+                                    <label class="form-label">Project Subtitle</label>
+                                    <input type="text" name="subtitle" class="form-input" placeholder="Enter project subtitle" value="{{ old('subtitle') }}">
+                                    <div class="error-msg" data-for="subtitle"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 - Description (kept separate for two-and-two style) -->
+                    <div class="form-container-view">
+                        <div class="form-header">
+                            <div class="form-icon icon-project"></div>
+                            <h1 class="form-title">Project Description</h1>
+                            <p class="form-subtitle">Describe your project in detail</p>
+                        </div>
+
+                        <div class="form-fields">
+                            <div class="field-row single">
+                                <div class="form-field">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="description" class="form-input" placeholder="Describe your project in detail..." rows="4">{{ old('description') }}</textarea>
+                                    <div class="error-msg" data-for="description"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
                     <div class="form-container-view">
                         <div class="form-header">
                             <div class="form-icon icon-budget"></div>
@@ -133,7 +145,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 4 -->
+                    <!-- Step 5 -->
                     <div class="form-container-view">
                         <div class="form-header">
                             <div class="form-icon icon-timeline"></div>
@@ -172,7 +184,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 5 (Review + Team assignment simplified) -->
+                    <!-- Step 6 (Review + Team assignment simplified) -->
                     <div class="form-container-view">
                         <div class="form-header">
                             <div class="form-icon icon-team"></div>
@@ -191,7 +203,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 6 (success) -->
+                    <!-- Step 7 (success) -->
                     <div class="form-container-view">
                         <div style="text-align: center;">
                             <div class="form-icon icon-project"
@@ -238,12 +250,19 @@
             const route = $form.attr('action');
 
             // map which fields are required per step (name attributes)
+            // UPDATED: Step 0 => customer selection (customer_id)
+            //          Step 1 => project basic (name)
+            //          Step 2 => description (optional)
+            //          Step 3 => budget/timeline
+            //          Step 4 => status/progress
+            //          Step 5 => review (no required)
             const stepRequired = {
-                0: ['name'], // Step 1
-                1: ['customer_id'], // Step 2
-                2: ['budget', 'timeline'], // Step 3
-                3: ['status', 'progress'], // Step 4
-                4: [] // Step 5 - optional but allow team
+                0: ['customer_id'], // Step 1 (customer)
+                1: ['name'],       // Step 2 (project name)
+                2: [],             // Step 3 (description) - optional
+                3: ['budget', 'timeline'], // Step 4
+                4: ['status', 'progress'], // Step 5
+                5: [] // Step 6 (review)
             };
 
             function showStep(n) {
@@ -425,4 +444,3 @@
         });
     </script>
 @endpush
-

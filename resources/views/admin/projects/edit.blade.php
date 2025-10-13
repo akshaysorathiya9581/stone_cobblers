@@ -35,8 +35,43 @@
                         <div class="progress-percentage"></div>
                     </div>
 
-                    <!-- Step 1 -->
+                    <!-- Step 1 (MOVED) - Customer selection (2 inputs) -->
                     <div class="form-container-view active">
+                        <div class="form-header">
+                            <div class="form-icon icon-customer"></div>
+                            <h1 class="form-title">Which customer is this for?</h1>
+                            <p class="form-subtitle">Select the customer this project belongs to</p>
+                        </div>
+
+                        <div class="form-fields">
+                            <div class="field-row">
+                                <div class="form-field">
+                                    <label class="form-label required">Customer</label>
+                                    <select class="form-input" name="customer_id" required>
+                                        <option value="">Select Customer</option>
+                                        @foreach($customers as $c)
+                                            <option value="{{ $c->id }}"
+                                                {{ (int) old('customer_id', $project->user_id ?? 0) === $c->id ? 'selected' : '' }}>
+                                                {{ $c->first_name }} {{ $c->last_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <div class="error-msg" data-for="customer_id"></div>
+                                </div>
+
+                                <div class="form-field">
+                                    <label class="form-label">Customer Notes</label>
+                                    <input type="text" name="customer_notes" class="form-input"
+                                           placeholder="Any specific customer requirements or notes..."
+                                           value="{{ old('customer_notes', $project->customer_notes ?? '') }}">
+                                    <div class="error-msg" data-for="customer_notes"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 (MOVED) - Project basic info (2 inputs) -->
+                    <div class="form-container-view">
                         <div class="form-header">
                             <div class="form-icon icon-project"></div>
                             <h1 class="form-title">Let's start with your project details</h1>
@@ -58,6 +93,18 @@
                                     <div class="error-msg" data-for="subtitle"></div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 - Description (kept separate) -->
+                    <div class="form-container-view">
+                        <div class="form-header">
+                            <div class="form-icon icon-project"></div>
+                            <h1 class="form-title">Project Description</h1>
+                            <p class="form-subtitle">Describe your project in detail</p>
+                        </div>
+
+                        <div class="form-fields">
                             <div class="field-row single">
                                 <div class="form-field">
                                     <label class="form-label">Description</label>
@@ -68,44 +115,10 @@
                         </div>
                     </div>
 
-                    <!-- Step 2 -->
+                    <!-- Step 4 -->
                     <div class="form-container-view">
                         <div class="form-header">
-                            <div class="form-icon icon-customer"></div>
-                            <h1 class="form-title">Which customer is this for?</h1>
-                            <p class="form-subtitle">Select the customer this project belongs to</p>
-                        </div>
-
-                        <div class="form-fields">
-                            <div class="field-row">
-                                <div class="form-field">
-                                    <label class="form-label required">Customer</label>
-                                    <select class="form-input" name="customer_id" required>
-                                        <option value="">Select Customer</option>
-                                        @foreach($customers as $c)
-                                            <option value="{{ $c->id }}" {{ (int)old('customer_id', $project->user_id ?? 0) === $c->id ? 'selected' : '' }}>
-                                                {{ $c->first_name }} {{ $c->last_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="error-msg" data-for="customer_id"></div>
-                                </div>
-
-                                <div class="form-field">
-                                    <label class="form-label">Customer Notes</label>
-                                    <input type="text" name="customer_notes" class="form-input"
-                                           placeholder="Any specific customer requirements or notes..."
-                                           value="{{ old('customer_notes', $project->customer_notes ?? '') }}">
-                                    <div class="error-msg" data-for="customer_notes"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="form-container-view">
-                        <div class="form-header">
-                            <div class="form-icon icon-project"></div>
+                            <div class="form-icon icon-budget"></div>
                             <h1 class="form-title">What's the budget and timeline?</h1>
                             <p class="form-subtitle">Help us understand your project scope and timeline</p>
                         </div>
@@ -141,7 +154,7 @@
                         </div>
                     </div>
 
-                    <!-- Step 4 -->
+                    <!-- Step 5 -->
                     <div class="form-container-view">
                         <div class="form-header">
                             <div class="form-icon icon-timeline"></div>
@@ -180,12 +193,12 @@
                         </div>
                     </div>
 
-                    <!-- Step 5 -->
+                    <!-- Step 6 (Review / Team) -->
                     <div class="form-container-view">
                         <div class="form-header">
                             <div class="form-icon icon-team"></div>
                             <h1 class="form-title">Who's on the team?</h1>
-                            <p class="form-subtitle">Assign team members to this project</p>
+                            <p class="form-subtitle">Review & assign team members (optional)</p>
                         </div>
 
                         <div class="form-fields">
@@ -240,13 +253,14 @@
         const route = $form.attr('action');
         const isEdit = $form.find('input[name="_method"]').length > 0;
 
-        // required fields per step
+        // NEW mapping: Step0 = customer; Step1 = project basic; Step2 = description; Step3 = budget/timeline; Step4 = status/progress; Step5 = review
         const stepRequired = {
-            0: ['name'],
-            1: ['customer_id'],
-            2: ['budget','timeline'],
-            3: ['status','progress'],
-            4: []
+            0: ['customer_id'],
+            1: ['name'],
+            2: [], // description optional
+            3: ['budget','timeline'],
+            4: ['status','progress'],
+            5: []
         };
 
         function showStep(n) {
@@ -254,7 +268,6 @@
             updateProgress();
             updateButtons();
             if (n === totalSteps - 1) populateReview();
-
             if (n === $steps.length - 1) {
                 $navWrapper.hide();
             } else {
@@ -324,8 +337,6 @@
 
         function submitForm() {
             const formData = $form.serialize();
-
-            // clear server errors
             $('.error-msg').text('').hide();
 
             $.ajax({
@@ -337,7 +348,6 @@
             })
             .done(function (res) {
                 if (res && res.success) {
-                    // set messages for edit/create
                     $('#success-title').text(isEdit ? 'Project Updated Successfully!' : 'Project Created Successfully!');
                     currentStep = $steps.length - 1;
                     showStep(currentStep);
@@ -379,7 +389,9 @@
                 for (let i = 0; i < Object.keys(stepRequired).length; i++) {
                     const req = stepRequired[i] || [];
                     let missing = false;
-                    req.forEach(name => { if ($('[name="' + name + '"]').length && $.trim($('[name="' + name + '"]').val() || '') === '') missing = true; });
+                    req.forEach(name => {
+                        if ($('[name="' + name + '"]').length && $.trim($('[name="' + name + '"]').val() || '') === '') missing = true;
+                    });
                     if (missing) { currentStep = i; break; }
                 }
             @endif
