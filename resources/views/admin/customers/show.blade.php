@@ -3,23 +3,6 @@
 @section('title', 'Customers')
 
 @push('css')
-<style>
-/* small inline styles to keep layout neat (you can move to your CSS files) */
-.view-details .list-view .table th { width: 180px; text-align: left; vertical-align: top; }
-.project-avatar { width:40px; height:40px; border-radius:6px; background:#eef; display:inline-flex; align-items:center; justify-content:center; font-weight:600; margin-right:8px; }
-.project-details h4 { margin:0 0 4px; font-size:15px; }
-.status-tag { display:inline-block; padding:4px 8px; border-radius:10px; font-size:12px; color:#fff; }
-.status-active { background:#2a9d8f; }
-.status-planning { background:#f4a261; color:#fff; }
-.status-progress { background:#2b8cff; }
-.status-hold { background:#9a8c98; }
-.status-completed { background:#2a9d8f; }
-.status-cancelled { background:#d62828; }
-.progress-bar { background:#eee; width:100%; height:8px; border-radius:4px; overflow:hidden; }
-.progress-fill { height:100%; background:#2b8cff; width:0%; }
-.no-projects { color:#666; padding:20px; text-align:center; }
-.table .actions a { margin-right:8px; color:#333; }
-</style>
 @endpush
 
 @section('content')
@@ -213,7 +196,7 @@
                         <div class="nested-content" id="subtab-{{ $sub }}" style="display: none;">
                             @php $list = $projectsByStatus->get($sub) ?? collect(); @endphp
                             @if($list->isEmpty())
-                                <div class="no-projects">No projects found for this status.</div>
+                                <div class="no-records">No projects found for this status.</div>
                             @else
                                 <div class="projects-table custom-table">
                                     <table class="table">

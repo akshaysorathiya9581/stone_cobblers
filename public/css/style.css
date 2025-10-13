@@ -933,6 +933,10 @@ select:focus-visible {
     color: #333;
 }
 
+.normal-text {
+    font-size: 14px;
+} 
+
 .status-tag {
     padding: 4px 12px;
     border-radius: 12px;
@@ -1012,7 +1016,7 @@ select:focus-visible {
 }
 
 .status-draft {
-    background-color: #f8f9fa;
+    background-color: #ffe2e2;
     color: #666;
 }
 
