@@ -3,10 +3,55 @@
 @section('title', 'Project Details')
 
 @push('css')
-
+<style>
+/* preserve the original visual style from your static mockup */
+.view-details .list-view .table th { width: 160px; text-align:left; vertical-align:top; padding:10px 12px; }
+.view-details .list-view .table td { padding:10px 12px; }
+.project-avatar { width:40px; height:40px; border-radius:6px; background:#eef; display:inline-flex; align-items:center; justify-content:center; font-weight:700; margin-right:8px; }
+.project-details h4 { margin:0 0 4px; font-size:15px; }
+.status-tag { display:inline-block; padding:6px 10px; border-radius:6px; font-size:12px; color:#fff; }
+.status-planning { background:#f4a261; }
+.status-progress { background:#2b8cff; }
+.status-hold { background:#9a8c98; }
+.status-completed { background:#2a9d8f; }
+.status-cancelled { background:#d62828; }
+.files-grid { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+.file-card { width:200px; border:1px solid #eee; border-radius:8px; padding:12px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+.file-thumb { height:70px; display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:8px; }
+.file-name { font-weight:600; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.file-meta { font-size:12px; color:#666; margin-bottom:8px; }
+.file-actions button, .file-actions a { margin-right:8px; }
+.crm-table .table { width:100%; border-collapse:collapse; }
+.crm-table .table th, .crm-table .table td { padding:10px; border-bottom:1px solid #f1f1f1; text-align:left; }
+.no-records { padding:18px; color:#666; text-align:center; }
+.action-btn { background:none; border:0; cursor:pointer; padding:6px; font-size:14px; }
+.customer-avatar { width:36px; height:36px; border-radius:6px; background:#eef; display:inline-flex; align-items:center; justify-content:center; font-weight:700; margin-right:8px; }
+.progress-bar { background:#eee; width:220px; height:10px; border-radius:6px; overflow:hidden; display:inline-block; vertical-align:middle; }
+.progress-fill { height:100%; background:#2b8cff; }
+</style>
 @endpush
 
 @section('content')
+@php
+    $user = auth()->user();
+    // Helper for human readable file sizes
+    if (! function_exists('human_filesize')) {
+        function human_filesize($bytes, $decimals = 2) {
+            if (!is_numeric($bytes) || $bytes <= 0) return '';
+            $sizes = ['B','KB','MB','GB','TB'];
+            $i = 0;
+            while ($bytes >= 1024 && $i < count($sizes)-1) { $bytes /= 1024; $i++; }
+            return round($bytes, $decimals) . ' ' . $sizes[$i];
+        }
+    }
+
+    // normalize helpers
+    $proj = $project_details;
+    $cust = $proj->customer ?? null;
+    $custName = $cust ? trim(($cust->first_name ?? '') . ' ' . ($cust->last_name ?? '') ) : ($proj->customer_name ?? '—');
+    if ($custName === '') $custName = ($cust->name ?? ($proj->customer_name ?? '—'));
+@endphp
+
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
@@ -19,14 +64,12 @@
                 <div class="content-header mb-20">
                     <h1 class="content-title">Project Management View</h1>
                     <div class="action-buttons">
-                        <a href="/admin/customers" class="btn primary" role="button">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M4 10L3.64645 10.3536L3.29289 10L3.64645 9.64645L4 10ZM20.5 18C20.5 18.2761 20.2761 18.5 20 18.5C19.7239 18.5 19.5 18.2761 19.5 18L20.5 18ZM8.64645 15.3536L3.64645 10.3536L4.35355 9.64645L9.35355 14.6464L8.64645 15.3536ZM3.64645 9.64645L8.64645 4.64645L9.35355 5.35355L4.35355 10.3536L3.64645 9.64645ZM4 9.5L14 9.5L14 10.5L4 10.5L4 9.5ZM20.5 16L20.5 18L19.5 18L19.5 16L20.5 16ZM14 9.5C17.5898 9.5 20.5 12.4101 20.5 16L19.5 16C19.5 12.9624 17.0376 10.5 14 10.5L14 9.5Z"
-                                    fill="currentColor" />
-                            </svg>
+                        <a href="{{ route('admin.projects.index') }}" class="btn primary" role="button">
                             Back
                         </a>
+                        @if($user && $user->role === 'admin')
+                            <a href="{{ route('admin.projects.edit', $proj->id) }}" class="btn" role="button">Edit</a>
+                        @endif
                     </div>
                 </div>
 
@@ -41,114 +84,178 @@
                     @endphp
 
                     @foreach ($tabs as $status)
-                        @php
-                            $activeClass = $status['id'] == '1' ? 'active' : '';
-                        @endphp
-                        <button class="tab {{ $activeClass }}" data-status="{{ strtolower($status['id']) }}">
+                        @php $activeClass = $status['id'] == 1 ? 'active' : ''; @endphp
+                        <button class="tab {{ $activeClass }}" data-status="{{ $status['id'] }}">
                             {{ $status['text'] }}
                         </button>
                     @endforeach
                 </div>
 
+                <!-- Tab 1: Project Details -->
                 <div class="tab-content" id="tab-1">
                     <div class="list-view">
                         <table class="table">
                             <tbody>
                                 <tr>
                                     <th>Customer</th>
-                                    <td class="name">Ajay Rabadiya</td>
+                                    <td class="name">{{ $custName }}</td>
                                 </tr>
                                 <tr>
                                     <th>Project</th>
                                     <td class="project-info">
-                                        <div class="project-avatar">P</div>
-                                        <div class="project-details">
-                                            <h4>Project-1</h4>
-                                            <p></p>
+                                        <div style="display:flex; align-items:center;">
+                                            <div class="project-avatar">{{ strtoupper(mb_substr($proj->title ?? $proj->name ?? 'P', 0, 1)) }}</div>
+                                            <div class="project-details">
+                                                <h4>{{ $proj->title ?? $proj->name ?? 'Untitled Project' }}</h4>
+                                                <p style="margin:0; color:#666;">{{ Str::limit($proj->summary ?? $proj->description ?? '', 160) }}</p>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Budget</th>
-                                    <td class="budget">$5,000 - $10,000</td>
+                                    <td class="budget">
+                                        @php
+                                            $budgetText = '—';
+                                            if (!empty($proj->budget) && is_numeric($proj->budget)) {
+                                                $budgetText = '$' . number_format((float)$proj->budget, 2);
+                                            } elseif (!empty($proj->budget_min) || !empty($proj->budget_max)) {
+                                                $min = is_numeric($proj->budget_min) ? (float)$proj->budget_min : 0;
+                                                $max = is_numeric($proj->budget_max) ? (float)$proj->budget_max : $min;
+                                                $budgetText = '$' . number_format($min,0) . ' - $' . number_format($max,0);
+                                            }
+                                        @endphp
+                                        {{ $budgetText }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Progress</th>
                                     <td>
+                                        @php $progress = isset($proj->progress) ? intval($proj->progress) : 0; @endphp
                                         <div class="progress-bar">
-                                            <div class="progress-fill" style="width: 0%"></div>
+                                            <div class="progress-fill" style="width: {{ $progress }}%"></div>
                                         </div>
-                                        <div class="progress-text">0% Complete</div>
+                                        <div class="progress-text" style="margin-top:6px;">{{ $progress }}% Complete</div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Status</th>
                                     <td>
-                                        <span class="status-tag status-planning">
-                                            Planning
-                                        </span>
+                                        @php
+                                            $s = strtolower($proj->status ?? 'planning');
+                                            $statusClass = 'status-planning';
+                                            if (in_array($s, ['in progress','progress','ongoing'])) $statusClass = 'status-progress';
+                                            if (in_array($s, ['hold','on hold'])) $statusClass = 'status-hold';
+                                            if (in_array($s, ['completed','complete','done'])) $statusClass = 'status-completed';
+                                            if (in_array($s, ['cancelled','canceled'])) $statusClass = 'status-cancelled';
+                                        @endphp
+                                        <span class="status-tag {{ $statusClass }}">{{ strtoupper($proj->status ?? $s) }}</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Timeline</th>
-                                    <td class="timeline on-track">1-2 weeks</td>
+                                    <td class="timeline on-track">
+                                        @php
+                                            $timeline = '—';
+                                            if (!empty($proj->timeline)) {
+                                                $timeline = $proj->timeline;
+                                            } elseif (!empty($proj->start_date) || !empty($proj->end_date)) {
+                                                $start = $proj->start_date ? (is_string($proj->start_date) ? $proj->start_date : optional($proj->start_date)->format('M d, Y')) : '';
+                                                $end = $proj->end_date ? (is_string($proj->end_date) ? $proj->end_date : optional($proj->end_date)->format('M d, Y')) : '';
+                                                $timeline = trim($start . ' - ' . $end, ' - ');
+                                            }
+                                        @endphp
+                                        {{ $timeline }}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
+                <!-- Tab 2: Files (grouped by Customer Name, same display type) -->
                 <div class="tab-content" id="tab-2" style="display:none;">
                     <div class="list-view">
                         <div class="project-files">
-                            <div class="name">
-                                Customer Name: <span>Ajay Rabadiya</span>
-                            </div>
-                            <div class="files-grid" id="filesGrid">
-                                <div class="file-card">
-                                    <div class="file-thumb">
-                                        <div class="icon">📄</div>
+
+                            @php
+                                // human-readable filesize helper (define here if not global)
+                                if (! function_exists('human_filesize')) {
+                                    function human_filesize($bytes, $decimals = 2) {
+                                        if (!is_numeric($bytes) || $bytes <= 0) return '';
+                                        $sizes = ['B','KB','MB','GB','TB'];
+                                        $i = 0;
+                                        while ($bytes >= 1024 && $i < count($sizes)-1) { $bytes /= 1024; $i++; }
+                                        return round($bytes, $decimals) . ' ' . $sizes[$i];
+                                    }
+                                }
+
+                                // ensure we have a collection
+                                $filesCollection = collect($project_files ?? []);
+                                // Group files by uploader/customer name (fallback to "Unknown")
+                                $filesByCustomer = $filesCollection->groupBy(function($f){
+                                    $user = $f->user ?? null;
+                                    if ($user && (!empty($user->name) || !empty($user->first_name) || !empty($user->last_name))) {
+                                        return trim(($user->name ?? '') ?: (($user->first_name ?? '') . ' ' . ($user->last_name ?? '')));
+                                    }
+                                    if (!empty($f->uploaded_by_name)) return $f->uploaded_by_name;
+                                    if (!empty($f->user_id)) return 'User #' . $f->user_id;
+                                    return 'Unknown';
+                                });
+                            @endphp
+
+                            @if($filesByCustomer->isEmpty())
+                                <div class="name">Project: <strong>{{ $proj->title ?? $proj->name ?? '—' }}</strong></div>
+                                <div class="no-records" style="margin-top:12px;">No files uploaded for this project.</div>
+                            @else
+                                @foreach($filesByCustomer as $customerName => $files)
+                                    <div style="margin-bottom:18px;">
+                                        <div class="name" style="font-weight:600; margin-bottom:10px;">
+                                            Customer Name: <span>{{ $customerName }}</span>
+                                        </div>
+
+                                        <div class="files-grid" id="filesGrid-{{ \Illuminate\Support\Str::slug($customerName ?: 'unknown') }}">
+                                            @foreach($files as $file)
+                                                @php
+                                                    $filename = $file->filename ?? $file->name ?? ($file->path ? basename($file->path) : 'file');
+                                                    $uploader = $file->user->name ?? ($file->uploaded_by_name ?? 'Unknown');
+                                                    $size = $file->size ?? $file->filesize ?? null;
+                                                @endphp
+
+                                                <div class="file-card" data-file-id="{{ $file->id }}">
+                                                    <div class="file-thumb">
+                                                        <div class="icon">📄</div>
+                                                    </div>
+
+                                                    <div class="file-name">{{ $filename }}</div>
+
+                                                    <div class="file-meta">{{ $uploader }} • {{ $size ? human_filesize($size) : '—' }}</div>
+
+                                                    <div class="file-actions">
+                                                        <a href="{{ route('admin.files.download', ['project' => $proj->id, 'file' => $file->id]) }}" class="action-btn download" title="Download">
+                                                            <i class="fa-solid fa-download"></i>
+                                                        </a>
+
+                                                        @can('delete', $file)
+                                                            <form method="POST" action="{{ route('admin.files.destroy', ['project' => $proj->id, 'file' => $file->id]) }}" style="display:inline" onsubmit="return confirm('Delete this file?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="action-btn delete" title="Delete" type="submit"><i class="fa-solid fa-trash"></i></button>
+                                                            </form>
+                                                        @endcan
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     </div>
-                                    <div class="file-name">QT-2025-014.pdf</div>
-                                    <div class="file-meta">Admin User • 1.2 MB</div>
-                                    <div class="file-actions">
-                                        <button class="action-btn download" title="Download"><i
-                                                class="fa-solid fa-download"></i></button>
-                                        <button class="action-btn delete" title="Delete"><i
-                                                class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                <div class="file-card">
-                                    <div class="file-thumb">
-                                        <div class="icon">📄</div>
-                                    </div>
-                                    <div class="file-name">QT-2025-001.pdf</div>
-                                    <div class="file-meta">Admin User • 1.2 MB</div>
-                                    <div class="file-actions">
-                                        <button class="action-btn download" title="Download"><i
-                                                class="fa-solid fa-download"></i></button>
-                                        <button class="action-btn delete" title="Delete"><i
-                                                class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                <div class="file-card">
-                                    <div class="file-thumb">
-                                        <div class="icon">📄</div>
-                                    </div>
-                                    <div class="file-name">QT-2025-001.pdf</div>
-                                    <div class="file-meta">Admin User • 1.2 MB</div>
-                                    <div class="file-actions">
-                                        <button class="action-btn download" title="Download"><i
-                                                class="fa-solid fa-download"></i></button>
-                                        <button class="action-btn delete" title="Delete"><i
-                                                class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </div>
-                            </div>
+                                @endforeach
+                            @endif
+
                         </div>
                     </div>
                 </div>
 
+                <!-- Tab 3: Quotes -->
                 <div class="tab-content" id="tab-3" style="display:none;">
                     <div class="tabs mb-15 nested-tabs">
                         <button class="tab active" data-subtab="all">All Quotes</button>
@@ -159,214 +266,145 @@
                         <button class="tab" data-subtab="expired">Expired</button>
                     </div>
 
+                    @php
+                        $quotesByStatus = $project_quotes->groupBy(function($q){
+                            $s = strtolower(trim($q->status ?? 'draft'));
+                            if (in_array($s, ['draft','sent','approved','rejected','expired'])) return $s;
+                            return 'other';
+                        });
+                    @endphp
+
                     <div class="nested-content" id="subtab-all">
-                        <div class="crm-table">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Quote #</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="quotes-tbody">
-                                    <tr class="table-row">
-                                        <td class="customer-info">
-                                            <div class="customer-avatar">AK</div>
-                                            <div class="customer-details">
-                                                <h4>akshay sorathiya</h4>
-                                                <p>Project-1</p>
-                                            </div>
-                                        </td>
-                                        <td class="quote-number">QT-2025-004</td>
-                                        <td class="amount">$36,305.03</td>
-                                        <td>
-                                            <span class="status-tag status-draft">Draft</span>
-                                        </td>
-                                        <td class="date">Oct 09, 2025</td>
-                                        <td class="date">Nov 08, 2025</td>
-                                        <td class="actions">
-                                            <button type="button" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr class="table-row">
-                                        <td class="customer-info">
-                                            <div class="customer-avatar">AK</div>
-                                            <div class="customer-details">
-                                                <h4>akshay sorathiya</h4>
-                                                <p>Project-1</p>
-                                            </div>
-                                        </td>
-                                        <td class="quote-number">QT-2025-004</td>
-                                        <td class="amount">$36,305.03</td>
-                                        <td>
-                                            <span class="status-tag status-draft">Draft</span>
-                                        </td>
-                                        <td class="date">Oct 09, 2025</td>
-                                        <td class="date">Nov 08, 2025</td>
-                                        <td class="actions">
-                                            <button type="button" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        @if($project_quotes->isEmpty())
+                            <div class="no-records">No quotes for this project.</div>
+                        @else
+                            <div class="crm-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Quote #</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
+                                            <th>Expires</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($project_quotes as $q)
+                                            @php
+                                                $qCust = $q->customer ?? null;
+                                                $qCustName = $qCust->name ?? ($q->customer_name ?? $custName ?? '—');
+                                                $quoteNumber = $q->quote_number ?? ('QT-' . $q->id);
+                                                $amount = is_numeric($q->total) ? '$' . number_format((float)$q->total,2) : ($q->total_display ?? '—');
+                                                $created = optional($q->created_at)->format('M d, Y') ?? '-';
+                                                $expires = optional($q->expires_at)->format('M d, Y') ?? '-';
+                                                $qStatus = ucfirst($q->status ?? 'Draft');
+                                            @endphp
+                                            <tr>
+                                                <td class="customer-info">
+                                                    <div style="display:flex; align-items:center;">
+                                                        <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
+                                                        <div>
+                                                            <div style="font-weight:600;">{{ $qCustName }}</div>
+                                                            <div style="color:#666;">{{ $proj->title ?? $proj->name ?? '' }}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="quote-number">{{ $quoteNumber }}</td>
+                                                <td class="amount">{{ $amount }}</td>
+                                                <td><span class="status-tag {{ 'status-'.strtolower($q->status ?? 'draft') }}">{{ $qStatus }}</span></td>
+                                                <td class="date">{{ $created }}</td>
+                                                <td class="date">{{ $expires }}</td>
+                                                <td class="actions">
+                                                    {{-- <a href="{{ route('admin.quotes.show', $q->id) }}" class="action-btn" title="View"><i class="fa-solid fa-eye"></i></a> --}}
+                                                    <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn" title="Download"><i class="fa-solid fa-download"></i></a>
+
+                                                    @if($user && $user->role === 'admin')
+                                                        @if(strtolower($q->status ?? '') !== 'approved')
+                                                            <form method="POST" action="{{ route('admin.quotes.approve', $q->id) }}" style="display:inline">
+                                                                @csrf
+                                                                <button class="action-btn" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
+                                                            </form>
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
                     </div>
 
-                    <div class="nested-content" id="subtab-draft" style="display:none;">
-                        <div class="crm-table">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Quote #</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="quotes-tbody">
-                                    <tr class="table-row">
-                                        <td class="customer-info">
-                                            <div class="customer-avatar">AK</div>
-                                            <div class="customer-details">
-                                                <h4>akshay sorathiya</h4>
-                                                <p>Project-1</p>
-                                            </div>
-                                        </td>
-                                        <td class="quote-number">QT-2025-004</td>
-                                        <td class="amount">$36,305.03</td>
-                                        <td>
-                                            <span class="status-tag status-draft">Draft</span>
-                                        </td>
-                                        <td class="date">Oct 09, 2025</td>
-                                        <td class="date">Nov 08, 2025</td>
-                                        <td class="actions">
-                                            <button type="button" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr class="table-row">
-                                        <td class="customer-info">
-                                            <div class="customer-avatar">AK</div>
-                                            <div class="customer-details">
-                                                <h4>akshay sorathiya</h4>
-                                                <p>Project-1</p>
-                                            </div>
-                                        </td>
-                                        <td class="quote-number">QT-2025-004</td>
-                                        <td class="amount">$36,305.03</td>
-                                        <td>
-                                            <span class="status-tag status-draft">Draft</span>
-                                        </td>
-                                        <td class="date">Oct 09, 2025</td>
-                                        <td class="date">Nov 08, 2025</td>
-                                        <td class="actions">
-                                            <button type="button" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    @foreach (['draft','sent','approved','rejected','expired'] as $sub)
+                        <div class="nested-content" id="subtab-{{ $sub }}" style="display:none;">
+                            @php $list = $quotesByStatus->get($sub) ?? collect(); @endphp
+                            @if($list->isEmpty())
+                                <div class="no-records">No quotes found for this status.</div>
+                            @else
+                                <div class="crm-table">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Quote #</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Created</th>
+                                                <th>Expires</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($list as $q)
+                                                @php
+                                                    $qCust = $q->customer ?? null;
+                                                    $qCustName = $qCust->name ?? ($q->customer_name ?? '—');
+                                                    $quoteNumber = $q->quote_number ?? ('QT-'.$q->id);
+                                                    $amount = is_numeric($q->total) ? '$'.number_format((float)$q->total,2) : ($q->total_display ?? '—');
+                                                    $created = optional($q->created_at)->format('M d, Y') ?? '-';
+                                                    $expires = optional($q->expires_at)->format('M d, Y') ?? '-';
+                                                    $qStatus = ucfirst($q->status ?? $sub);
+                                                @endphp
+                                                <tr>
+                                                    <td class="customer-info">
+                                                        <div style="display:flex; align-items:center;">
+                                                            <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
+                                                            <div>
+                                                                <div style="font-weight:600;">{{ $qCustName }}</div>
+                                                                <div style="color:#666;">{{ $proj->title ?? $proj->name ?? '' }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="quote-number">{{ $quoteNumber }}</td>
+                                                    <td class="amount">{{ $amount }}</td>
+                                                    <td><span class="status-tag {{ 'status-'.strtolower($q->status ?? $sub) }}">{{ $qStatus }}</span></td>
+                                                    <td class="date">{{ $created }}</td>
+                                                    <td class="date">{{ $expires }}</td>
+                                                    <td class="actions">
+                                                        <a href="{{ route('admin.quotes.show', $q->id) }}" class="action-btn" title="View"><i class="fa-solid fa-eye"></i></a>
+                                                        <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn" title="Download"><i class="fa-solid fa-download"></i></a>
+                                                        @if($user && $user->role === 'admin')
+                                                            @if(strtolower($q->status ?? '') !== 'approved')
+                                                                <form method="POST" action="{{ route('admin.quotes.approve', $q->id) }}" style="display:inline">
+                                                                    @csrf
+                                                                    <button class="action-btn" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
                         </div>
-                    </div>
+                    @endforeach
 
-                    <div class="nested-content" id="subtab-sent" style="display:none;">
-                        <div class="crm-table">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Quote #</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="quotes-tbody">
-                                    <tr>
-                                        <td colspan="7" class="text-align-center no-records">No quotes found.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="nested-content" id="subtab-approved" style="display:none;">
-                        <div class="crm-table">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Quote #</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="quotes-tbody">
-                                    <tr>
-                                        <td colspan="7" class="text-align-center no-records">No quotes found.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="nested-content" id="subtab-rejected" style="display:none;">
-                        <div class="crm-table">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Quote #</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="quotes-tbody">
-                                    <tr>
-                                        <td colspan="7" class="text-align-center no-records">No quotes found.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="nested-content" id="subtab-expired" style="display:none;">
-                        <div class="crm-table">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Quote #</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Expires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="quotes-tbody">
-                                    <tr>
-                                        <td colspan="7" class="text-align-center no-records">No quotes found.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                </div> {{-- end tab-3 --}}
 
             </div>
         </div>
@@ -374,47 +412,45 @@
 @endsection
 
 @push('scripts')
+<script>
+    $(document).ready(function () {
+        // 🔹 Main Tabs
+        $('.tabs .tab').click(function () {
+            if ($(this).closest('.nested-tabs').length) return;
 
-    <script>
-        $(document).ready(function () {
-            // 🔹 Main Tabs
-            $('.tabs .tab').click(function () {
-                if ($(this).closest('.nested-tabs').length) return;
+            // Only affect main-level tabs
+            $('.tabs:not(.nested-tabs) .tab').removeClass('active');
+            $(this).addClass('active');
 
-                // Only affect main-level tabs
-                $('.tabs:not(.nested-tabs) .tab').removeClass('active');
-                $(this).addClass('active');
+            $('.tab-content').hide();
 
-                $('.tab-content').hide();
-
-                const status = $(this).data('status');
-                $('#tab-' + status).show();
-            });
-
-            // 🔹 Nested Tabs inside "Projects"
-            $(document).on('click', '.nested-tabs .tab', function () {
-                $(this).siblings().removeClass('active');
-                $(this).addClass('active');
-
-                const parent = $(this).closest('.tab-content');
-                parent.find('.nested-content').hide();
-
-                const subtab = $(this).data('subtab');
-                parent.find('#subtab-' + subtab).show();
-            });
-
-            // ✅ Default active nested tab handling on page load
-            $('.nested-tabs').each(function () {
-                const firstTab = $(this).find('.tab.active');
-                const parent = $(this).closest('.tab-content');
-
-                if (firstTab.length) {
-                    const subtab = firstTab.data('subtab');
-                    parent.find('.nested-content').hide();
-                    parent.find('#subtab-' + subtab).show();
-                }
-            });
+            const status = $(this).data('status');
+            $('#tab-' + status).show();
         });
-    </script>
 
+        // 🔹 Nested Tabs inside "Quotes"
+        $(document).on('click', '.nested-tabs .tab', function () {
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+
+            const parent = $(this).closest('.tab-content');
+            parent.find('.nested-content').hide();
+
+            const subtab = $(this).data('subtab');
+            parent.find('#subtab-' + subtab).show();
+        });
+
+        // ✅ Default active nested tab handling on page load
+        $('.nested-tabs').each(function () {
+            const firstTab = $(this).find('.tab.active');
+            const parent = $(this).closest('.tab-content');
+
+            if (firstTab.length) {
+                const subtab = firstTab.data('subtab');
+                parent.find('.nested-content').hide();
+                parent.find('#subtab-' + subtab).show();
+            }
+        });
+    });
+</script>
 @endpush

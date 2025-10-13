@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\FileDocument;
+use App\Models\Quote;
 use Carbon\Carbon;
 
 class ProjectController extends Controller
@@ -87,7 +89,33 @@ class ProjectController extends Controller
 
     public function show($id)
     {
-        return view('admin.projects.show', compact('id'));
+        $user = auth()->user();
+
+        // Load project + its customer (or 404)
+        $project = Project::with('customer')->findOrFail($id);
+
+        // If not admin, ensure the user actually owns / is the customer for this project
+        if ($user->role !== 'admin') {
+            // Adjust this check if your project->customer relation uses a different FK
+            if (($project->user_id ?? $project->customer->id ?? null) !== $user->id) {
+                abort(403, 'Unauthorized access to this project.');
+            }
+
+            // Customer: return only their own files & quotes for this project
+            $project_files  = FileDocument::where('project_id', $id)->where('user_id', $user->id)->get();
+            $project_quotes = Quote::where('project_id', $id)->where('user_id', $user->id)->get();
+        } else {
+            // Admin: return all files & quotes for this project
+            $project_files  = FileDocument::where('project_id', $id)->get();
+            $project_quotes = Quote::where('project_id', $id)->get();
+        }
+
+        return view('admin.projects.show', [
+            'id' => $id,
+            'project_details' => $project,
+            'project_files' => $project_files,
+            'project_quotes' => $project_quotes,
+        ]);
     }
 
     public function edit($id)
