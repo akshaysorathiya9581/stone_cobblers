@@ -3,32 +3,7 @@
 @section('title', 'Project Details')
 
 @push('css')
-<style>
-/* preserve the original visual style from your static mockup */
-.view-details .list-view .table th { width: 160px; text-align:left; vertical-align:top; padding:10px 12px; }
-.view-details .list-view .table td { padding:10px 12px; }
-.project-avatar { width:40px; height:40px; border-radius:6px; background:#eef; display:inline-flex; align-items:center; justify-content:center; font-weight:700; margin-right:8px; }
-.project-details h4 { margin:0 0 4px; font-size:15px; }
-.status-tag { display:inline-block; padding:6px 10px; border-radius:6px; font-size:12px; color:#fff; }
-.status-planning { background:#f4a261; }
-.status-progress { background:#2b8cff; }
-.status-hold { background:#9a8c98; }
-.status-completed { background:#2a9d8f; }
-.status-cancelled { background:#d62828; }
-.files-grid { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
-.file-card { width:200px; border:1px solid #eee; border-radius:8px; padding:12px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
-.file-thumb { height:70px; display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:8px; }
-.file-name { font-weight:600; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.file-meta { font-size:12px; color:#666; margin-bottom:8px; }
-.file-actions button, .file-actions a { margin-right:8px; }
-.crm-table .table { width:100%; border-collapse:collapse; }
-.crm-table .table th, .crm-table .table td { padding:10px; border-bottom:1px solid #f1f1f1; text-align:left; }
-.no-records { padding:18px; color:#666; text-align:center; }
-.action-btn { background:none; border:0; cursor:pointer; padding:6px; font-size:14px; }
-.customer-avatar { width:36px; height:36px; border-radius:6px; background:#eef; display:inline-flex; align-items:center; justify-content:center; font-weight:700; margin-right:8px; }
-.progress-bar { background:#eee; width:220px; height:10px; border-radius:6px; overflow:hidden; display:inline-block; vertical-align:middle; }
-.progress-fill { height:100%; background:#2b8cff; }
-</style>
+
 @endpush
 
 @section('content')
@@ -103,12 +78,10 @@
                                 <tr>
                                     <th>Project</th>
                                     <td class="project-info">
-                                        <div style="display:flex; align-items:center;">
-                                            <div class="project-avatar">{{ strtoupper(mb_substr($proj->title ?? $proj->name ?? 'P', 0, 1)) }}</div>
-                                            <div class="project-details">
-                                                <h4>{{ $proj->title ?? $proj->name ?? 'Untitled Project' }}</h4>
-                                                <p style="margin:0; color:#666;">{{ Str::limit($proj->summary ?? $proj->description ?? '', 160) }}</p>
-                                            </div>
+                                        <div class="project-avatar">{{ strtoupper(mb_substr($proj->title ?? $proj->name ?? 'P', 0, 1)) }}</div>
+                                        <div class="project-details">
+                                            <h4>{{ $proj->title ?? $proj->name ?? 'Untitled Project' }}</h4>
+                                            <p style="margin:0; color:#666;">{{ Str::limit($proj->summary ?? $proj->description ?? '', 160) }}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -304,12 +277,10 @@
                                             @endphp
                                             <tr>
                                                 <td class="customer-info">
-                                                    <div style="display:flex; align-items:center;">
-                                                        <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
-                                                        <div>
-                                                            <div style="font-weight:600;">{{ $qCustName }}</div>
-                                                            <div style="color:#666;">{{ $proj->title ?? $proj->name ?? '' }}</div>
-                                                        </div>
+                                                    <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
+                                                    <div class="customer-details">
+                                                        <h4>{{ $qCustName }}</h4>
+                                                        <p>{{ $proj->title ?? $proj->name ?? '' }}</p>
                                                     </div>
                                                 </td>
                                                 <td class="quote-number">{{ $quoteNumber }}</td>
@@ -319,13 +290,13 @@
                                                 <td class="date">{{ $expires }}</td>
                                                 <td class="actions">
                                                     {{-- <a href="{{ route('admin.quotes.show', $q->id) }}" class="action-btn" title="View"><i class="fa-solid fa-eye"></i></a> --}}
-                                                    <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn" title="Download"><i class="fa-solid fa-download"></i></a>
+                                                    <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
 
                                                     @if($user && $user->role === 'admin')
                                                         @if(strtolower($q->status ?? '') !== 'approved')
                                                             <form method="POST" action="{{ route('admin.quotes.approve', $q->id) }}" style="display:inline">
                                                                 @csrf
-                                                                <button class="action-btn" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
+                                                                <button class="action-btn approve" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
                                                             </form>
                                                         @endif
                                                     @endif
@@ -370,12 +341,10 @@
                                                 @endphp
                                                 <tr>
                                                     <td class="customer-info">
-                                                        <div style="display:flex; align-items:center;">
-                                                            <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
-                                                            <div>
-                                                                <div style="font-weight:600;">{{ $qCustName }}</div>
-                                                                <div style="color:#666;">{{ $proj->title ?? $proj->name ?? '' }}</div>
-                                                            </div>
+                                                        <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
+                                                        <div class="customer-details">
+                                                            <h4>{{ $qCustName }}</h4>
+                                                            <p>{{ $proj->title ?? $proj->name ?? '' }}</p>
                                                         </div>
                                                     </td>
                                                     <td class="quote-number">{{ $quoteNumber }}</td>
@@ -384,13 +353,13 @@
                                                     <td class="date">{{ $created }}</td>
                                                     <td class="date">{{ $expires }}</td>
                                                     <td class="actions">
-                                                        <a href="{{ route('admin.quotes.show', $q->id) }}" class="action-btn" title="View"><i class="fa-solid fa-eye"></i></a>
-                                                        <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn" title="Download"><i class="fa-solid fa-download"></i></a>
+                                                        <a href="{{ route('admin.quotes.show', $q->id) }}" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
+                                                        <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
                                                         @if($user && $user->role === 'admin')
                                                             @if(strtolower($q->status ?? '') !== 'approved')
                                                                 <form method="POST" action="{{ route('admin.quotes.approve', $q->id) }}" style="display:inline">
                                                                     @csrf
-                                                                    <button class="action-btn" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
+                                                                    <button class="action-btn approve" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
                                                                 </form>
                                                             @endif
                                                         @endif
