@@ -10,12 +10,8 @@
   <!-- Main Content -->
   <div class="main-content">
     <!-- Header -->
-	<x-header
-		:export-url="null"
-		:create-url="route('admin.quotes.create')"
-		export-label="Export Quote"
-		create-label="New Quote"
-	/>
+    <x-header :export-url="null" :create-url="route('admin.quotes.create')" export-label="Export Quote"
+      create-label="New Quote" />
 
     <!-- Content -->
     <div class="content bg-content">
@@ -30,8 +26,8 @@
               <h3 style="margin:0 0 12px 0">Select Project</h3>
               <div class="selector-group">
                 {{-- FIX: add name so project_id is submitted --}}
-                <select id="project-select" name="project_id">
-                  <option value="">Select Project</option>
+                <select id="project-select" name="project_id" class="custom-select" data-placeholder="Select Project">
+                  <option></option>
                   @foreach($projects as $project)
                     <option value="{{ $project->id }}">{{ $project->name }}</option>
                   @endforeach
@@ -114,15 +110,15 @@
                   <td>{{ $label }}</td>
                   <td class="alpha-fill">{{ $label === 'Kitchen - Sq Ft' ? 'alpha fill' : '' }}</td>
                   <td>
-                    <input type="number" name="kitchen[qty][]" class="qty-input num-fill kitchen-qty" placeholder="0" min="0"
-                      step="0.01" value="{{ old('kitchen.qty', 0) }}">
+                    <input type="number" name="kitchen[qty][]" class="qty-input num-fill kitchen-qty" placeholder="0"
+                      min="0" step="0.01" value="{{ old('kitchen.qty', 0) }}">
                   </td>
 
-                  <td class="cost-value"
-                      data-cost="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
+                  <td class="cost-value" data-cost="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
                     ${{ number_format($kitchen_tops[$label] ?? 0, 2) }}
                     <input type="hidden" name="kitchen[name][]" value="{{ $label }}">
-                    <input type="hidden" name="kitchen[unit_price][]" value="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
+                    <input type="hidden" name="kitchen[unit_price][]"
+                      value="{{ number_format($kitchen_tops[$label] ?? 0, 4, '.', '') }}">
                   </td>
 
                   <td class="line-total empty-value">$ -</td>
@@ -208,7 +204,8 @@
 
                       <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
                         {{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}
-                        <input type="hidden" name="manufacturer[unit_price][]" value="{{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}">
+                        <input type="hidden" name="manufacturer[unit_price][]"
+                          value="{{ fmtAuto($manufacturers[$mfg] ?? $defaults[$mfg]) }}">
                       </td>
 
                       <td style="padding:8px;border:1px solid #e0e0e0;text-align:center;">
@@ -218,7 +215,7 @@
 
                       <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;"
                         class="manufacturer-line empty-value">
-                        $ - 
+                        $ -
                         <input type="hidden" name="manufacturer[line_total][]" class="manufacturer-line-hidden" value="0">
                       </td>
                     </tr>
@@ -227,7 +224,8 @@
                   <!-- subtotal -->
                   <tr>
                     <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:center;font-weight:700">=</td>
-                    <td id="manufacturer-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8">$ -</td>
+                    <td id="manufacturer-total"
+                      style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8">$ -</td>
                   </tr>
                 </tbody>
               </table>
@@ -331,7 +329,8 @@
                     <input type="number" id="delivery-full-kit" name="delivery_full_kit" class="qty-input" placeholder=""
                       min="0" step="0.01" value="0">
                   </td>
-                  <td id="delivery-full-kit-total" style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
+                  <td id="delivery-full-kit-total"
+                    style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
                 </tr>
 
                 <tr>
@@ -403,7 +402,8 @@
           </div>
 
           <div class="nav-footer">
-            <button type="button" id="prev-tab-2" class="btn secondary" onclick="prevStep(2)"><span>←</span> Previous</button>
+            <button type="button" id="prev-tab-2" class="btn secondary" onclick="prevStep(2)"><span>←</span>
+              Previous</button>
             <div class="steps-indicator">Step 2 of 3</div>
             <button type="button" id="next-tab-2" class="btn theme" data-current="2">Next <span>→</span></button>
           </div>

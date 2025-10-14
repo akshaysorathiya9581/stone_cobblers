@@ -153,8 +153,8 @@
                                 </div>
                                 <div class="form-field">
                                     <label class="form-label" for="referralSource">How did you hear about us?</label>
-                                    <select class="form-input" id="referralSource" name="referralSource">
-                                        <option value="">Select How did you hear about us?</option>
+                                    <select class="form-input custom-select" id="referralSource" name="referralSource" data-placeholder="Select How did you hear about us?">
+                                        <option></option>
                                         <option value="Google Search" {{ old('referralSource', $customer->referralSource ?? '') == 'Google Search' ? 'selected' : '' }}>Google Search</option>
                                         <option value="Social Media" {{ old('referralSource', $customer->referralSource ?? '') == 'Social Media' ? 'selected' : '' }}>Social Media</option>
                                         <option value="Referral" {{ old('referralSource', $customer->referralSource ?? '') == 'Referral' ? 'selected' : '' }}>Referral</option>
@@ -167,8 +167,8 @@
                             <div class="field-row">
                                 <div class="form-field">
                                     <label class="form-label" for="customer_status">Status</label>
-                                    <select name="customer_status" id="customer_status" class="form-input">
-                                        <option value="">Select Status</option>
+                                    <select name="customer_status" id="customer_status" class="form-input custom-select" data-placeholder="Select Status">
+                                        <option></option>
                                         @foreach (get_customer_status_list() as $status)
                                             <option value="{{ $status['id'] }}"
                                                 {{ (string) old('customer_status', $customer->status ?? '') === (string) $status['id'] ? 'selected' : '' }}>

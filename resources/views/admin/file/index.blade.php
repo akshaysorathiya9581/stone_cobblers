@@ -4,7 +4,7 @@
 @section('title', 'Files')
 
 @push('css')
-   
+
 @endpush
 
 @section('content')
@@ -24,28 +24,22 @@
                 <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
             </div>
         </div>
-        {{-- <div class="header" style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-            <div class="search-bar">
-                <i>🔍</i>
-                <input type="text" placeholder="Search files..." id="global-search">
-            </div>
 
+        <div class="header">
+            <h1 class="content-title">File Management</h1>
             <div class="header-actions">
-                <a href="{{ route('admin.files.create') }}" class="header-btn primary">➕ Upload Files</a>
+                <a href="{{ route('admin.files.create') }}" class="btn primary">➕ Upload Files</a>
             </div>
-        </div> --}}
+        </div>
 
-        <div class="content" style="margin-top:16px;">
-            <div class="content-header" style="display:flex; justify-content:space-between; align-items:center;">
-                <h1 class="content-title">File Management</h1>
-            </div>
+        <div class="content">
 
-            <div class="selector-section mt-12 files">
+            <div class="selector-section files">
                 <div class="selector-grid">
                     <div class="selector-group">
                         <label for="user-select">Customer</label>
-                        <select id="user-select" name="user_id">
-                            <option value="">All Customers</option>
+                        <select id="user-select" name="user_id" class="custom-select" data-placeholder="All Customers">
+                            <option></option>
                             @foreach($customers as $c)
                                 <option value="{{ $c->id }}">{{ $c->name }}</option>
                             @endforeach
@@ -54,8 +48,8 @@
 
                     <div class="selector-group">
                         <label for="project-select">Project</label>
-                        <select id="project-select" name="project_id">
-                            <option value="">All Projects</option>
+                        <select id="project-select" name="project_id" class="custom-select" data-placeholder="All Projects">
+                            <option></option>
                             @foreach($projects as $p)
                                 <option value="{{ $p->id }}">{{ $p->name }}</option>
                             @endforeach
@@ -107,16 +101,16 @@
                     const preview = f.image_url ? `<img src="${f.image_url}" alt="${escapeHtml(f.name)}">` : '<div class="icon">📄</div>',
                         uploader = f.uploader?.name ? escapeHtml(f.uploader.name) + ' • ' : '';
                     const $card = $(`
-                    <div class="file-card">
-                        <div class="file-thumb">${preview}</div>
-                        <div class="file-name">${escapeHtml(f.name)}</div>
-                        <div class="file-meta">${uploader}${formatSize(f.size)}</div>
-                        <div class="file-actions">
-                            <button class="action-btn download" data-id="${f.id}" title="Download"><i class="fa-solid fa-download"></i></button>
-                            <button class="action-btn delete" data-id="${f.id}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                        <div class="file-card">
+                            <div class="file-thumb">${preview}</div>
+                            <div class="file-name">${escapeHtml(f.name)}</div>
+                            <div class="file-meta">${uploader}${formatSize(f.size)}</div>
+                            <div class="file-actions">
+                                <button class="action-btn download" data-id="${f.id}" title="Download"><i class="fa-solid fa-download"></i></button>
+                                <button class="action-btn delete" data-id="${f.id}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
-                    </div>
-                `);
+                    `);
                     $grid.append($card);
                 });
             }
