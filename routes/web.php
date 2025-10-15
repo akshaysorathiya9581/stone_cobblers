@@ -58,8 +58,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 
     // Projects
-    Route::resource('projects', ProjectController::class)
-        ->middleware('module:projects');
+    Route::resource('projects', ProjectController::class)->middleware('module:projects');
+    // Return projects for a given customer (used by AJAX)
+    Route::get('/customers/{customer}/projects', [ProjectController::class, 'byCustomer'])->name('customers.projects');
 
     // Quotes
     Route::resource('quotes', QuoteController::class)->middleware('module:quotes');

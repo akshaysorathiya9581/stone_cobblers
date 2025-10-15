@@ -165,4 +165,20 @@ class ProjectController extends Controller
     {
         // delete logic
     }
+
+    /**
+     * Return JSON list of projects for a customer.
+     */
+    public function byCustomer($customerId, Request $request)
+    {
+        // optional: authorize, validate, etc.
+        $projects = Project::where('user_id', $customerId)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return response()->json([
+            'ok' => true,
+            'data' => $projects
+        ]);
+    }
 }

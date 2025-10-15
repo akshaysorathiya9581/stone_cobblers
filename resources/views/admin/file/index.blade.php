@@ -50,9 +50,9 @@
                         <label for="project-select">Project</label>
                         <select id="project-select" name="project_id" class="custom-select" data-placeholder="All Projects">
                             <option></option>
-                            @foreach($projects as $p)
+                            {{-- @foreach($projects as $p)
                                 <option value="{{ $p->id }}">{{ $p->name }}</option>
-                            @endforeach
+                            @endforeach --}}
                         </select>
                     </div>
                 </div>
@@ -76,11 +76,11 @@
 @endsection
 
 @push('scripts')
-
     <script>
         $(function () {
             const listUrl = "{{ route('admin.files.index') }}",
-                downloadBase = "{{ url('admin/files') }}";
+                downloadBase = "{{ url('admin/files') }}",
+                projectsByCustomerUrl = "{{ route('admin.customers.projects', ['customer' => '%%CUSTOMER%%']) }}"; // we'll replace token.
 
             $.ajaxSetup({
                 headers: {
@@ -90,9 +90,11 @@
                 cache: false
             });
 
+            // helpers
             const escapeHtml = s => (s || '').toString().replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
             const formatSize = b => !b ? '0 KB' : (b / 1024 / 1024 >= 1 ? (b / 1024 / 1024).toFixed(1) + ' MB' : Math.round(b / 1024) + ' KB');
 
+            // renderFiles / renderPagination (unchanged from your existing code)
             function renderFiles(files) {
                 const $grid = $('#filesGrid').empty();
                 if (!files?.length) return $grid.html('<div class="empty">No files found</div>');
@@ -123,35 +125,122 @@
                 if (res.next_page_url) $p.append(`<button class="page-btn" data-page="${res.current_page + 1}">Next »</button>`);
             }
 
+            // safe Select2 init helper (re-inits without duplicating handlers)
+            function initSelect2($el) {
+                if (!$.fn.select2) return;
+                // destroy then init to avoid double-init errors (Select2 v4.x)
+                try {
+                    if ($el.data('select2')) $el.select2('destroy');
+                } catch (e) {
+                    // ignore
+                }
+                $el.select2({
+                    placeholder: $el.data('placeholder') || '',
+                    allowClear: true,
+                    width: 'resolve'
+                });
+            }
+
+            // initialize both selects on load
+            initSelect2($('#user-select'));
+            initSelect2($('#project-select'));
+
+            // Populate project select from response array [{id,name},...]
+            function populateProjects(projects) {
+                const $project = $('#project-select');
+                // keep placeholder option (an empty <option>) for allowClear to work
+                $project.empty();
+                $project.append('<option></option>');
+
+                if (projects && projects.length) {
+                    projects.forEach(p => {
+                        // escape values for safety
+                        const id = String(p.id).replace(/"/g, '&quot;'),
+                            name = escapeHtml(p.name);
+                        $project.append(`<option value="${id}">${name}</option>`);
+                    });
+                }
+                // re-init Select2 so it picks up new options
+                initSelect2($project);
+
+                // if you want the project select to auto-open after loading (UX), uncomment:
+                // $project.select2('open');
+            }
+
+            // When customer changes, fetch projects
+            async function fetchProjectsForCustomer(customerId) {
+                const $proj = $('#project-select');
+
+                // Reset project select & show temporary loading option
+                $proj.prop('disabled', true);
+                $proj.empty().append('<option></option>'); // placeholder for Select2 allowClear
+                initSelect2($proj);
+                // optional: show single "Loading..." option inside original select so Select2 shows it
+                $proj.append('<option value="_loading" disabled>Loading...</option>');
+                initSelect2($proj);
+
+                if (!customerId) {
+                    // no customer -> clear projects
+                    $proj.val(null).trigger('change');
+                    $proj.prop('disabled', false);
+                    return;
+                }
+
+                // build URL (replace token)
+                const url = projectsByCustomerUrl.replace('%%CUSTOMER%%', encodeURIComponent(customerId));
+
+                try {
+                    const res = await $.getJSON(url);
+                    if (res?.ok && Array.isArray(res.data)) {
+                        populateProjects(res.data);
+                    } else if (Array.isArray(res)) {
+                        // accept both shapes {ok,data} or plain array
+                        populateProjects(res);
+                    } else {
+                        populateProjects([]);
+                    }
+                } catch (err) {
+                    console.error('Failed to load projects', err);
+                    populateProjects([]);
+                    toastr.error('Failed to load projects');
+                } finally {
+                    $proj.prop('disabled', false);
+                }
+            }
+
+            // Refresh files grid (unchanged)
             function refreshFilesGrid(page = 1) {
                 const category = $('.tab.active').data('status');
                 const params = {
                     page,
-                    project_id: $('#project-select').val(),
-                    user_id: $('#user-select').val(),
-                    category: category !== 'all' ? category : undefined, // IMPORTANT: backend expects category
-                    search: $('#global-search').val()?.trim()
+                    project_id: $('#project-select').val() || undefined,
+                    user_id: $('#user-select').val() || undefined,
+                    category: category !== 'all' ? category : undefined,
+                    search: $('#global-search').val()?.trim() || undefined
                 };
 
                 $.getJSON(listUrl, params)
-                    .done(res => { renderFiles(res.data || res); renderPagination(res); })
+                    .done(res => {
+                        const files = res.data ?? res;
+                        renderFiles(files || []);
+                        renderPagination(res);
+                    })
                     .fail(() => { toastr.error('Failed to load files'); });
             }
 
-            // Tab click
+            // Tab click handler (unchanged)
             $('.tab').on('click', function () {
                 $('.tab').removeClass('active');
                 $(this).addClass('active');
-                refreshFilesGrid();
+                refreshFilesGrid(1);
             });
 
-            // Trigger active tab on load
+            // initial render
             $('.tab.active').trigger('click');
 
-            // Pagination click
+            // pagination & file actions (unchanged)
             $('#pagination').on('click', '.page-btn', function () { refreshFilesGrid($(this).data('page')); });
 
-            // File actions
             $('#filesGrid').on('click', '.action-btn.download', function () {
                 const id = $(this).data('id');
                 if (!id) return toastr.error('Invalid file id');
@@ -166,10 +255,39 @@
                     .fail(xhr => { let msg = 'Delete failed'; try { msg = JSON.parse(xhr.responseText)?.message || msg; } catch (e) { } toastr.error(msg); });
             });
 
-            // Filters
-            $('#project-select, #user-select').on('change', refreshFilesGrid);
-            $('#global-search').on('input', function () { clearTimeout(window._searchTimer); window._searchTimer = setTimeout(refreshFilesGrid, 300); });
+            // Filter change handlers
+            const onFilterChange = function () { refreshFilesGrid(1); };
+            $('#user-select').on('change', function () {
+                const customerId = $(this).val() || null;
+                // fetch projects for this customer then refresh files (refresh after project loaded)
+                fetchProjectsForCustomer(customerId).then(() => {
+                    // reset project filter when customer changes
+                    $('#project-select').val(null).trigger('change');
+                    refreshFilesGrid(1);
+                });
+            });
+
+            // project change triggers grid refresh
+            $('#project-select').on('change', onFilterChange);
+
+            // also bind select2 events if enabled (keeps consistency)
+            if ($.fn.select2) {
+                $('#user-select').on('select2:select select2:unselect', function () {
+                    $(this).trigger('change');
+                });
+                $('#project-select').on('select2:select select2:unselect', function () {
+                    $(this).trigger('change');
+                });
+            }
+
+            // search input debounce
+            $('#global-search').on('input', function () { clearTimeout(window._searchTimer); window._searchTimer = setTimeout(() => refreshFilesGrid(1), 300); });
+
+            // Optional: if you want to load projects for a pre-selected customer on page load
+            const initialCustomer = $('#user-select').val();
+            if (initialCustomer) {
+                fetchProjectsForCustomer(initialCustomer);
+            }
         });
     </script>
-
 @endpush
