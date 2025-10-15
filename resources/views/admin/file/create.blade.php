@@ -4,55 +4,7 @@
 @section('title', 'Upload Files')
 
 @push('css')
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <style>
-        .files-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .file-card {
-            width: 220px;
-            border: 1px solid #eee;
-            padding: 10px;
-            border-radius: 6px;
-            background: #fff;
-        }
-
-        .file-thumb img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .empty {
-            padding: 20px;
-            color: #666;
-        }
-
-        .ajax-upload-progress {
-            height: 6px;
-            background: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .ajax-upload-progress>i {
-            display: block;
-            height: 100%;
-            width: 0%;
-            background: #17a2b8;
-            transition: width .2s ease;
-        }
-
-        .upload-area.dragover {
-            border-color: #17a2b8;
-            background: #f8feff;
-        }
-    </style>
+    
 @endpush
 
 @section('content')
@@ -75,7 +27,7 @@
         <div class="header">
             <h1 class="content-title">Upload New Files</h1>
             <div class="header-actions">
-                <a href="{{ route('admin.files.index') }}" class="header-btn secondary">📂 View All Files</a>
+                <a href="{{ route('admin.files.index') }}" class="btn primary">📂 View All Files</a>
             </div>
         </div>
 
@@ -85,8 +37,8 @@
                 <div class="selector-grid">
                     <div class="selector-group">
                         <label for="customer-select">Customer</label>
-                        <select id="customer-select" name="customer_id">
-                            <option value="">Select Customer</option>
+                        <select id="customer-select" name="customer_id" class="form-input custom-select" data-placeholder="Select Customer">
+                            <option></option>
                             @foreach($customers as $c)
                                 <option value="{{ $c->id }}">{{ $c->name }}</option>
                             @endforeach
@@ -95,8 +47,8 @@
 
                     <div class="selector-group">
                         <label for="project-select">Project</label>
-                        <select id="project-select" name="project_id">
-                            <option value="">Select Project</option>
+                        <select id="project-select" name="project_id" class="form-input custom-select" data-placeholder="Select Project">
+                            <option></option>
                             @foreach($projects as $p)
                                 <option value="{{ $p->id }}">{{ $p->name }}</option>
                             @endforeach
@@ -122,14 +74,10 @@
 @endsection
 
 @push('scripts')
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
     <script>
         $(function () {
             const uploadUrl = "{{ route('admin.files.store') }}";
 
-            // ✅ Add CSRF to all AJAX requests
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),

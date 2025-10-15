@@ -130,8 +130,8 @@
                                             class="fa-solid fa-address-card"></i></button>
                                     <a href="{{ route('admin.customers.show', ['customer' => $customer->id]) }}"
                                         class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
-                                    <a href="#" class="action-btn edit" title="Edit"><i
-                                            class="fa-solid fa-pen-to-square"></i></a>
+                                    <a href="{{ route('admin.customers.edit', $customer->id) }}" class="action-btn edit"
+                                        title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                                     <a href="#" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
                                 </td>
                             </tr>

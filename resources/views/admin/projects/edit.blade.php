@@ -47,8 +47,8 @@
                             <div class="field-row">
                                 <div class="form-field">
                                     <label class="form-label required">Customer</label>
-                                    <select class="form-input" name="customer_id" required>
-                                        <option value="">Select Customer</option>
+                                    <select class="form-input custom-select" name="customer_id" data-placeholder="Select Customer" required>
+                                        <option></option>
                                         @foreach($customers as $c)
                                             <option value="{{ $c->id }}"
                                                 {{ (int) old('customer_id', $project->user_id ?? 0) === $c->id ? 'selected' : '' }}>
@@ -127,8 +127,8 @@
                             <div class="field-row">
                                 <div class="form-field">
                                     <label class="form-label required">Budget Range</label>
-                                    <select class="form-input" name="budget" required>
-                                        <option value="">Select Budget Range</option>
+                                    <select class="form-input custom-select" name="budget" data-placeholder="Select Budget Range" required>
+                                        <option></option>
                                         @foreach(get_budget_ranges() as $opt)
                                             <option value="{{ $opt['id'] }}" {{ old('budget', $project->budget ?? '') == $opt['id'] ? 'selected' : '' }}>
                                                 {{ $opt['text'] }}
@@ -140,8 +140,8 @@
 
                                 <div class="form-field">
                                     <label class="form-label required">Timeline</label>
-                                    <select class="form-input" name="timeline" required>
-                                        <option value="">Select Timeline</option>
+                                    <select class="form-input custom-select" name="timeline" data-placeholder="Select Timeline" required>
+                                        <option></option>
                                         @foreach(get_timeline_options() as $opt)
                                             <option value="{{ $opt['id'] }}" {{ old('timeline', $project->timeline ?? '') == $opt['id'] ? 'selected' : '' }}>
                                                 {{ $opt['text'] }}
@@ -166,8 +166,8 @@
                             <div class="field-row">
                                 <div class="form-field">
                                     <label class="form-label required">Project Status</label>
-                                    <select class="form-input" name="status" required>
-                                        <option value="">Select Project Status</option>
+                                    <select class="form-input custom-select" name="status" data-placeholder="Select Project Status" required>
+                                        <option></option>
                                         @foreach(get_project_status_list() as $opt)
                                             <option value="{{ $opt['id'] }}" {{ old('status', $project->status ?? '') == $opt['id'] ? 'selected' : '' }}>
                                                 {{ $opt['text'] }}
@@ -179,8 +179,8 @@
 
                                 <div class="form-field">
                                     <label class="form-label required">Progress</label>
-                                    <select class="form-input" name="progress" required>
-                                        <option value="">Select Progress</option>
+                                    <select class="form-input custom-select" name="progress" data-placeholder="Select Progress" required>
+                                        <option></option>
                                         @foreach(get_progress_list() as $opt)
                                             <option value="{{ $opt['id'] }}" {{ old('progress', $project->progress ?? '') == $opt['id'] ? 'selected' : '' }}>
                                                 {{ $opt['text'] }}
