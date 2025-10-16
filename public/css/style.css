@@ -1748,7 +1748,7 @@ select {
 }
 
 .quote-details .title {
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 .quote-details .subtitle {
@@ -1965,7 +1965,7 @@ select {
     padding: 12px 16px;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 14px;
     transition: all 0.2s ease;
     background: #f9fafb;
 }
@@ -2163,7 +2163,7 @@ select {
     padding: 12px 16px;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 14px;
     transition: all 0.2s ease;
     background: #f9fafb;
 }
@@ -2248,7 +2248,7 @@ select {
     padding: 12px 16px;
     border: 2px solid #e5e7eb;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 14px;
     transition: all 0.2s ease;
     background: #f9fafb;
 }
@@ -2449,4 +2449,56 @@ select {
     line-height: inherit;
     margin-top: -3px;
     margin-right: 2px;
+}
+
+.select2-container--default .select2-results__option[aria-disabled=true] {
+    font-size: 14px;
+}
+
+.select2-results__option {
+    font-size: 14px;
+}
+
+.quote-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quote-form .form-group:not(:last-child) {
+    margin-bottom: 15px;
+}
+
+.quote-form .form-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+    margin: 0;
+}
+
+.quote-form .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: var(--white-color);
+}
+
+.quote-form .form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: white;
+}
+
+.quote-form .form-input.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.quote-form .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
 }
