@@ -65,13 +65,11 @@ class QuoteController extends Controller
      */
     public function create()
     {
-        $kitchen_tops = KitchenQuote::where('type', 'KITCHEN_TOP')
-            ->pluck('cost', 'project')
-            ->toArray();
-
-        $manufacturers = KitchenQuote::where('type', 'KITCHEN_CABINET')
-            ->pluck('cost', 'project')
-            ->toArray();
+        $KITCHEN_TOP = KitchenQuote::where('type', 'KITCHEN_TOP')->pluck('cost', 'project')->toArray();
+        $KITCHEN_MANUFACTURER = KitchenQuote::where('type', 'KITCHEN_MANUFACTURER')->pluck('cost', 'project')->toArray();
+        $KITCHEN_MARGIN_MARKUP = KitchenQuote::where('type', 'KITCHEN_MARGIN_MARKUP')->pluck('cost', 'project')->toArray();
+        $KITCHEN_DELIVERY = KitchenQuote::where('type', 'KITCHEN_DELIVERY')->pluck('cost', 'project')->toArray();
+        $KITCHEN_BUFFER = KitchenQuote::where('type', 'KITCHEN_BUFFER')->pluck('cost', 'project')->toArray();
 
         // You will likely pass clients/projects list to select project
         $user = auth()->user();
@@ -83,18 +81,15 @@ class QuoteController extends Controller
             $projects  = $user ? Project::where('user_id', $user->id)->get() : collect();
         }
 
-        return view('admin.quote.create', compact('kitchen_tops', 'manufacturers', 'projects'));
+        return view('admin.quote.create', compact('KITCHEN_TOP', 'KITCHEN_MANUFACTURER', 'KITCHEN_MARGIN_MARKUP', 'KITCHEN_DELIVERY', 'KITCHEN_BUFFER', 'projects'));
     }
 
-    /**
-     * Store quote, generate PDF (private), save file record.
-     * Returns JSON success or error. You can change to redirect if you prefer.
+   /**
+     * Store a new quote (handles full multi-step form payload)
      */
     public function store(Request $request)
     {
-        $user = Auth::user();
-
-        // Basic validation
+        // Basic server-side validation (arrays / nested)
         $request->validate([
             'project_id'               => 'required|exists:projects,id',
             'kitchen.name'             => 'nullable|array',
@@ -104,14 +99,24 @@ class QuoteController extends Controller
             'manufacturer.qty'         => 'nullable|array',
             'manufacturer.unit_price'  => 'nullable|array',
             'delivery'                 => 'nullable|array',
+            'buffer'                   => 'nullable|array',
+            'margin'                   => 'nullable|array',
             'final_total'              => 'nullable|numeric',
             'list_price'               => 'nullable|numeric',
             'expires_at'               => 'nullable|date',
             'tax'                      => 'nullable|numeric',
             'discount'                 => 'nullable|numeric',
+            'price_buffer'             => 'nullable|numeric',
+            'phone_call_buffer'        => 'nullable|numeric',
+            'dba_surcharge'            => 'nullable|numeric',
+            'hardware_qty'             => 'nullable|numeric',
+            'is_kitchen'               => 'nullable|in:0,1,2',
+            'is_vanity'                => 'nullable|in:0,1,2',
         ]);
 
-        // Format helpers (as in your original)
+        $user = Auth::user();
+
+        // helpers to ensure consistent DB storage formatting
         $toUnitPrice = fn($v) => number_format((float)$v, 4, '.', '');
         $toQty       = fn($v) => number_format((float)$v, 2, '.', '');
         $toLine      = fn($v) => number_format((float)$v, 4, '.', '');
@@ -119,14 +124,15 @@ class QuoteController extends Controller
         DB::beginTransaction();
 
         try {
+            // generate quote number (implement in your controller or adjust)
             $quoteNumber = $this->generateQuoteNumber();
 
             $expiresAt = $request->filled('expires_at')
                 ? Carbon::parse($request->input('expires_at'))
                 : Carbon::now()->addDays(30);
 
-            $isKitchen = $request->has('is_kitchen') ? (bool)$request->input('is_kitchen') : false;
-            $isVanity  = $request->has('is_vanity')  ? (bool)$request->input('is_vanity') : false;
+            $isKitchen = (bool)$request->input('is_kitchen', false);
+            $isVanity  = (bool)$request->input('is_vanity', false);
 
             // Create quote master
             $quote = Quote::create([
@@ -148,7 +154,7 @@ class QuoteController extends Controller
 
             $computedSubtotal = 0.0;
 
-            // 1) Kitchen items (parallel arrays)
+            // ---- 1) Kitchen items ----
             $kNames = $request->input('kitchen.name', []);
             $kQtys  = $request->input('kitchen.qty', []);
             $kUnits = $request->input('kitchen.unit_price', []);
@@ -168,7 +174,7 @@ class QuoteController extends Controller
                 $computedSubtotal += (float)$item->line_total;
             }
 
-            // 2) Manufacturer items
+            // ---- 2) Manufacturer items ----
             $mNames = $request->input('manufacturer.name', []);
             $mQtys  = $request->input('manufacturer.qty', []);
             $mUnits = $request->input('manufacturer.unit_price', []);
@@ -188,7 +194,7 @@ class QuoteController extends Controller
                 $computedSubtotal += (float)$item->line_total;
             }
 
-            // 3) Delivery items (nested)
+            // ---- 3) Delivery items (nested) ----
             $delivery = $request->input('delivery', []);
             if (is_array($delivery)) {
                 foreach ($delivery as $key => $vals) {
@@ -197,7 +203,7 @@ class QuoteController extends Controller
                     $unit = isset($vals['unit_price']) ? (float)$vals['unit_price'] : 0.0;
                     $line = $qty * $unit;
                     if ($qty == 0 && $line == 0) continue;
-                    $label = strtoupper(str_replace('_', ' ', $key));
+                    $label = $vals['name'] ?? strtoupper(str_replace('_', ' ', $key));
                     $item = $quote->items()->create([
                         'name'       => $label,
                         'unit_price' => $toUnitPrice($unit),
@@ -208,7 +214,64 @@ class QuoteController extends Controller
                 }
             }
 
-            // 4) Extras map
+            // ---- 4) Buffer rows ----
+            $buffer = $request->input('buffer', []);
+            if (is_array($buffer)) {
+                foreach ($buffer as $slug => $vals) {
+                    if (!is_array($vals)) continue;
+                    $unit = isset($vals['unit']) ? (float)$vals['unit'] : 0.0;
+                    $qty  = isset($vals['qty']) ? (float)$vals['qty'] : 0.0;
+                    $line = isset($vals['line_total']) ? (float)$vals['line_total'] : null;
+
+                    if ($line === null) {
+                        if ($unit && $qty) $line = $unit * $qty;
+                        else $line = $qty; // input-mode absolute
+                    }
+
+                    if ((float)$line == 0.0) continue;
+
+                    $label = $vals['name'] ?? str_replace('_', ' ', strtoupper($slug));
+                    $item = $quote->items()->create([
+                        'name'       => $label,
+                        'unit_price' => $toUnitPrice($unit ?: $line),
+                        'qty'        => $toQty($qty ?: 1),
+                        'line_total' => $toLine($line),
+                    ]);
+                    $computedSubtotal += (float)$item->line_total;
+                }
+            }
+
+            // ---- 5) Margins: save to meta (do not auto-apply to totals) ----
+            $margins = $request->input('margin', []);
+            $savedMargins = [];
+            if (is_array($margins) && count($margins)) {
+                foreach ($margins as $slug => $vals) {
+                    $mname = $vals['name'] ?? $slug;
+                    $mval  = isset($vals['value']) ? (float)$vals['value'] : null;
+                    $mres  = isset($vals['result']) ? (float)$vals['result'] : null;
+                    $savedMargins[$slug] = [
+                        'name' => $mname,
+                        'multiplier' => $mval,
+                        'percent' => $mres,
+                    ];
+                }
+
+                try {
+                    if (Schema::hasColumn('quotes', 'meta')) {
+                        $existing = $quote->meta ?? [];
+                        if (is_string($existing)) $existing = json_decode($existing, true) ?: [];
+                        $existing['margins'] = $savedMargins;
+                        $quote->meta = $existing;
+                        $quote->save();
+                    } else {
+                        Log::info('Margins received but quotes.meta column not present. Margins:', $savedMargins);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to persist margins into quote.meta: ' . $e->getMessage());
+                }
+            }
+
+            // ---- 6) Extras (price_buffer, phone_call_buffer, dba_surcharge) ----
             $extrasMap = [
                 'price_buffer'      => 'Price Change Buffer',
                 'phone_call_buffer' => 'Phone Call Buffer',
@@ -229,7 +292,7 @@ class QuoteController extends Controller
                 }
             }
 
-            // 5) Hardware quantity
+            // ---- 7) Hardware quantity (if provided) ----
             if ($request->filled('hardware_qty')) {
                 $hardwareQty = (float)$request->input('hardware_qty', 0);
                 if ($hardwareQty > 0) {
@@ -243,7 +306,7 @@ class QuoteController extends Controller
                 }
             }
 
-            // 6) compute totals
+            // ---- 8) Totals ----
             $subtotal = round($computedSubtotal, 2);
             $discount = (float)$request->input('discount', 0);
             $taxInput = $request->input('tax', null);
@@ -261,16 +324,14 @@ class QuoteController extends Controller
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Quote store error: '.$e->getMessage(), ['trace'=>$e->getTraceAsString()]);
+            Log::error('Quote store error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to save quote: ' . $e->getMessage(),
             ], 500);
         }
 
-        // --------------------------
-        // Generate PDF and save file (private)
-        // --------------------------
+        // ---- 9) Generate PDF & save file record ----
         try {
             $project = Project::find($quote->project_id);
             $clientId = $project->user_id ?? 'unknown';
@@ -280,17 +341,16 @@ class QuoteController extends Controller
             $filename = "quote-{$safeQuoteNumber}.pdf";
             $storagePath = "{$relativePath}/{$filename}"; // storage/app/clients/...
 
-            // prepare view data
-            $items = $quote->items()->get();
+            // view data for pdf (adjust view name/vars as needed)
+            $items = $quote->items()->orderBy('id')->get();
 
-            // company logo — if exists, convert to base64 for DOMPDF
-            $logoPath = public_path('images/logo.jpeg'); // adjust path to your logo
+            // embed company logo as base64 if exists (optional)
             $companyLogo = null;
+            $logoPath = public_path('images/logo.jpeg'); // change to your logo path
             if (file_exists($logoPath)) {
                 $type = pathinfo($logoPath, PATHINFO_EXTENSION);
                 $data = file_get_contents($logoPath);
-                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                $companyLogo = $base64;
+                $companyLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
             }
 
             $viewData = [
@@ -301,12 +361,14 @@ class QuoteController extends Controller
                 'companyLogo' => $companyLogo,
             ];
 
+            // generate pdf
             $pdf = Pdf::loadView('admin.quote.pdf', $viewData)->setPaper('a4', 'portrait');
-
             $bytes = $pdf->output();
+
+            // ensure dir exists
             Storage::disk('local')->put($storagePath, $bytes);
 
-            // create file record (morph)
+            // create file record - adjust fields to your files table
             $file = $quote->files()->create([
                 'name' => $filename,
                 'path' => $storagePath,
@@ -316,12 +378,11 @@ class QuoteController extends Controller
                 'created_by' => $user->id,
             ]);
 
-            // update quote pdf_path
+            // attach path to quote
             $quote->update(['pdf_path' => $storagePath]);
-
         } catch (\Throwable $e) {
-            Log::error('PDF generation error: '.$e->getMessage(), ['trace'=>$e->getTraceAsString()]);
-            // do not fail creation if PDF generation fails; return success with warning
+            Log::error('PDF generation error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            // don't treat PDF failure as fatal; return success with warning
             return response()->json([
                 'success' => true,
                 'message' => 'Quote saved but PDF generation failed: ' . $e->getMessage(),
@@ -330,13 +391,13 @@ class QuoteController extends Controller
             ], 201);
         }
 
-        // success response
+        // All good
         return response()->json([
             'success'       => true,
             'message'       => 'Quote saved and PDF generated',
             'quote_id'      => $quote->id,
             'quote_number'  => $quote->quote_number,
-            'pdf_path'      => $storagePath, // private path
+            'pdf_path'      => $storagePath,
             'subtotal'      => (float)$subtotal,
             'tax'           => (float)$tax,
             'discount'      => (float)$discount,

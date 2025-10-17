@@ -102,6 +102,32 @@ if (!function_exists('get_progress_list')) {
     }
 }
 
+if (!function_exists('get_kitchen_type_list')) {
+    /**
+     * Get kitchen type list or a single label by ID.
+     *
+     * @param string $id
+     * @return array|string
+     */
+    function get_kitchen_type_list($id = '')
+    {
+        $data = [
+            ['id' => 'KITCHEN_TOP', 'text' => 'Kitchen Top'],
+            ['id' => 'KITCHEN_MANUFACTURER', 'text' => 'Cabinet Manufacturer'],
+            ['id' => 'KITCHEN_MARGIN_MARKUP', 'text' => 'Margin / Markup'],
+            ['id' => 'KITCHEN_DELIVERY', 'text' => 'Delivery Charges'],
+            ['id' => 'KITCHEN_BUFFER', 'text' => 'BUFFER & Totals'],
+        ];
+
+        if ($id !== '') {
+            $temp = array_combine(array_column($data, 'id'), array_column($data, 'text'));
+            return $temp[$id] ?? '';
+        }
+
+        return $data;
+    }
+}
+
 if (! function_exists('format_money_short')) {
     /**
      * Format a number as compact currency string (e.g. $2.4M, ₹1.2K).
@@ -145,4 +171,33 @@ if (! function_exists('format_money_short')) {
         $short = rtrim(rtrim($short, '0'), '.');
         return ($neg ? '-' : '') . $currency . $short;
     }
+}
+
+function slugify_id($s)
+{
+    $s = preg_replace('/[^\p{L}\p{N}\-]+/u', '-', trim($s));
+    $s = preg_replace('/-+/', '-', $s);
+    return strtolower(trim($s, '-'));
+}
+
+function fmt2($v)
+{
+    return number_format((float) $v, 2, '.', '');
+}
+
+function slug_id($s)
+{
+    $s = preg_replace('/[^\p{L}\p{N}\-]+/u', '-', $s);
+    $s = preg_replace('/-+/', '-', $s);
+
+    return strtolower(trim($s, '-'));
+}
+
+function fmtAuto($v)
+{
+    $v = (float) $v;
+    if (round($v, 2) != $v) {
+        return number_format($v, 4, '.', '');
+    }
+    return number_format($v, 2, '.', '');
 }
