@@ -47,21 +47,52 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $postData = $request->all();
-        $fullName = trim($postData['first_name'].' '.$postData['last_name']);
+        $fullName = trim(
+            ($postData['first_name'] ?? '') . ' ' . ($postData['last_name'] ?? '')
+        );
+
+        // Role (defaults to customer)
+        $role = $postData['role'] ?? 'customer';
+
+        // Modules: expect array; clean and reindex. If empty -> null
+        $modulesRaw = $postData['modules'] ?? null;
+        $modulesValue = null;
+        if (is_array($modulesRaw)) {
+            // remove empty values and reindex
+            $modulesClean = array_values(array_filter($modulesRaw, function ($m) {
+                return $m !== null && $m !== '';
+            }));
+            if (count($modulesClean)) {
+                $modulesValue = json_encode($modulesClean);
+            }
+        } elseif (is_string($modulesRaw) && $modulesRaw !== '') {
+            // if client sent JSON string, try to decode it
+            $decoded = json_decode($modulesRaw, true);
+            if (is_array($decoded)) {
+                $modulesClean = array_values(array_filter($decoded, function ($m) {
+                    return $m !== null && $m !== '';
+                }));
+                if (count($modulesClean)) {
+                    $modulesValue = json_encode($modulesClean);
+                }
+            }
+        }
 
         $user = User::create([
             'name'             => $fullName,
-            'first_name'       => $postData['first_name'],
-            'last_name'        => $postData['last_name'],
-            'email'            => $postData['email'],
-            'phone'            => $postData['phone'],
-            'address'          => $postData['address'],
-            'city'             => $postData['city'],
-            'state'            => $postData['state'],
-            'zipCode'         => $postData['zipCode'],
-            'additionalNotes' => $postData['additionalNotes'] ?? null,
-            'referralSource'  => $postData['referralSource'] ?? null,
-            'status'  => $postData['customer_status'] ?? 'Active',
+            'first_name'       => $postData['first_name'] ?? null,
+            'last_name'        => $postData['last_name'] ?? null,
+            'email'            => $postData['email'] ?? null,
+            'phone'            => $postData['phone'] ?? null,
+            'address'          => $postData['address'] ?? null,
+            'city'             => $postData['city'] ?? null,
+            'state'            => $postData['state'] ?? null,
+            'zipCode'          => $postData['zipCode'] ?? null,
+            'additionalNotes'  => $postData['additionalNotes'] ?? null,
+            'referralSource'   => $postData['referralSource'] ?? null,
+            'status'           => $postData['customer_status'] ?? 'Active',
+            'role'             => $role,
+            'modules'          => $modulesValue,
             'password'         => Hash::make('123456'),
         ]);
 
@@ -72,6 +103,7 @@ class CustomerController extends Controller
             'name'    => $user->name,
         ], 201);
     }
+
 
     public function show($id)
     {
@@ -141,8 +173,26 @@ class CustomerController extends Controller
     public function update(Request $request, $id)
     {
         $postData = $request->all();
-        $fullName = trim($postData['first_name'].' '.$postData['last_name']);
 
+        // Combine first and last name
+        $fullName = trim(($postData['first_name'] ?? '') . ' ' . ($postData['last_name'] ?? ''));
+
+        // === Validation (optional but recommended) ===
+        $request->validate([
+            'first_name'       => 'required|string|max:100',
+            'last_name'        => 'required|string|max:100',
+            'email'            => 'required|email|unique:users,email,' . $id,
+            'phone'            => 'required|string|max:20',
+            'address'          => 'required|string|max:255',
+            'city'             => 'required|string|max:100',
+            'state'            => 'required|string|max:100',
+            'zipCode'          => 'required|string|max:20',
+            'role'             => 'required|in:admin,customer',
+            'modules'          => 'nullable|array',
+            'modules.*'        => 'string',
+        ]);
+
+        // Prepare base data
         $data = [
             'name'             => $fullName,
             'first_name'       => $postData['first_name'],
@@ -152,21 +202,27 @@ class CustomerController extends Controller
             'address'          => $postData['address'],
             'city'             => $postData['city'],
             'state'            => $postData['state'],
-            'zipCode'         => $postData['zipCode'],
-            'additionalNotes' => $postData['additionalNotes'] ?? null,
-            'referralSource'  => $postData['referralSource'] ?? null,
-            'status'  => $postData['customer_status'] ?? 'Active'
+            'zipCode'          => $postData['zipCode'],
+            'additionalNotes'  => $postData['additionalNotes'] ?? null,
+            'referralSource'   => $postData['referralSource'] ?? null,
+            'status'           => $postData['customer_status'] ?? 'Active',
+            'role'             => $postData['role'] ?? 'customer',
+            'modules'          => isset($postData['modules']) ? json_encode($postData['modules']) : json_encode([]),
         ];
 
+        // === Update the record ===
         $customer = User::findOrFail($id);
         $customer->update($data);
 
         return response()->json([
-            'status' => 'ok',
+            'status'  => 'ok',
             'message' => 'Customer updated successfully.',
-            'id' => $customer->id
+            'id'      => $customer->id,
+            'role'    => $customer->role,
+            'modules' => json_decode($customer->modules, true),
         ]);
     }
+
 
     public function destroy($id)
     {
