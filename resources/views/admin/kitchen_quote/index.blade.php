@@ -6,13 +6,26 @@
 @endpush
 
 @section('content')
-    <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="search-bar">
-                <i>🔍</i>
-                <input type="text" placeholder="Search quotes, customers...">
-            </div>
+
+  <div class="main-content" style="display: none;">
+    <!-- Header -->
+    <div class="header">
+      <div class="search-bar">
+        <i>🔍</i>
+        <input type="text" placeholder="Search quotes, customers...">
+      </div>
+
+      <div class="header-actions">
+        {{-- <button class="header-btn secondary">
+          <i>📤</i> Export
+        </button>
+        <button class="header-btn primary">
+          <i>➕</i> New Quote
+        </button> --}}
+        <a href="{{ route('admin.profile.edit') }}"
+          class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U', 0, 2)) : 'U' }}</a>
+      </div>
+    </div>
 
             <div class="header-actions">
                 {{-- <button class="header-btn secondary">
@@ -190,6 +203,172 @@
 			</form>
 		</div>
 	</div>
+
+  <!-- New Step Design -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <div class="search-bar">
+        <i>🔍</i>
+        <input type="text" placeholder="Search quotes, customers...">
+      </div>
+
+      <div class="header-actions">
+        {{-- <button class="header-btn secondary">
+          <i>📤</i> Export
+        </button>
+        <button class="header-btn primary">
+          <i>➕</i> New Quote
+        </button> --}}
+        <a href="{{ route('admin.profile.edit') }}"
+          class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U', 0, 2)) : 'U' }}</a>
+      </div>
+    </div>
+
+    <div class="content bg-white">
+      <div class="quote-details">
+        <div class="breadcrumb mb-8">
+          <span class="breadcrumb-item">Quote Generation – Step 1 of 3</span>
+        </div>
+        <div class="content-header d-block">
+          <h2 class="title">Stone by Stone: Your Perfect Kitchen Quote</h2>
+          <h3 class="subtitle">Step 1 of 3 – Enter Item Quantities</h3>
+          <div class="quote-steps">
+            <!-- Progress Indicator -->
+            <div class="progress-container">
+              <div class="progress-step active">1</div>
+              <div class="progress-line"></div>
+              <div class="progress-step inactive">2</div>
+              <div class="progress-line"></div>
+              <div class="progress-step inactive">3</div>
+            </div>
+            <div class="progress-labels">
+              <div class="progress-label active">Quantities</div>
+              <div class="progress-label">Details</div>
+              <div class="progress-label">Review</div>
+            </div>
+          </div>
+        </div>
+        <div class="quote-stepview">
+          <div class="quote-stepview__left">
+            <div class="stepview-title">
+              <h3 class="title mb-8">Quote Items</h3>
+              <p>Adjust quantities for each item</p>
+            </div>
+            <div class="custom-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 15%;">Project/Item Name</th>
+                    <th>Scope/Material</th>
+                    <th>QTY</th>
+                    <th>Unit Cost</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="label">Kitchen - Sq Ft <span class="t_tag">T</span> </td>
+                    <td class="label">Granite</td>
+                    <td class="label">
+                      <div class="quantity-controls">
+                        <button class="quantity-btn minus">−</button>
+                        <input type="number" class="quantity-input" value="0" min="0" />
+                        <button class="quantity-btn plus">+</button>
+                      </div>
+                    </td>
+                    <td class="label">$75.00</td>
+                    <td class="label">$3,750.00</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Labor Charge <span class="t_tag">T</span> </td>
+                    <td class="label">Service</td>
+                    <td class="label">
+                      <div class="quantity-controls">
+                        <button class="quantity-btn minus">−</button>
+                        <input type="number" class="quantity-input" value="12" min="0" />
+                        <button class="quantity-btn plus">+</button>
+                      </div>
+                    </td>
+                    <td class="label">$120.00</td>
+                    <td class="label">$1440.00</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Edge - Lin Ft</td>
+                    <td class="label">Stone</td>
+                    <td class="label">
+                      <div class="quantity-controls">
+                        <button class="quantity-btn minus">−</button>
+                        <input type="number" class="quantity-input" value="16" min="0" />
+                        <button class="quantity-btn plus">+</button>
+                      </div>
+                    </td>
+                    <td class="label">$85.00</td>
+                    <td class="label">$1,360.00</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Arc Charges <span class="t_tag">T</span> </td>
+                    <td class="label">-</td>
+                    <td class="label">
+                      <div class="quantity-controls">
+                        <button class="quantity-btn minus">−</button>
+                        <input type="number" class="quantity-input" value="50" min="0" />
+                        <button class="quantity-btn plus">+</button>
+                      </div>
+                    </td>
+                    <td class="label">$250.00</td>
+                    <td class="label">$250.00</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Bump-Outs</td>
+                    <td class="label">-</td>
+                    <td class="label">
+                      <div class="quantity-controls">
+                        <button class="quantity-btn minus">−</button>
+                        <input type="number" class="quantity-input" value="62" min="0" />
+                        <button class="quantity-btn plus">+</button>
+                      </div>
+                    </td>
+                    <td class="label">$15.00</td>
+                    <td class="label">$930.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="quote-stepview__right">
+            <div class="stepview-title">
+              <h3 class="title">Quote Summary</h3>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">Subtotal</div>
+              <div class="summary-amount" id="subtotal">$7,730.00</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">Tax (8%)</div>
+              <div class="summary-amount" id="tax">$618.40</div>
+            </div>
+            <div class="summary-item grand-total">
+              <div class="summary-label">Grand Total</div>
+              <div class="summary-amount" id="grand-total">$8,348.40</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="step-footer">
+      <div class="footer-content">
+        <div class="step-indicator">Step 1 of 3</div>
+        <div class="footer-actions">
+          <button class="btn secondary">Previous</button>
+          <button class="btn theme">Next</button>
+        </div>
+      </div>
+    </footer>
+
+  </div>
 
 @endsection
 
@@ -461,5 +640,50 @@
 			});
 
         });
-    </script>
+      });
+    });
+  </script>
+
+  <script>
+    $(document).ready(function () {
+      // Open modal
+      $('.open-modal').on('click', function () {
+        const targetModal = $(this).data('target');
+        $(targetModal).fadeIn(200).addClass('active');
+      });
+
+      $('.close-btn').on('click', function () {
+        $(this).closest('.modal').fadeOut(200).removeClass('active');
+      });
+
+      $('.modal').on('click', function (e) {
+        if ($(e.target).is('.modal')) {
+          $(this).fadeOut(200).removeClass('active');
+        }
+      });
+    });
+  </script>
+
+  <script>
+    $(document).ready(function () {
+      $(".quantity-controls").each(function () {
+        const $container = $(this);
+
+        $container.find(".plus").click(function () {
+          let $input = $container.find(".quantity-input");
+          let value = parseInt($input.val()) || 0;
+          $input.val(value + 1);
+        });
+
+        $container.find(".minus").click(function () {
+          let $input = $container.find(".quantity-input");
+          let value = parseInt($input.val()) || 0;
+          if (value > 0) {
+            $input.val(value - 1);
+          }
+        });
+      });
+    });
+  </script>
+
 @endpush
