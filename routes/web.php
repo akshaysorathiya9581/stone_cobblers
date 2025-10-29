@@ -81,5 +81,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     //     ->middleware('module:kitchen-quotes');
     Route::get('kitchen-quotes', [KitchenQuoteController::class, 'index'])->name('kitchen-quotes.index')->middleware('module:kitchen_quotes');
     Route::post('kitchen-quotes/store', [KitchenQuoteController::class, 'store'])->name('kitchen-quotes.store')->middleware('module:kitchen_quotes');
+    
+    // show single (for edit prefill), update and delete
+    Route::get('kitchen-quotes/{quote}', [KitchenQuoteController::class, 'show'])->name('admin.kitchen-quotes.show');
+    Route::match(['put','patch'],'kitchen-quotes/{quote}', [KitchenQuoteController::class, 'update'])->name('admin.kitchen-quotes.update');
+    Route::delete('kitchen-quotes/{quote}', [KitchenQuoteController::class, 'destroy'])->name('admin.kitchen-quotes.destroy');
 });
 

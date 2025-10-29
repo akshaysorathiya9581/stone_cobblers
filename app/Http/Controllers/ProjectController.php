@@ -12,19 +12,20 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::with('customer')->orderBy('created_at', 'desc')->get();
-        $activeProjects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->count();
-        $completedProjectsThisMonth  = Project::where('status', 'Completed')->count();
-        // $completedProjectsThisMonth = Project::where('status', 'Completed')
-        //     ->whereMonth('completed_at', Carbon::now()->month)
-        //     ->whereYear('completed_at', Carbon::now()->year)
-        //     ->count();
+        // $projects = Project::with('customer')->orderBy('created_at', 'desc')->get();
+        // $activeProjects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->count();
+        // $completedProjectsThisMonth  = Project::where('status', 'Completed')->count();
+        // // $completedProjectsThisMonth = Project::where('status', 'Completed')
+        // //     ->whereMonth('completed_at', Carbon::now()->month)
+        // //     ->whereYear('completed_at', Carbon::now()->year)
+        // //     ->count();
 
-        return view('admin.projects.index', compact('projects', 'activeProjects', 'completedProjectsThisMonth'));
+        // return view('admin.projects.index', compact('projects', 'activeProjects', 'completedProjectsThisMonth'));
 
         $user = auth()->user();
 
-        if ($user->isAdmin()) {
+        if ($user->role === 'admin') {
+            $projects = Project::with('customer')->orderBy('created_at', 'desc')->get();
             $totalCustomers = User::customers()->count();
             $activeProjects = Project::active()->count();
             $completedProjectsThisMonth = Project::completedThisMonth()->count();
@@ -34,6 +35,7 @@ class ProjectController extends Controller
                 ->withSum('projects', 'budget')
                 ->get();
         } else {
+            $projects = Project::with('customer')->where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
             $totalCustomers = $user->role === 'customer' ? 1 : 0;
             $activeProjects = $user->projects()->active()->count();
             $completedProjectsThisMonth = $user->projects()->completedThisMonth()->count();
@@ -43,6 +45,7 @@ class ProjectController extends Controller
         }
 
         return view('admin.projects.index', compact(
+            'projects',
             'totalCustomers',
             'activeProjects',
             'completedProjectsThisMonth'

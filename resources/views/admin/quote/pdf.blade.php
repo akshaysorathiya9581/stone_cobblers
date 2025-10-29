@@ -92,7 +92,7 @@
         }
 
         .pdf-footer .pagenum:before {
-            content: "Page " counter(page) " / " counter(pages);
+            content: "Page " counter(page);
         }
 
         /* --- Content area (starts below header) --- */

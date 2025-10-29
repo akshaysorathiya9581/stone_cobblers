@@ -12,68 +12,109 @@ class KitchenQuoteController extends Controller
 {
     public function index()
     {
-        $kitchen_tops = KitchenQuote::where('type', 'KITCHEN_TOP')
-            ->pluck('cost', 'project')
-            ->toArray();
+        $kitchen_tops = KitchenQuote::orderBy('created_at')->get();
+        // $manufacturers = KitchenQuote::where('type', 'KITCHEN_CABINET')->orderBy('created_at')->get();
 
-        $manufacturers = KitchenQuote::where('type', 'KITCHEN_CABINET')
-            ->pluck('cost', 'project')
-            ->toArray();
-
-        return view('admin.kitchen_quote.index', compact('kitchen_tops', 'manufacturers'));
+        return view('admin.kitchen_quote.index', compact('kitchen_tops'));
     }
 
-   public function store(Request $request)
+   /**
+     * Store via AJAX
+     */
+    public function store(Request $request)
     {
-        // expected arrays:
-        // kitchen[name][], kitchen[unit_price][]
-        // manufacturer[name][], manufacturer[unit_price][]
-        $kNames = $request->input('kitchen.name', []);
-        $kPrices = $request->input('kitchen.unit_price', []);
-        $mNames = $request->input('manufacturer.name', []);
-        $mPrices = $request->input('manufacturer.unit_price', []);
+        // Validate. We expect single quote create from modal: item, unit_price, category
+        $rules = [
+            'project' => 'required|string|max:255',
+            'cost' => 'required|numeric|min:0',
+            'type' => 'required|string',
+        ];
 
-        DB::beginTransaction();
-        try {
-            // upsert Kitchen Top items
-            $countK = max(count($kNames), count($kPrices));
-            for ($i = 0; $i < $countK; $i++) {
-                $name = isset($kNames[$i]) ? trim($kNames[$i]) : null;
-                if (!$name) continue;
-                $price = isset($kPrices[$i]) && $kPrices[$i] !== '' ? (float)$kPrices[$i] : 0.0;
+        $validator = Validator::make($request->all(), $rules);
 
-                KitchenQuote::updateOrCreate(
-                    ['project' => $name, 'type' => 'KITCHEN_TOP'],
-                    ['cost' => number_format($price, 4, '.', '')]
-                );
-            }
-
-            // upsert Manufacturer items
-            $countM = max(count($mNames), count($mPrices));
-            for ($i = 0; $i < $countM; $i++) {
-                $name = isset($mNames[$i]) ? trim($mNames[$i]) : null;
-                if (!$name) continue;
-                $price = isset($mPrices[$i]) && $mPrices[$i] !== '' ? (float)$mPrices[$i] : 0.0;
-
-                KitchenQuote::updateOrCreate(
-                    ['project' => $name, 'type' => 'KITCHEN_CABINET'],
-                    ['cost' => number_format($price, 4, '.', '')]
-                );
-            }
-
-            DB::commit();
-
+        if ($validator->fails()) {
+            // Return JSON 422 with errors and old input (so frontend can re-populate)
             return response()->json([
-                'success' => true,
-                'message' => 'Prices saved.'
-            ]);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            \Log::error('KitchenQuote store error: '.$e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Save failed: '.$e->getMessage()
-            ], 500);
+                'ok' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+                'old' => $request->only(['project','cost','type'])
+            ], 422);
         }
+
+        $quote = KitchenQuote::create([
+            'project' => $request->post('project'),
+            'cost' => $request->post('cost'),
+            'type' => $request->post('type'),
+        ]);
+
+        // Return the newly created resource (client can append it)
+        return response()->json([
+            'ok' => true,
+            'message' => 'created successfully',
+            'data' => array_merge($quote->toArray(), [
+                'type_label' => get_kitchen_type_list($quote->type)
+            ])
+        ], 201);
+    }
+
+     /**
+     * Return single quote JSON (for edit prefill)
+     */
+    public function show(KitchenQuote $quote)
+    {
+        return response()->json([
+            'ok' => true,
+            'data' => $quote
+        ]);
+    }
+
+    /**
+     * Update via AJAX
+     */
+    public function update(Request $request, KitchenQuote $quote)
+    {
+        $rules = [
+            'project' => 'required|string|max:255',
+            'cost' => 'required|numeric|min:0',
+            'type' => 'required|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+                'old' => $request->only(['project','cost','type'])
+            ], 422);
+        }
+
+        $quote->project = $request->post('project');
+        $quote->cost = $request->post('cost');
+        $quote->type = $request->post('type');
+        $quote->save();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'updated successfully',
+            'data' => array_merge($quote->toArray(), [
+                'type_label' => get_kitchen_type_list($quote->type)
+            ])
+        ]);
+    }
+
+    /**
+     * Destroy via AJAX (optional)
+     */
+    public function destroy(KitchenQuote $quote)
+    {
+        $quote->delete();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'deleted successfully',
+        ]);
     }
 }
