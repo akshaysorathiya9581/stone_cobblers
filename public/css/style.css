@@ -9,6 +9,7 @@
     --primary-color-rgb: 22, 163, 74;
     --secondary-color: #f1f3f4;
     --text-color: #333;
+    --text-dark: #171a1f;
     --text-color-light: #666;
     --background-color: #f8f9fa;
     --border-color: #e0e0e0;
@@ -149,6 +150,10 @@ select {
 
 .d-block {
     display: block !important;
+}
+
+.text-align-center {
+    text-align: center;
 }
 
 .breadcrumb {
@@ -2542,7 +2547,13 @@ select {
 
 .quote-steps .progress-step.active {
     background-color: var(--primary-color);
-    color: var(--text-color);
+    color: var(--white-color);
+}
+
+.quote-steps .progress-step.completed {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-size: 0;
 }
 
 .quote-steps .progress-line {
@@ -2602,6 +2613,10 @@ select {
     border-radius: 10px;
 }
 
+.quote-stepview .quote-stepview__full {
+    width: 100%;
+}
+
 .quote-stepview .stepview-title {
     margin-bottom: 25px;
 }
@@ -2619,6 +2634,15 @@ select {
 .quote-stepview .custom-table .label {
     font-size: 14px;
     font-weight: 500;
+}
+
+.quote-stepview .custom-table .form-input {
+    padding: 11px 16px;
+    max-width: 167px;
+}
+
+.quote-stepview .custom-table .form-input::placeholder {
+    color: #565E6C;
 }
 
 .t_tag {
@@ -2757,4 +2781,145 @@ select {
 .step-footer .footer-actions {
     display: flex;
     gap: 14px;
+}
+
+.quote-accordion {}
+
+.quote-accordion__item {
+    /* border: 1px solid var(--border-color); */
+}
+
+.quote-accordion__item:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.quote-accordion__header {
+    position: relative;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-dark);
+    padding: 17px 25px;
+    padding-right: 35px !important;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.25s ease-in-out;
+    cursor: pointer;
+}
+
+.quote-accordion__header .quote-accordion__icon {
+    position: absolute;
+    right: 0;
+    top: 42%;
+    right: 20px;
+    width: 12px;
+    height: auto;
+    transform: rotate(-90deg) translateY(-50%);
+    transition: all .25s ease-in-out;
+}
+
+.quote-accordion__header.active .quote-accordion__icon {
+    top: 50%;
+    transform: rotate(0deg) translateY(-50%);
+}
+
+.quote-accordion__body {
+    display: none;
+    background: var(--white-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 6px 6px;
+    padding: 30px 20px 20px;
+    margin-top: -10px;
+}
+
+.quote-accordion__body input::placeholder {
+    color: #565E6C;
+}
+
+.quote-accordion__body .add-btn {
+    display: inline-flex;
+    background-color: #EAFFE8;
+    border: 1px solid #00000000;
+    color: var(--primary-color);
+}
+
+.quote-stepview__summary {
+    width: 100%;
+}
+
+.quote-stepview__summary .summary-card {
+    background-color: #f8f9fa;
+    border-radius: 16px;
+    padding: 20px 25px 30px;
+}
+
+.quote-stepview__summary .summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.quote-stepview__summary .summary-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 22px;
+    color: #171a1f;
+}
+
+.quote-stepview__summary .final-total-section {
+    text-align: right;
+}
+
+.quote-stepview__summary .final-total-label {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #171a1f;
+    margin-bottom: 6px;
+}
+
+.quote-stepview__summary .final-total-amount {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 27px;
+    color: #0f8300;
+}
+
+.quote-stepview__summary .summary-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #bcc1ca;
+    margin: 22px 0;
+}
+
+.quote-stepview__summary .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.quote-stepview__summary .summary-item:last-child {
+    margin-bottom: 0;
+}
+
+.quote-stepview__summary .item-description {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 22px;
+    color: #171a1f;
+}
+
+.quote-stepview__summary .item-price {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 22px;
+    color: #323842;
+}
+
+.quote-stepview__summary .total-row .item-description,
+.quote-stepview__summary .total-row .item-price {
+    font-weight: 700;
 }
