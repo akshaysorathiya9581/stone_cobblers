@@ -23,11 +23,12 @@ class KitchenQuoteController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate. We expect single quote create from modal: item, unit_price, category
+        // Validate. We expect single quote create from modal: item, unit_price, category, is_taxable
         $rules = [
             'project' => 'required|string|max:255',
             'cost' => 'required|numeric|min:0',
             'type' => 'required|string',
+            'is_taxable' => 'nullable|boolean',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -38,7 +39,7 @@ class KitchenQuoteController extends Controller
                 'ok' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
-                'old' => $request->only(['project','cost','type'])
+                'old' => $request->only(['project','cost','type','is_taxable'])
             ], 422);
         }
 
@@ -46,6 +47,7 @@ class KitchenQuoteController extends Controller
             'project' => $request->post('project'),
             'cost' => $request->post('cost'),
             'type' => $request->post('type'),
+            'is_taxable' => $request->post('is_taxable', false),
         ]);
 
         // Return the newly created resource (client can append it)
@@ -78,6 +80,7 @@ class KitchenQuoteController extends Controller
             'project' => 'required|string|max:255',
             'cost' => 'required|numeric|min:0',
             'type' => 'required|string',
+            'is_taxable' => 'nullable|boolean',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -87,13 +90,14 @@ class KitchenQuoteController extends Controller
                 'ok' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
-                'old' => $request->only(['project','cost','type'])
+                'old' => $request->only(['project','cost','type','is_taxable'])
             ], 422);
         }
 
         $quote->project = $request->post('project');
         $quote->cost = $request->post('cost');
         $quote->type = $request->post('type');
+        $quote->is_taxable = $request->post('is_taxable', false);
         $quote->save();
 
         return response()->json([

@@ -65,23 +65,44 @@ class QuoteController extends Controller
      */
     public function create()
     {
-        $KITCHEN_TOP = KitchenQuote::where('type', 'KITCHEN_TOP')->pluck('cost', 'project')->toArray();
-        $KITCHEN_MANUFACTURER = KitchenQuote::where('type', 'KITCHEN_MANUFACTURER')->pluck('cost', 'project')->toArray();
-        $KITCHEN_MARGIN_MARKUP = KitchenQuote::where('type', 'KITCHEN_MARGIN_MARKUP')->pluck('cost', 'project')->toArray();
-        $KITCHEN_DELIVERY = KitchenQuote::where('type', 'KITCHEN_DELIVERY')->pluck('cost', 'project')->toArray();
-        $KITCHEN_BUFFER = KitchenQuote::where('type', 'KITCHEN_BUFFER')->pluck('cost', 'project')->toArray();
+        // Fetch kitchen quote data from database with full objects (including is_taxable)
+        $KITCHEN_TOP = KitchenQuote::where('type', 'KITCHEN_TOP')
+            ->get()
+            ->keyBy('project');
+            
+        $KITCHEN_MANUFACTURER = KitchenQuote::where('type', 'KITCHEN_MANUFACTURER')
+            ->get()
+            ->keyBy('project');
+            
+        $KITCHEN_MARGIN_MARKUP = KitchenQuote::where('type', 'KITCHEN_MARGIN_MARKUP')
+            ->get()
+            ->keyBy('project');
+            
+        $KITCHEN_DELIVERY = KitchenQuote::where('type', 'KITCHEN_DELIVERY')
+            ->get()
+            ->keyBy('project');
+            
+        $KITCHEN_BUFFER = KitchenQuote::where('type', 'KITCHEN_BUFFER')
+            ->get()
+            ->keyBy('project');
 
-        // You will likely pass clients/projects list to select project
+        // Get projects list based on user role
         $user = auth()->user();
 
-        // dd($user);
         if ($user && $user->role === 'admin') {
-            $projects  = Project::all();
+            $projects = Project::with('customer')->get();
         } else {
-            $projects  = $user ? Project::where('user_id', $user->id)->get() : collect();
+            $projects = $user ? Project::with('customer')->where('user_id', $user->id)->get() : collect();
         }
 
-        return view('admin.quote.create', compact('KITCHEN_TOP', 'KITCHEN_MANUFACTURER', 'KITCHEN_MARGIN_MARKUP', 'KITCHEN_DELIVERY', 'KITCHEN_BUFFER', 'projects'));
+        return view('admin.quote.create', compact(
+            'KITCHEN_TOP', 
+            'KITCHEN_MANUFACTURER', 
+            'KITCHEN_MARGIN_MARKUP', 
+            'KITCHEN_DELIVERY', 
+            'KITCHEN_BUFFER', 
+            'projects'
+        ));
     }
 
    /**
@@ -89,29 +110,18 @@ class QuoteController extends Controller
      */
     public function store(Request $request)
     {
-        // Basic server-side validation (arrays / nested)
+        // Basic server-side validation
         $request->validate([
-            'project_id'               => 'required|exists:projects,id',
-            'kitchen.name'             => 'nullable|array',
-            'kitchen.qty'              => 'nullable|array',
-            'kitchen.unit_price'       => 'nullable|array',
-            'manufacturer.name'        => 'nullable|array',
-            'manufacturer.qty'         => 'nullable|array',
-            'manufacturer.unit_price'  => 'nullable|array',
-            'delivery'                 => 'nullable|array',
-            'buffer'                   => 'nullable|array',
-            'margin'                   => 'nullable|array',
-            'final_total'              => 'nullable|numeric',
-            'list_price'               => 'nullable|numeric',
-            'expires_at'               => 'nullable|date',
-            'tax'                      => 'nullable|numeric',
-            'discount'                 => 'nullable|numeric',
-            'price_buffer'             => 'nullable|numeric',
-            'phone_call_buffer'        => 'nullable|numeric',
-            'dba_surcharge'            => 'nullable|numeric',
-            'hardware_qty'             => 'nullable|numeric',
-            'is_kitchen'               => 'nullable|in:0,1,2',
-            'is_vanity'                => 'nullable|in:0,1,2',
+            'project_id'       => 'required|exists:projects,id',
+            'customer_name'    => 'nullable|string',
+            'project_name'     => 'nullable|string',
+            'items'            => 'nullable|array',
+            'manufacturers'    => 'nullable|array',
+            'margins'          => 'nullable|array',
+            'subtotal'         => 'required|numeric',
+            'tax'              => 'required|numeric',
+            'total'            => 'required|numeric',
+            'discount'         => 'nullable|numeric',
         ]);
 
         $user = Auth::user();
@@ -124,202 +134,115 @@ class QuoteController extends Controller
         DB::beginTransaction();
 
         try {
-            // generate quote number (implement in your controller or adjust)
+            // Get project details
+            $project = Project::with('customer')->findOrFail($request->input('project_id'));
+            
+            // generate quote number
             $quoteNumber = $this->generateQuoteNumber();
 
             $expiresAt = $request->filled('expires_at')
                 ? Carbon::parse($request->input('expires_at'))
                 : Carbon::now()->addDays(30);
 
-            $isKitchen = (bool)$request->input('is_kitchen', false);
-            $isVanity  = (bool)$request->input('is_vanity', false);
-
             // Create quote master
             $quote = Quote::create([
                 'user_id'      => $user->id,
                 'project_id'   => $request->input('project_id'),
                 'quote_number' => $quoteNumber,
-                'customer_name'=> $request->input('customer_name'),
-                'project_name' => $request->input('project_name'),
+                'customer_name'=> $request->input('customer_name') ?? $project->customer->name ?? '',
+                'project_name' => $request->input('project_name') ?? $project->name ?? '',
                 'status'       => 'Draft',
-                'subtotal'     => 0,
-                'tax'          => 0,
+                'subtotal'     => $request->input('subtotal', 0),
+                'tax'          => $request->input('tax', 0),
                 'discount'     => $request->input('discount', 0),
-                'total'        => 0,
+                'total'        => $request->input('total', 0),
                 'pdf_path'     => null,
-                'is_kitchen'   => $isKitchen,
-                'is_vanity'    => $isVanity,
+                'is_kitchen'   => true,
+                'is_vanity'    => false,
                 'expires_at'   => $expiresAt,
             ]);
 
-            $computedSubtotal = 0.0;
-
-            // ---- 1) Kitchen items ----
-            $kNames = $request->input('kitchen.name', []);
-            $kQtys  = $request->input('kitchen.qty', []);
-            $kUnits = $request->input('kitchen.unit_price', []);
-            $kCount = max(count($kNames), count($kQtys), count($kUnits));
-            for ($i = 0; $i < $kCount; $i++) {
-                $name = trim((string)($kNames[$i] ?? ''));
-                if ($name === '') continue;
-                $qty  = isset($kQtys[$i]) ? (float)$kQtys[$i] : 0.0;
-                $unit = isset($kUnits[$i]) ? (float)$kUnits[$i] : 0.0;
-                $line = $qty * $unit;
-                $item = $quote->items()->create([
-                    'name'       => $name,
-                    'unit_price' => $toUnitPrice($unit),
-                    'qty'        => $toQty($qty),
-                    'line_total' => $toLine($line),
+            // ---- 1) Process Quote Items ----
+            $items = $request->input('items', []);
+            foreach ($items as $item) {
+                if (empty($item['name'])) continue;
+                
+                $isTaxable = $item['is_taxable'] ?? false;
+                $lineTotal = $toLine($item['line_total'] ?? 0);
+                $taxCost = $isTaxable ? ($lineTotal * 0.08) : 0;
+                
+                $quote->items()->create([
+                    'name'       => $item['name'],
+                    'type'       => 'KITCHEN_TOP',
+                    'unit_price' => $toUnitPrice($item['unit_price'] ?? 0),
+                    'qty'        => $toQty($item['qty'] ?? 0),
+                    'line_total' => $lineTotal,
+                    'tax_cost'   => $taxCost,
+                    'is_taxable' => $isTaxable,
                 ]);
-                $computedSubtotal += (float)$item->line_total;
             }
 
-            // ---- 2) Manufacturer items ----
-            $mNames = $request->input('manufacturer.name', []);
-            $mQtys  = $request->input('manufacturer.qty', []);
-            $mUnits = $request->input('manufacturer.unit_price', []);
-            $mCount = max(count($mNames), count($mQtys), count($mUnits));
-            for ($i = 0; $i < $mCount; $i++) {
-                $name = trim((string)($mNames[$i] ?? ''));
-                if ($name === '') continue;
-                $qty  = isset($mQtys[$i]) ? (float)$mQtys[$i] : 0.0;
-                $unit = isset($mUnits[$i]) ? (float)$mUnits[$i] : 0.0;
-                $line = $qty * $unit;
-                $item = $quote->items()->create([
-                    'name'       => $name,
-                    'unit_price' => $toUnitPrice($unit),
-                    'qty'        => $toQty($qty),
-                    'line_total' => $toLine($line),
+            // ---- 2) Process Manufacturers ----
+            $manufacturers = $request->input('manufacturers', []);
+            foreach ($manufacturers as $manufacturer) {
+                if (empty($manufacturer['name'])) continue;
+                
+                $isTaxable = $manufacturer['is_taxable'] ?? false;
+                $lineTotal = $toLine($manufacturer['line_total'] ?? 0);
+                $taxCost = $isTaxable ? ($lineTotal * 0.08) : 0;
+                
+                $quote->items()->create([
+                    'name'       => $manufacturer['name'],
+                    'type'       => 'KITCHEN_MANUFACTURER',
+                    'unit_price' => $toUnitPrice($manufacturer['unit_price'] ?? 0),
+                    'qty'        => $toQty($manufacturer['qty'] ?? 0),
+                    'line_total' => $lineTotal,
+                    'tax_cost'   => $taxCost,
+                    'is_taxable' => $isTaxable,
                 ]);
-                $computedSubtotal += (float)$item->line_total;
             }
 
-            // ---- 3) Delivery items (nested) ----
-            $delivery = $request->input('delivery', []);
-            if (is_array($delivery)) {
-                foreach ($delivery as $key => $vals) {
-                    if (!is_array($vals)) continue;
-                    $qty  = isset($vals['qty']) ? (float)$vals['qty'] : 0.0;
-                    $unit = isset($vals['unit_price']) ? (float)$vals['unit_price'] : 0.0;
-                    $line = $qty * $unit;
-                    if ($qty == 0 && $line == 0) continue;
-                    $label = $vals['name'] ?? strtoupper(str_replace('_', ' ', $key));
-                    $item = $quote->items()->create([
-                        'name'       => $label,
-                        'unit_price' => $toUnitPrice($unit),
-                        'qty'        => $toQty($qty),
-                        'line_total' => $toLine($line),
-                    ]);
-                    $computedSubtotal += (float)$item->line_total;
-                }
-            }
-
-            // ---- 4) Buffer rows ----
-            $buffer = $request->input('buffer', []);
-            if (is_array($buffer)) {
-                foreach ($buffer as $slug => $vals) {
-                    if (!is_array($vals)) continue;
-                    $unit = isset($vals['unit']) ? (float)$vals['unit'] : 0.0;
-                    $qty  = isset($vals['qty']) ? (float)$vals['qty'] : 0.0;
-                    $line = isset($vals['line_total']) ? (float)$vals['line_total'] : null;
-
-                    if ($line === null) {
-                        if ($unit && $qty) $line = $unit * $qty;
-                        else $line = $qty; // input-mode absolute
-                    }
-
-                    if ((float)$line == 0.0) continue;
-
-                    $label = $vals['name'] ?? str_replace('_', ' ', strtoupper($slug));
-                    $item = $quote->items()->create([
-                        'name'       => $label,
-                        'unit_price' => $toUnitPrice($unit ?: $line),
-                        'qty'        => $toQty($qty ?: 1),
-                        'line_total' => $toLine($line),
-                    ]);
-                    $computedSubtotal += (float)$item->line_total;
-                }
-            }
-
-            // ---- 5) Margins: save to meta (do not auto-apply to totals) ----
-            $margins = $request->input('margin', []);
+            // ---- 3) Process Margins (save as items and metadata) ----
+            $margins = $request->input('margins', []);
             $savedMargins = [];
-            if (is_array($margins) && count($margins)) {
-                foreach ($margins as $slug => $vals) {
-                    $mname = $vals['name'] ?? $slug;
-                    $mval  = isset($vals['value']) ? (float)$vals['value'] : null;
-                    $mres  = isset($vals['result']) ? (float)$vals['result'] : null;
-                    $savedMargins[$slug] = [
-                        'name' => $mname,
-                        'multiplier' => $mval,
-                        'percent' => $mres,
-                    ];
-                }
+            
+            foreach ($margins as $margin) {
+                if (empty($margin['description'])) continue;
+                
+                $isTaxable = $margin['is_taxable'] ?? false;
+                $lineTotal = $toLine($margin['result'] ?? 0);
+                $taxCost = $isTaxable ? ($lineTotal * 0.08) : 0;
+                
+                // Save as quote item without prefix (type column identifies it)
+                $quote->items()->create([
+                    'name'       => $margin['description'],
+                    'type'       => 'KITCHEN_MARGIN_MARKUP',
+                    'unit_price' => $toUnitPrice($margin['multiplier'] ?? 0),
+                    'qty'        => $toQty(1),
+                    'line_total' => $lineTotal,
+                    'tax_cost'   => $taxCost,
+                    'is_taxable' => $isTaxable,
+                ]);
+                
+                // Save to metadata
+                $savedMargins[] = [
+                    'description' => $margin['description'],
+                    'multiplier' => $margin['multiplier'] ?? 0,
+                    'result' => $margin['result'] ?? 0,
+                ];
+            }
 
+            // Save margins to meta if column exists
+            if (!empty($savedMargins)) {
                 try {
-                    if (Schema::hasColumn('quotes', 'meta')) {
-                        $existing = $quote->meta ?? [];
-                        if (is_string($existing)) $existing = json_decode($existing, true) ?: [];
-                        $existing['margins'] = $savedMargins;
-                        $quote->meta = $existing;
+                    if (\Schema::hasColumn('quotes', 'meta')) {
+                        $quote->meta = json_encode(['margins' => $savedMargins]);
                         $quote->save();
-                    } else {
-                        Log::info('Margins received but quotes.meta column not present. Margins:', $savedMargins);
                     }
                 } catch (\Throwable $e) {
                     Log::warning('Failed to persist margins into quote.meta: ' . $e->getMessage());
                 }
             }
-
-            // ---- 6) Extras (price_buffer, phone_call_buffer, dba_surcharge) ----
-            $extrasMap = [
-                'price_buffer'      => 'Price Change Buffer',
-                'phone_call_buffer' => 'Phone Call Buffer',
-                'dba_surcharge'     => 'DBA Surcharge',
-            ];
-            foreach ($extrasMap as $field => $label) {
-                if ($request->filled($field)) {
-                    $val = (float)$request->input($field, 0);
-                    if ($val != 0) {
-                        $item = $quote->items()->create([
-                            'name'       => $label,
-                            'unit_price' => $toUnitPrice($val),
-                            'qty'        => $toQty(1),
-                            'line_total' => $toLine($val),
-                        ]);
-                        $computedSubtotal += (float)$item->line_total;
-                    }
-                }
-            }
-
-            // ---- 7) Hardware quantity (if provided) ----
-            if ($request->filled('hardware_qty')) {
-                $hardwareQty = (float)$request->input('hardware_qty', 0);
-                if ($hardwareQty > 0) {
-                    $item = $quote->items()->create([
-                        'name'       => 'Hardware Quantity',
-                        'unit_price' => $toUnitPrice(1),
-                        'qty'        => $toQty($hardwareQty),
-                        'line_total' => $toLine($hardwareQty),
-                    ]);
-                    $computedSubtotal += (float)$item->line_total;
-                }
-            }
-
-            // ---- 8) Totals ----
-            $subtotal = round($computedSubtotal, 2);
-            $discount = (float)$request->input('discount', 0);
-            $taxInput = $request->input('tax', null);
-            $tax = ($taxInput !== null) ? round((float)$taxInput, 2) : 0.00;
-            $total = round($subtotal + $tax - $discount, 2);
-
-            $quote->update([
-                'subtotal' => number_format($subtotal, 2, '.', ''),
-                'tax'      => number_format($tax, 2, '.', ''),
-                'discount' => number_format($discount, 2, '.', ''),
-                'total'    => number_format($total, 2, '.', ''),
-                'saved_to_db_at' => now(),
-            ]);
 
             DB::commit();
         } catch (\Throwable $e) {
@@ -394,14 +317,14 @@ class QuoteController extends Controller
         // All good
         return response()->json([
             'success'       => true,
-            'message'       => 'Quote saved and PDF generated',
+            'message'       => 'Quote saved and PDF generated successfully',
             'quote_id'      => $quote->id,
             'quote_number'  => $quote->quote_number,
-            'pdf_path'      => $storagePath,
-            'subtotal'      => (float)$subtotal,
-            'tax'           => (float)$tax,
-            'discount'      => (float)$discount,
-            'total'         => (float)$total,
+            'pdf_path'      => $storagePath ?? null,
+            'subtotal'      => (float)$quote->subtotal,
+            'tax'           => (float)$quote->tax,
+            'discount'      => (float)$quote->discount,
+            'total'         => (float)$quote->total,
         ], 201);
     }
 
@@ -571,5 +494,41 @@ class QuoteController extends Controller
             'message' => 'Quote rejected and customer notified.',
             'status_label' => $quote->status,
         ]);
+    }
+
+    /**
+     * Delete a quote and all associated items
+     */
+    public function destroy(Quote $quote)
+    {
+        try {
+            // Delete associated PDF file if exists
+            if ($quote->pdf_path && Storage::exists($quote->pdf_path)) {
+                Storage::delete($quote->pdf_path);
+            }
+
+            // Delete all quote items (cascade should handle this, but explicit is safer)
+            $quote->items()->delete();
+
+            // Delete the quote
+            $quote->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'success' => true,
+                'message' => 'Quote deleted successfully.',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Quote deletion failed: ' . $e->getMessage(), [
+                'quote_id' => $quote->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'success' => false,
+                'message' => 'Failed to delete quote: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

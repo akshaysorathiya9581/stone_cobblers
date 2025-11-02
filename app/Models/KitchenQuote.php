@@ -14,5 +14,11 @@ class KitchenQuote extends Model
         'project',
         'type',
         'cost',
+        'is_taxable',
+    ];
+
+    protected $casts = [
+        'cost' => 'decimal:4',
+        'is_taxable' => 'boolean',
     ];
 }

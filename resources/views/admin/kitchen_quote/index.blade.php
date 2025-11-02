@@ -7,7 +7,7 @@
 
 @section('content')
 
-  <div class="main-content" style="display: none;">
+  <div class="main-content">
     <!-- Header -->
     <div class="header">
       <div class="search-bar">
@@ -51,10 +51,11 @@
         <table class="table">
           <thead>
             <tr>
-              <th style="width: 40%;">Item</th>
-              <th>Unit Price</th>
-              <th>Type</th>
-              <th style="width: 7%;">Actions</th>
+              <th style="width: 35%;">Item</th>
+              <th style="width: 15%;">Unit Price</th>
+              <th style="width: 20%;">Type</th>
+              <th style="width: 10%;">Taxable</th>
+              <th style="width: 10%;">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -64,10 +65,17 @@
                 $dec = $n !== 0.0 && abs($n) < 1.0 ? 4 : 2;
                 $formatted = number_format($n, $dec, '.', '');
               @endphp
-              <tr data-id="{{ $quote->id }}">
+              <tr data-id="{{ $quote->id }}" data-taxable="{{ $quote->is_taxable ? '1' : '0' }}">
                 <td class="item-label">{{ $quote->project }}</td>
                 <td>{{ $formatted }}</td>
                 <td>{{ get_kitchen_type_list($quote->type) }}</td>
+                <td class="text-center">
+                  @if($quote->is_taxable)
+                    <span class="badge badge-success" style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>
+                  @else
+                    <span class="badge badge-secondary" style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>
+                  @endif
+                </td>
                 <td>
                   <div class="actions">
                     <a href="javascript:;" class="action-btn open-modal edit" data-id="{{ $quote->id }}"
@@ -153,6 +161,14 @@
           <div class="invalid-feedback" data-field="category"></div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" name="is_taxable" id="add_is_taxable" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Is Taxable?</span>
+          </label>
+          <div class="invalid-feedback" data-field="is_taxable"></div>
+        </div>
+
         <div class="btn-group">
           <button type="submit" class="btn theme" id="addSubmitBtn">Submit</button>
         </div>
@@ -198,347 +214,19 @@
           <div class="invalid-feedback" data-field="type" style="display:none;"></div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" name="is_taxable" id="edit_is_taxable" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Is Taxable?</span>
+          </label>
+          <div class="invalid-feedback" data-field="is_taxable" style="display:none;"></div>
+        </div>
+
         <div class="btn-group">
           <button type="submit" class="btn theme" id="editSubmitBtn">Save</button>
         </div>
       </form>
     </div>
-  </div>
-
-  <!-- New Step Design -->
-  <div class="main-content">
-    <!-- Header -->
-    <div class="header">
-      <div class="search-bar">
-        <i>🔍</i>
-        <input type="text" placeholder="Search quotes, customers...">
-      </div>
-
-      <div class="header-actions">
-        {{-- <button class="header-btn secondary">
-          <i>📤</i> Export
-        </button>
-        <button class="header-btn primary">
-          <i>➕</i> New Quote
-        </button> --}}
-        <a href="{{ route('admin.profile.edit') }}"
-          class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U', 0, 2)) : 'U' }}</a>
-      </div>
-    </div>
-
-    <div class="content bg-white">
-      <div class="quote-details">
-        <div class="breadcrumb mb-8">
-          <span class="breadcrumb-item">Quote Generation – Step 1 of 3</span>
-        </div>
-        <div class="content-header d-block">
-          <h2 class="title">Stone by Stone: Your Perfect Kitchen Quote</h2>
-          <h3 class="subtitle">Step 1 of 3 – Enter Item Quantities</h3>
-          <div class="quote-steps">
-            <!-- Progress Indicator -->
-            <div class="progress-container">
-              <div class="progress-step active">1</div>
-              <div class="progress-line"></div>
-              <div class="progress-step inactive">2</div>
-              <div class="progress-line"></div>
-              <div class="progress-step inactive">3</div>
-            </div>
-            <div class="progress-labels">
-              <div class="progress-label active">Quantities</div>
-              <div class="progress-label">Details</div>
-              <div class="progress-label">Review</div>
-            </div>
-          </div>
-        </div>
-        <!-- First Step -->
-        <div class="quote-stepview first-step" style="display: none;">
-          <div class="quote-stepview__left">
-            <div class="stepview-title">
-              <h3 class="title mb-8">Quote Items</h3>
-              <p>Adjust quantities for each item</p>
-            </div>
-            <div class="custom-table">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 15%;">Project/Item Name</th>
-                    <th>Scope/Material</th>
-                    <th>QTY</th>
-                    <th>Unit Cost</th>
-                    <th>Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="label">Kitchen - Sq Ft <span class="t_tag">T</span> </td>
-                    <td class="label">Granite</td>
-                    <td class="label">
-                      <div class="quantity-controls">
-                        <button class="quantity-btn minus">−</button>
-                        <input type="number" class="quantity-input" value="0" min="0" />
-                        <button class="quantity-btn plus">+</button>
-                      </div>
-                    </td>
-                    <td class="label">$75.00</td>
-                    <td class="label">$3,750.00</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Labor Charge <span class="t_tag">T</span> </td>
-                    <td class="label">Service</td>
-                    <td class="label">
-                      <div class="quantity-controls">
-                        <button class="quantity-btn minus">−</button>
-                        <input type="number" class="quantity-input" value="12" min="0" />
-                        <button class="quantity-btn plus">+</button>
-                      </div>
-                    </td>
-                    <td class="label">$120.00</td>
-                    <td class="label">$1440.00</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Edge - Lin Ft</td>
-                    <td class="label">Stone</td>
-                    <td class="label">
-                      <div class="quantity-controls">
-                        <button class="quantity-btn minus">−</button>
-                        <input type="number" class="quantity-input" value="16" min="0" />
-                        <button class="quantity-btn plus">+</button>
-                      </div>
-                    </td>
-                    <td class="label">$85.00</td>
-                    <td class="label">$1,360.00</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Arc Charges <span class="t_tag">T</span> </td>
-                    <td class="label">-</td>
-                    <td class="label">
-                      <div class="quantity-controls">
-                        <button class="quantity-btn minus">−</button>
-                        <input type="number" class="quantity-input" value="50" min="0" />
-                        <button class="quantity-btn plus">+</button>
-                      </div>
-                    </td>
-                    <td class="label">$250.00</td>
-                    <td class="label">$250.00</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Bump-Outs</td>
-                    <td class="label">-</td>
-                    <td class="label">
-                      <div class="quantity-controls">
-                        <button class="quantity-btn minus">−</button>
-                        <input type="number" class="quantity-input" value="62" min="0" />
-                        <button class="quantity-btn plus">+</button>
-                      </div>
-                    </td>
-                    <td class="label">$15.00</td>
-                    <td class="label">$930.00</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="quote-stepview__right">
-            <div class="stepview-title">
-              <h3 class="title">Quote Summary</h3>
-            </div>
-            <div class="summary-item">
-              <div class="summary-label">Subtotal</div>
-              <div class="summary-amount" id="subtotal">$7,730.00</div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-label">Tax (8%)</div>
-              <div class="summary-amount" id="tax">$618.40</div>
-            </div>
-            <div class="summary-item grand-total">
-              <div class="summary-label">Grand Total</div>
-              <div class="summary-amount" id="grand-total">$8,348.40</div>
-            </div>
-          </div>
-        </div>
-        <!-- Second Step -->
-        <div class="quote-stepview first-step" style="display: none;">
-          <div class="quote-stepview__full">
-            <div class="quote-accordion">
-              <div class="quote-accordion__item">
-                <div class="quote-accordion__header">
-                  Box Manufacturer
-                  <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                    <path
-                      d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
-                      fill="currentColor" />
-                  </svg>
-                </div>
-                <div class="quote-accordion__body">
-                  <div class="custom-table">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th style="width: 15%;">Manufacturer</th>
-                          <th>Unit Price</th>
-                          <th>Qty</th>
-                          <th>Line Total</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td class="label">Premium Box Co.</td>
-                          <td class="label">350</td>
-                          <td class="label">
-                            <div class="quantity-controls">
-                              <button class="quantity-btn minus">−</button>
-                              <input type="number" class="quantity-input" value="0" min="0" />
-                              <button class="quantity-btn plus">+</button>
-                            </div>
-                          </td>
-                          <td class="label">$3500.00</td>
-                          <td class="label"></td>
-                        </tr>
-                        <tr>
-                          <td class="label">Eco-Wood Designs</td>
-                          <td class="label">280</td>
-                          <td class="label">
-                            <div class="quantity-controls">
-                              <button class="quantity-btn minus">−</button>
-                              <input type="number" class="quantity-input" value="12" min="0" />
-                              <button class="quantity-btn plus">+</button>
-                            </div>
-                          </td>
-                          <td class="label">$4200.00</td>
-                          <td class="label"></td>
-                        </tr>
-                        <tr>
-                          <td class="label">
-                            <input type="text" class="form-input" placeholder="Manufacturer Name" />
-                          </td>
-                          <td class="label">
-                            <input type="text" class="form-input text-align-center" placeholder="Unit Price" />
-                          </td>
-                          <td class="label">
-                            <div class="quantity-controls">
-                              <button class="quantity-btn minus">−</button>
-                              <input type="number" class="quantity-input" value="16" min="0" />
-                              <button class="quantity-btn plus">+</button>
-                            </div>
-                          </td>
-                          <td class="label">
-                            <input type="text" class="form-input text-align-center" placeholder="Line Total (Auto)" />
-                          </td>
-                          <td class="label">
-                            <a href="#" class="btn add-btn">+ Add Box</a>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <div class="quote-accordion__item">
-                <div class="quote-accordion__header">
-                  Margin Markup
-                  <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                    <path
-                      d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
-                      fill="currentColor" />
-                  </svg>
-                </div>
-                <div class="quote-accordion__body">
-                  <div class="custom-table">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th style="width: 15%;">Description</th>
-                          <th>Multiplier</th>
-                          <th>Result</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td class="label">Standard Profit Margin</td>
-                          <td class="label">1.25</td>
-                          <td class="label">2000</td>
-                          <td class="label"></td>
-                        </tr>
-                        <tr>
-                          <td class="label">
-                            <input type="text" class="form-input" placeholder="e.g., Design Fee" />
-                          </td>
-                          <td class="label">
-                            <input type="text" class="form-input text-align-center" placeholder="e.g., 1.15" />
-                          </td>
-                          <td class="label">$0.00</td>
-                          <td class="label">
-                            <a href="#" class="btn add-btn">+ Add Margin</a>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-        <!-- Third Step -->
-        <div class="quote-stepview third-step">
-          <div class="quote-stepview__summary">
-            <div class="summary-card">
-              <div class="summary-header">
-                <h2 class="summary-title">Summary</h2>
-                <div class="final-total-section">
-                  <div class="final-total-label">Final Total</div>
-                  <div class="final-total-amount">$3158.37</div>
-                </div>
-              </div>
-
-              <div class="summary-divider"></div>
-
-              <div class="summary-item">
-                <div class="item-description">Cooktop Cutout × 90</div>
-                <div class="item-price">$3150.00</div>
-              </div>
-
-              <div class="summary-divider"></div>
-
-              <div class="summary-item">
-                <div class="item-description">UM Sink Cutout × 0.1</div>
-                <div class="item-price">$5.00</div>
-              </div>
-
-              <div class="summary-divider"></div>
-
-              <div class="summary-item">
-                <div class="item-description">Extra Labor × 0.07</div>
-                <div class="item-price">$3.15</div>
-              </div>
-
-              <div class="summary-divider"></div>
-
-              <div class="summary-item total-row">
-                <div class="item-description">Total</div>
-                <div class="item-price">$3345.22</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="step-footer">
-      <div class="footer-content">
-        <div class="step-indicator">Step 1 of 3</div>
-        <div class="footer-actions">
-          <button class="btn secondary">Previous</button>
-          <button class="btn theme">Next</button>
-        </div>
-      </div>
-    </footer>
-
   </div>
 
 @endsection
@@ -607,18 +295,24 @@
         'KITCHEN_CABINET': 'Cabinet Manufacturer' // if you use this alias
       };
 
-      // buildRowHtml now returns 4 columns: item | price | category | actions
+      // buildRowHtml now returns 5 columns: item | price | category | taxable | actions
       function buildRowHtml(quote) {
         const unitPriceFormatted = (Number(quote.cost) || 0).toFixed((Math.abs(Number(quote.cost)) < 1 && Number(quote.cost) !== 0) ? 4 : 2);
 
         // prefer server-provided label, else use map
         const typeLabel = quote.type_label || typeMap[quote.type] || quote.type || '';
+        
+        // taxable badge
+        const taxableBadge = quote.is_taxable 
+          ? '<span class="badge badge-success" style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>'
+          : '<span class="badge badge-secondary" style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>';
 
         return `
-                              <tr data-id="${quote.id}">
+                              <tr data-id="${quote.id}" data-taxable="${quote.is_taxable ? '1' : '0'}">
                                 <td class="item-label">${escapeHtml(quote.project)}</td>
                                 <td>${unitPriceFormatted}</td>
-                                <td class="type-label">${escapeHtml(typeLabel)}</td>  <!-- NEW -->
+                                <td class="type-label">${escapeHtml(typeLabel)}</td>
+                                <td class="text-center">${taxableBadge}</td>
                                 <td>
                                   <div class="actions">
                                     <a href="javascript:;" class="action-btn open-modal edit" title="Edit" data-target="#editQuoteModal"><i class="fa-solid fa-pen-to-square"></i></a>
@@ -649,6 +343,7 @@
           project: $form.find('[name="project"]').val(),
           cost: $form.find('[name="cost"]').val(),
           type: $form.find('[name="type"]').val(),
+          is_taxable: $form.find('[name="is_taxable"]').is(':checked') ? 1 : 0,
           _token: $form.find('input[name="_token"]').val() || $('meta[name="csrf-token"]')
             .attr('content')
         };
@@ -710,6 +405,7 @@
             $('#edit_project').val(q.project);
             $('#edit_cost').val(q.cost);
             $('#edit_type').val(q.type).trigger('change.select2');
+            $('#edit_is_taxable').prop('checked', q.is_taxable ? true : false);
 
             clearFormErrors('#editQuoteForm');
             $('#editQuoteModal').fadeIn(150).addClass('active');
@@ -732,6 +428,7 @@
           project: $('#edit_project').val(),
           cost: $('#edit_cost').val(),
           type: $('#edit_type').val(),
+          is_taxable: $('#edit_is_taxable').is(':checked') ? 1 : 0,
           _token: $form.find('input[name="_token"]').val()
         };
 
@@ -750,6 +447,9 @@
 
             // if table rendered server-side uses plain text cells, update them
             if ($tr.length) {
+              // update data attribute
+              $tr.attr('data-taxable', q.is_taxable ? '1' : '0');
+              
               // update the item label cell
               $tr.find('.item-label').first().text(q.project);
 
@@ -761,6 +461,12 @@
               // update category (3rd column) - prefer server-provided label or map
               const typeLabel = q.type_label || typeMap[q.type] || q.type || '';
               $tr.find('td').eq(2).text(typeLabel);
+              
+              // update taxable badge (4th column)
+              const taxableBadge = q.is_taxable 
+                ? '<span class="badge badge-success" style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>'
+                : '<span class="badge badge-secondary" style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>';
+              $tr.find('td').eq(3).html(taxableBadge);
             } else {
               // if row missing, append to table bottom
               appendQuoteToTable(q);
@@ -811,8 +517,7 @@
       });
 
     });
-                          });
-                        });
+              
   </script>
 
   <script>
@@ -832,39 +537,6 @@
           $(this).fadeOut(200).removeClass('active');
         }
       });
-
-      // Qty Increment and Decrement
-      $(".quantity-controls").each(function () {
-        const $container = $(this);
-
-        $container.find(".plus").click(function () {
-          let $input = $container.find(".quantity-input");
-          let value = parseInt($input.val()) || 0;
-          $input.val(value + 1);
-        });
-
-        $container.find(".minus").click(function () {
-          let $input = $container.find(".quantity-input");
-          let value = parseInt($input.val()) || 0;
-          if (value > 0) {
-            $input.val(value - 1);
-          }
-        });
-      });
-
-      // Custom Accordion
-      $(".quote-accordion__header").click(function () {
-        var body = $(this).next(".quote-accordion__body");
-
-        // Collapse all except the clicked one
-        $(".quote-accordion__body").not(body).slideUp();
-        $(".quote-accordion__header").not(this).removeClass("active");
-
-        // Toggle current section
-        $(this).toggleClass("active");
-        body.stop(true, true).slideToggle();
-      });
-
     });
   </script>
 

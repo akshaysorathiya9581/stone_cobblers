@@ -122,6 +122,8 @@
                                         <button class="action-btn approve" title="Approve"><i class="fa-regular fa-square-check"></i></button>
                                         <button class="action-btn reject" title="Reject"><i class="fa-solid fa-square-xmark"></i></button>
                                     @endif
+                                    
+                                    <button class="action-btn delete" title="Delete" data-quote-id="{{ $quote->id }}"><i class="fa-solid fa-trash"></i></button>
                                 </td>
                             </tr>
                         @empty
@@ -228,6 +230,60 @@
 
             ajaxAction($btn, url, function (res) {
                 $row.find('.status-tag').removeClass().addClass('status-tag status-' + res.status_label.toLowerCase()).text(res.status_label);
+            });
+        });
+
+        // Delete quote
+        $(document).on('click', '.action-btn.delete', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $row = $btn.closest('tr');
+            var quoteId = $btn.data('quote-id') || $row.data('quote-id') || $row.attr('id')?.split('-').pop();
+            
+            if (!quoteId) {
+                if (window.toastr) toastr.error('Quote ID not found');
+                return;
+            }
+
+            // Get quote number for confirmation message
+            var quoteNumber = $row.find('.quote-number').text().trim() || 'this quote';
+            
+            if (!confirm('Are you sure you want to delete ' + quoteNumber + '?\n\nThis action cannot be undone and will also delete all associated quote items.')) {
+                return;
+            }
+
+            var original = $btn.html();
+            $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+
+            $.ajax({
+                url: "{{ url('admin/quotes') }}/" + quoteId,
+                method: 'DELETE',
+                dataType: 'json',
+                data: { _token: $('meta[name="csrf-token"]').attr('content') }
+            })
+            .done(function (res) {
+                if (res.status === 'success' || res.success) {
+                    if (window.toastr) toastr.success(res.message || 'Quote deleted successfully');
+                    // Fade out and remove the row
+                    $row.fadeOut(300, function() {
+                        $(this).remove();
+                        // Update stats if no quotes left
+                        if ($('#quotes-tbody tr.table-row').length === 0) {
+                            $('#quotes-tbody').html('<tr><td colspan="7" class="text-align-center">No quotes found.</td></tr>');
+                        }
+                    });
+                } else {
+                    if (window.toastr) toastr.error(res.message || 'Failed to delete quote');
+                    $btn.prop('disabled', false).html(original);
+                }
+            })
+            .fail(function (xhr) {
+                var msg = 'Failed to delete quote';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                if (window.toastr) toastr.error(msg);
+                $btn.prop('disabled', false).html(original);
             });
         });
 

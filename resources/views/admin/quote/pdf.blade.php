@@ -52,21 +52,6 @@
             display: block;
         }
 
-        /* .pdf-header .center {
-            width: 44%;
-            text-align: center;
-            }
-            .pdf-header .center h1 {
-            margin: 0;
-            font-size: 20px;
-            letter-spacing: 0.5px;
-            }
-            .pdf-header .center .tagline {
-            margin-top: 2px;
-            font-size: 11px;
-            color: #555;
-            } */
-
         .pdf-header .right {
             width: 35%;
             text-align: right;
@@ -184,6 +169,12 @@
         tr {
             page-break-inside: avoid;
         }
+        
+        .no-data-row {
+            background: #f9f9f9;
+            color: #999;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -199,11 +190,6 @@
                 <div style="font-weight:700;font-size:18px;">{{ $companyName }}</div>
             @endif
         </div>
-
-        {{-- <div class="center">
-      <h1 style="margin-bottom:4px;">{{ $companyName }}</h1>
-      <div class="tagline">{{ strtoupper(optional($quote->project)->name ?? '') }}</div>
-    </div> --}}
 
         <div class="right">
             {!! nl2br(e($companyAddress)) !!}
@@ -222,7 +208,7 @@
                 <td style="width:50%;">
                     <strong>Quote Number:</strong> {{ $quote->quote_number ?? '—' }}<br>
                     <strong>Customer:</strong>
-                    {{ $quote->customer_name ?? (optional($quote->project->client)->name ?? 'N/A') }}
+                    {{ $quote->customer_name ?? (optional(optional($quote->project)->customer)->name ?? 'N/A') }}
                 </td>
                 <td style="width:50%; text-align:right;">
                     <strong>Quote Date:</strong> {{ optional($quote->created_at)->format('m/d/Y') ?? '—' }}<br>
@@ -231,50 +217,41 @@
             </tr>
             <tr>
                 <td colspan="2">
+                    <strong>Project:</strong> {{ $quote->project_name ?? (optional($quote->project)->name ?? 'N/A') }}<br>
                     <strong>Address:</strong>
-                    {{ optional($quote->project->client)->address ?? 'N/A' }}
+                    {{ optional(optional($quote->project)->customer)->address ?? 'N/A' }}
                 </td>
             </tr>
         </table>
 
-        <p><strong>Project:</strong>
-            {{ trim(($quote->is_kitchen ? 'KITCHEN' : '') . ($quote->is_kitchen && $quote->is_vanity ? ' + ' : '') . ($quote->is_vanity ? 'VANITY' : '')) }}
+        <p><strong>Project Type:</strong>
+            {{ trim(($quote->is_kitchen ? 'KITCHEN' : '') . ($quote->is_kitchen && $quote->is_vanity ? ' + ' : '') . ($quote->is_vanity ? 'VANITY' : '')) ?: 'KITCHEN' }}
         </p>
 
+        {{-- MAIN QUOTE ITEMS --}}
+        <div class="section-title">QUOTE ITEMS</div>
         <table class="items">
             <thead>
                 <tr>
-                    <th style="width:22%;">Project</th>
-                    <th style="width:28%;">Scope / Material</th>
-                    <th style="width:10%;" class="col-center">Qty</th>
-                    <th style="width:12%;" class="col-right">Cost</th>
-                    <th style="width:16%;" class="col-right">Total</th>
-                    <th style="width:12%;" class="col-center">Taxed 'T'</th>
+                    <th style="width:35%;">Item / Description</th>
+                    <th style="width:15%;" class="col-center">Qty</th>
+                    <th style="width:20%;" class="col-right">Unit Price</th>
+                    <th style="width:20%;" class="col-right">Line Total</th>
+                    <th style="width:10%;" class="col-center">Taxed</th>
                 </tr>
             </thead>
 
             <tbody>
-                {{-- Filter only non-zero items --}}
                 @php
-                    $visibleItems = collect($items)->filter(function($item) {
-                        return (float)$item->qty > 0 && (float)$item->line_total > 0;
+                    // Filter items by type KITCHEN_TOP
+                    $quoteItems = collect($items)->filter(function($item) {
+                        return $item->type === 'KITCHEN_TOP' && (float)$item->qty > 0;
                     });
                 @endphp
                 
-                {{-- If no visible items, show all items --}}
-                @forelse($visibleItems as $item)
+                @forelse($quoteItems as $item)
                     <tr>
                         <td>{{ $item->name }}</td>
-
-                        <td style="text-align:center;">
-                            @if (!empty($item->image_data))
-                                <img src="{{ $item->image_data }}" alt="{{ $item->name }}" class="item-thumb">
-                                <div style="font-size:11px;">{{ $item->name }}</div>
-                            @else
-                                <div style="font-size:12px;">{{ $item->name }}</div>
-                            @endif
-                        </td>
-
                         <td class="col-center">
                             {{ $item->qty > 0 ? rtrim(rtrim(number_format($item->qty, 2, '.', ''), '0'), '.') : '—' }}
                         </td>
@@ -283,67 +260,127 @@
                         <td class="col-center">{{ !empty($item->is_taxable) ? 'T' : '' }}</td>
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="6" class="center">No items</td>
+                    <tr class="no-data-row">
+                        <td colspan="5" class="col-center">No quote items added</td>
                     </tr>
                 @endforelse
             </tbody>
+        </table>
 
+        {{-- BOX MANUFACTURERS --}}
+        <div class="section-title">BOX MANUFACTURERS</div>
+        <table class="items">
+            <thead>
+                <tr>
+                    <th style="width:40%;">Manufacturer Name</th>
+                    <th style="width:15%;" class="col-center">Qty</th>
+                    <th style="width:20%;" class="col-right">Unit Price</th>
+                    <th style="width:25%;" class="col-right">Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    // Filter items by type KITCHEN_MANUFACTURER
+                    $manufacturers = collect($items)->filter(function($item) {
+                        return $item->type === 'KITCHEN_MANUFACTURER';
+                    });
+                @endphp
+                
+                @forelse($manufacturers as $mfg)
+                    <tr>
+                        <td>{{ $mfg->name }}</td>
+                        <td class="col-center">
+                            {{ $mfg->qty > 0 ? rtrim(rtrim(number_format($mfg->qty, 2, '.', ''), '0'), '.') : '—' }}
+                        </td>
+                        <td class="col-right">${{ number_format($mfg->unit_price, 2) }}</td>
+                        <td class="col-right">${{ number_format($mfg->line_total, 2) }}</td>
+                    </tr>
+                @empty
+                    {{-- Show default manufacturer options --}}
+                    @foreach (['Bertch', 'Mantra', 'CB', '802/USCD FROM 2020', 'KCD/USCD', 'Dura Supreme', 'OMEGA', '20/20 LIST PRICE'] as $mfg)
+                        <tr>
+                            <td>{{ $mfg }}</td>
+                            <td class="col-center">—</td>
+                            <td class="col-right">—</td>
+                            <td class="col-right">—</td>
+                        </tr>
+                    @endforeach
+                @endforelse
+            </tbody>
+        </table>
+
+        {{-- MARGIN / MARKUP --}}
+        <div class="section-title">MARGIN / MARKUP</div>
+        <table class="items">
+            <thead>
+                <tr>
+                    <th style="width:50%;">Description</th>
+                    <th style="width:20%;" class="col-center">Multiplier</th>
+                    <th style="width:30%;" class="col-right">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    // Filter items by type KITCHEN_MARGIN_MARKUP
+                    $margins = collect($items)->filter(function($item) {
+                        return $item->type === 'KITCHEN_MARGIN_MARKUP';
+                    });
+                @endphp
+                
+                @forelse($margins as $margin)
+                    <tr>
+                        <td>{{ $margin->name }}</td>
+                        <td class="col-center">{{ number_format($margin->unit_price, 2) }}x</td>
+                        <td class="col-right">${{ number_format($margin->line_total, 2) }}</td>
+                    </tr>
+                @empty
+                    {{-- Show default margin options --}}
+                    @foreach ([
+                        '1.425 - 1.5 CONTRACTOR 1ST TIME',
+                        '1.5 - 1.55 CONTRACTOR',
+                        '1.55 - 1.6, 1.66 - 1.7 RETAIL',
+                        'TSC BUFFER',
+                        'HARDWARE QUANTITY',
+                        'MISC ITEMS',
+                        '802 FREIGHT SURCHARGE',
+                        'PRICE CHANGE BUFFER',
+                        'MORE THAN 1 PHONE CALL/DAY'
+                    ] as $marginOption)
+                        <tr>
+                            <td>{{ $marginOption }}</td>
+                            <td class="col-center">—</td>
+                            <td class="col-right">—</td>
+                        </tr>
+                    @endforeach
+                @endforelse
+            </tbody>
+        </table>
+
+        {{-- TOTALS SUMMARY --}}
+        <table class="items" style="margin-top: 20px;">
             <tfoot>
                 <tr class="totals">
-                    <td colspan="4">Subtotal</td>
-                    <td class="col-right">${{ number_format($quote->subtotal ?? 0, 2) }}</td>
-                    <td></td>
+                    <td colspan="3" style="text-align: right; font-size: 14px;">Subtotal</td>
+                    <td class="col-right" style="font-size: 14px;">${{ number_format($quote->subtotal ?? 0, 2) }}</td>
                 </tr>
 
                 <tr class="totals">
-                    <td colspan="4">Tax</td>
-                    <td class="col-right">${{ number_format($quote->tax ?? 0, 2) }}</td>
-                    <td></td>
+                    <td colspan="3" style="text-align: right; font-size: 14px;">Tax (8%)</td>
+                    <td class="col-right" style="font-size: 14px;">${{ number_format($quote->tax ?? 0, 2) }}</td>
                 </tr>
 
+                @if($quote->discount > 0)
                 <tr class="totals">
-                    <td colspan="4">Discount</td>
-                    <td class="col-right">${{ number_format($quote->discount ?? 0, 2) }}</td>
-                    <td></td>
+                    <td colspan="3" style="text-align: right; font-size: 14px;">Discount</td>
+                    <td class="col-right" style="font-size: 14px; color: #c00;">-${{ number_format($quote->discount ?? 0, 2) }}</td>
                 </tr>
+                @endif
 
-                <tr class="totals">
-                    <td colspan="4">Grand Total</td>
-                    <td class="col-right">${{ number_format($quote->total ?? 0, 2) }}</td>
-                    <td></td>
+                <tr class="totals" style="background: #f2f2f2;">
+                    <td colspan="3" style="text-align: right; font-size: 16px; font-weight: bold;">GRAND TOTAL</td>
+                    <td class="col-right" style="font-size: 16px; font-weight: bold;">${{ number_format($quote->total ?? 0, 2) }}</td>
                 </tr>
             </tfoot>
-        </table>
-
-        <div class="section-title">CABINET MANUFACTURER</div>
-        <table style="width:100%; border-collapse:collapse; margin-top:6px;">
-            @foreach (['bertch', 'mantra', 'CB', '802/USCD FROM 2020', 'KCD/USCD', 'dura', 'OMEGA', '20/20 LIST PRICE'] as $mfg)
-                <tr>
-                    <td style="padding:8px; border:1px solid #333;">{{ $mfg }}</td>
-                    <td style="padding:8px; border:1px solid #333;"></td>
-                </tr>
-            @endforeach
-        </table>
-
-        <div class="section-title">MARGIN / MARKUP</div>
-        <table style="width:100%; border-collapse:collapse; margin-top:6px;">
-            @foreach (['1.425 - 1.5 CONTRACTOR 1ST TIME', '1.5 - 1.55 CONTRACTOR', '1.55 - 1.6, 1.66 - 1.7 RETAIL', 'TSC BUFFER', 'HARDWARE QUANTITY', 'MISC ITEMS', '802 FREIGHT SURCHARGE', 'PRICE CHANGE BUFFER', 'MORE THAN 1 PHONE CALL/DAY', 'TOTAL RETAIL', 'TAX'] as $row)
-                <tr>
-                    <td style="padding:8px;border:1px solid #333;">{{ $row }}</td>
-                    <td style="padding:8px;border:1px solid #333;"></td>
-                </tr>
-            @endforeach
-        </table>
-
-        <div class="section-title">DELIVERY</div>
-        <table style="width:100%; border-collapse:collapse; margin-top:6px;">
-            @foreach (['FULL KIT TAILGATE', 'UP TO TEN ITEMS', 'SINGLE ITEM VAN', 'CUSTOMER PICKUP', 'DBA fee / fuel surcharge', 'Final total DBA'] as $row)
-                <tr>
-                    <td style="padding:8px;border:1px solid #333;">{{ $row }}</td>
-                    <td style="padding:8px;border:1px solid #333;"></td>
-                </tr>
-            @endforeach
         </table>
 
         <div class="signature">

@@ -1,792 +1,1544 @@
 @extends('layouts.admin')
 
-@section('title', 'Quote — Multi Step')
+@section('title', 'Kitchen Quotes — Prices')
 
 @push('css')
 @endpush
 
 @section('content')
-
-    <!-- Main Content -->
+    <!-- New Step Design -->
     <div class="main-content">
         <!-- Header -->
-        <x-header :export-url="null" :create-url="route('admin.quotes.create')" export-label="Export Quote" create-label="New Quote" />
-
-        <!-- Content -->
-        <div class="content bg-content">
-            <div class="welcome-container card" id="welcome-panel">
-                <div class="quote-type">
-                    <div class="icon"></div>
-                    <h1 class="title">Welcome to <br><span class="brand">The Stone Cobblers</span></h1>
-                    <p class="description">Transform your outdoor space with our premium stone cobbling services. Let's gather some details to provide you with a personalized quote.</p>
-
-                    <div class="quote-options">
-                        <div>
-                            <h3 style="margin:0 0 12px 0">Select Project</h3>
-                            <div class="selector-group">
-                                <select id="project-select" name="project_id" class="custom-select" data-placeholder="Select Project">
-                                    <option></option>
-                                    @foreach ($projects as $project)
-                                        <option value="{{ $project->id }}">{{ $project->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <br>
-                        <h3 style="margin:0 0 12px 0">Select Quote Type</h3>
-                        <div class="checkbox-group" id="quote-types">
-                            <div class="checkbox-item" id="chk-kitchen" data-value="kitchen" onclick="toggleCheckbox('kitchen')">
-                                <input type="checkbox" id="kitchen-quote" name="quote-type-kitchen" value="kitchen" />
-                                <label for="kitchen-quote">Kitchen Quote</label>
-                            </div>
-                            <div class="checkbox-item" id="chk-vanity" data-value="vanity" onclick="toggleCheckbox('vanity')">
-                                <input type="checkbox" id="vanity-quote" name="quote-type-vanity" value="vanity" />
-                                <label for="vanity-quote">Vanity Quote</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn theme" id="begin-btn" onclick="beginQuote()">Let's Begin <span style="margin-left:8px">→</span></button>
-                    <div class="time-estimate">Takes about 3 minutes to complete</div>
-                    <div class="error-message" id="welcome-error" style="display:none;color:#c62828;margin-top:8px">
-                        Please select at least one quote type and a project to continue.
-                    </div>
-                </div>
+        <div class="header">
+            <div class="search-bar">
+                <i>🔍</i>
+                <input type="text" placeholder="Search quotes, customers...">
             </div>
 
-            <!-- Multi-step form -->
-            <form id="multi-step-form" class="hidden quote-details" method="POST" action="{{ route('admin.quotes.store') }}">
-                @csrf
+            <div class="header-actions">
+                <a href="{{ route('admin.profile.edit') }}"
+                    class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U', 0, 2)) : 'U' }}</a>
+            </div>
+        </div>
 
-                <!-- STEP 1: Kitchen Top -->
-                <div class="container step" data-step="1" id="step-1">
-                    <div class="header-row">
-                        <h2 class="title">Kitchen Top</h2>
-                        <div class="header-row__right">
-                            <div class="title-label">Accumulative Cost Total:</div>
-                            <div class="title-span" id="header-total-1">$ -</div>
+        <div class="content bg-white">
+            <div class="quote-details">
+                <div class="breadcrumb mb-8">
+                    <span class="breadcrumb-item">Quote Generation – Step 1 of 4</span>
+                </div>
+                <div class="content-header d-block">
+                    <h2 class="title">Stone by Stone: Your Perfect Kitchen Quote</h2>
+                    <h3 class="subtitle">Step 1 of 4 – Select Project</h3>
+                    <div class="quote-steps">
+                        <!-- Progress Indicator -->
+                        <div class="progress-container">
+                            <div class="progress-step active">1</div>
+                            <div class="progress-line"></div>
+                            <div class="progress-step inactive">2</div>
+                            <div class="progress-line"></div>
+                            <div class="progress-step inactive">3</div>
+                            <div class="progress-line"></div>
+                            <div class="progress-step inactive">4</div>
+                        </div>
+                        <div class="progress-labels">
+                            <div class="progress-label active">Project</div>
+                            <div class="progress-label">Quantities</div>
+                            <div class="progress-label">Details</div>
+                            <div class="progress-label">Review</div>
                         </div>
                     </div>
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th class="project-col">Project</th>
-                                <th class="scope-col">Scope/Material</th>
-                                <th class="qty-col">QTY</th>
-                                <th class="cost-col">COST</th>
-                                <th class="total-col">TOTAL</th>
-                                <th class="taxed-col">TAXED 'T'</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="kitchen-rows">
-                            @forelse ($KITCHEN_TOP as $project => $cost)
-                                @php
-                                    $formattedCost = number_format($cost, 4, '.', '');
-                                    $displayCost = number_format($cost, 2);
-                                    $isTaxed = in_array($project, ['Kitchen - Sq Ft','Undermount Sink','small oval sink']);
-                                @endphp
-
-                                <tr data-name="{{ $project }}">
-                                    <td>{{ $project }}</td>
-                                    <td class="alpha-fill">{{ $project === 'Kitchen - Sq Ft' ? 'alpha fill' : '' }}</td>
-                                    <td>
-                                        <input type="number" name="kitchen[qty][]" class="qty-input num-fill kitchen-qty" placeholder="0" min="0" step="0.01" value="{{ old('kitchen.qty.' . $loop->index, 0) }}">
-                                    </td>
-                                    <td class="cost-value" data-cost="{{ $formattedCost }}">
-                                        ${{ $displayCost }}
-                                        <input type="hidden" name="kitchen[name][]" value="{{ $project }}">
-                                        <input type="hidden" name="kitchen[unit_price][]" value="{{ $formattedCost }}">
-                                    </td>
-                                    <td class="line-total empty-value">$ -</td>
-                                    <td class="taxed-t">{{ $isTaxed ? 'T' : '' }}</td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="6" class="text-center text-muted">No Kitchen Top items found.</td></tr>
-                            @endforelse
-                        </tbody>
-
-                        <tfoot>
-                            <tr>
-                                <td colspan="4" style="text-align:right;font-weight:700">Total:</td>
-                                <td id="grand-total-1" class="empty-value">$ -</td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-
-                    <div class="nav-footer">
-                        <button type="button" id="prev-tab-1" class="btn secondary" onclick="prevStep(1)" disabled><span>←</span> Previous</button>
-                        <div class="steps-indicator">Step 1 of 3</div>
-                        <button type="button" id="next-tab-1" class="btn theme" data-current="1">Next <span>→</span></button>
+                </div>
+                
+                <!-- Step 0: Project Selection -->
+                <div class="quote-stepview project-step">
+                    <div class="quote-stepview__full">
+                        <div class="stepview-title" style="text-align: center; margin-bottom: 30px;">
+                            <h3 class="title mb-8">Select a Project</h3>
+                            <p>Choose the project for which you want to create a quote</p>
+                        </div>
+                        <div class="form-fields" style="max-width: 600px; margin: 0 auto;">
+                            <div class="form-field">
+                                <label class="form-label required">Project</label>
+                                <select class="form-input custom-select" name="project_id" id="project_id" data-placeholder="Select Project" required>
+                                    <option value="">-- Select Project --</option>
+                                    @foreach($projects as $project)
+                                        <option value="{{ $project->id }}" 
+                                                data-customer="{{ $project->customer->first_name ?? '' }} {{ $project->customer->last_name ?? '' }}"
+                                                data-customer-id="{{ $project->user_id }}">
+                                            {{ $project->name }} - {{ $project->customer->first_name ?? '' }} {{ $project->customer->last_name ?? '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="error-msg" data-for="project_id" style="color: red; font-size: 14px; margin-top: 5px; display: none;"></div>
+                            </div>
+                            
+                            <div class="project-info" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                <h4 style="margin-bottom: 10px; color: #333;">Project Details</h4>
+                                <p><strong>Customer:</strong> <span id="selected-customer">-</span></p>
+                                <p><strong>Project:</strong> <span id="selected-project">-</span></p>
+                                <p><strong>Status:</strong> <span id="selected-status">-</span></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- STEP 2: Cabinet Manufacturer -->
-                <div class="container step hidden" data-step="2" id="step-2">
-                    <div class="header-row">
-                        <h2 class="title">Kitchen Cabinet</h2>
-                        <div class="header-row__right">
-                            <div class="title-label">Accumulative Cost Total:</div>
-                            <div class="title-span" id="header-total-2">$ -</div>
+                <!-- Step 1: Quantities -->
+                <div class="quote-stepview first-step">
+                    <div class="quote-stepview__left">
+                        <div class="stepview-title">
+                            <h3 class="title mb-8">Quote Items</h3>
+                            <p>Adjust quantities for each item</p>
                         </div>
-                    </div>
-
-                    <div class="table-container">
-                        <!-- CABINET MANUFACTURER -->
-                        <div style="margin-bottom: 30px;">
-                            <h3 style="background-color: #fff3cd; padding:10px; margin:0; border-bottom:1px solid #e0e0e0;">CABINET MANUFACTURER</h3>
-
+                        <div class="custom-table">
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:left;width:40%;">Manufacturer</th>
-                                        <th style="text-align:right;width:20%;">Unit Price</th>
-                                        <th style="text-align:center;width:20%;">Qty</th>
-                                        <th style="text-align:right;width:20%;">Line Total</th>
+                                        <th style="width: 15%;">Project/Item Name</th>
+                                        <th>Scope/Material</th>
+                                        <th>QTY</th>
+                                        <th>Unit Cost</th>
+                                        <th>Total</th>
                                     </tr>
                                 </thead>
-
-                                <tbody id="manufacturer-rows">
-                                    @forelse ($KITCHEN_MANUFACTURER as $mfg => $cost)
-                                        @php $formattedUnit = (float)$cost; @endphp
-                                        <tr data-name="{{ $mfg }}">
-                                            <td style="padding:8px;border:1px solid #e0e0e0;">
-                                                {{ $mfg }}
-                                                <input type="hidden" name="manufacturer[name][]" value="{{ $mfg }}">
+                                <tbody>
+                                    @forelse($KITCHEN_TOP ?? [] as $projectName => $item)
+                                        <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
+                                            <td class="label">
+                                                {{ $item->project }} 
+                                                @if($item->is_taxable)
+                                                    <span class="t_tag">T</span>
+                                                @endif
                                             </td>
-
-                                            <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
-                                                {{ number_format($formattedUnit, (round($formattedUnit,2) != $formattedUnit ? 4 : 2), '.', '') }}
-                                                <input type="hidden" name="manufacturer[unit_price][]" value="{{ number_format($formattedUnit, (round($formattedUnit,2) != $formattedUnit ? 4 : 2), '.', '') }}">
+                                            <td class="label">-</td>
+                                            <td class="label">
+                                                <div class="quantity-controls">
+                                                    <button class="quantity-btn minus">−</button>
+                                                    <input type="number" class="quantity-input" value="1"
+                                                        min="0" />
+                                                    <button class="quantity-btn plus">+</button>
+                                                </div>
                                             </td>
-
-                                            <td style="padding:8px;border:1px solid #e0e0e0;text-align:center;">
-                                                <input type="number" name="manufacturer[qty][]" class="qty-input manufacturer-qty" min="0" step="0.01" value="{{ old('manufacturer.qty.' . $loop->index, 0) }}" style="width:100%;">
-                                            </td>
-
-                                            <td style="padding:8px;border:1px solid #e0e0e0;text-align:right;" class="manufacturer-line empty-value">
-                                                $ -
-                                                <input type="hidden" name="manufacturer[line_total][]" class="manufacturer-line-hidden" value="0">
-                                            </td>
+                                            <td class="label">${{ number_format($item->cost, 2) }}</td>
+                                            <td class="label">${{ number_format($item->cost, 2) }}</td>
                                         </tr>
                                     @empty
-                                        <tr><td colspan="4" style="text-align:center;color:#999;">No manufacturer data found.</td></tr>
+                                        <tr data-taxable="1">
+                                            <td class="label">Kitchen - Sq Ft <span class="t_tag">T</span> </td>
+                                            <td class="label">Granite</td>
+                                            <td class="label">
+                                                <div class="quantity-controls">
+                                                    <button class="quantity-btn minus">−</button>
+                                                    <input type="number" class="quantity-input" value="50"
+                                                        min="0" />
+                                                    <button class="quantity-btn plus">+</button>
+                                                </div>
+                                            </td>
+                                            <td class="label">$75.00</td>
+                                            <td class="label">$3,750.00</td>
+                                        </tr>
+                                        <tr data-taxable="1">
+                                            <td class="label">Labor Charge <span class="t_tag">T</span> </td>
+                                            <td class="label">Service</td>
+                                            <td class="label">
+                                                <div class="quantity-controls">
+                                                    <button class="quantity-btn minus">−</button>
+                                                    <input type="number" class="quantity-input" value="12"
+                                                        min="0" />
+                                                    <button class="quantity-btn plus">+</button>
+                                                </div>
+                                            </td>
+                                            <td class="label">$120.00</td>
+                                            <td class="label">$1,440.00</td>
+                                        </tr>
+                                        <tr data-taxable="0">
+                                            <td class="label">Edge - Lin Ft</td>
+                                            <td class="label">Stone</td>
+                                            <td class="label">
+                                                <div class="quantity-controls">
+                                                    <button class="quantity-btn minus">−</button>
+                                                    <input type="number" class="quantity-input" value="16"
+                                                        min="0" />
+                                                    <button class="quantity-btn plus">+</button>
+                                                </div>
+                                            </td>
+                                            <td class="label">$85.00</td>
+                                            <td class="label">$1,360.00</td>
+                                        </tr>
+                                        <tr data-taxable="1">
+                                            <td class="label">Arc Charges <span class="t_tag">T</span> </td>
+                                            <td class="label">-</td>
+                                            <td class="label">
+                                                <div class="quantity-controls">
+                                                    <button class="quantity-btn minus">−</button>
+                                                    <input type="number" class="quantity-input" value="1"
+                                                        min="0" />
+                                                    <button class="quantity-btn plus">+</button>
+                                                </div>
+                                            </td>
+                                            <td class="label">$250.00</td>
+                                            <td class="label">$250.00</td>
+                                        </tr>
+                                        <tr data-taxable="0">
+                                            <td class="label">Bump-Outs</td>
+                                            <td class="label">-</td>
+                                            <td class="label">
+                                                <div class="quantity-controls">
+                                                    <button class="quantity-btn minus">−</button>
+                                                    <input type="number" class="quantity-input" value="62"
+                                                        min="0" />
+                                                    <button class="quantity-btn plus">+</button>
+                                                </div>
+                                            </td>
+                                            <td class="label">$15.00</td>
+                                            <td class="label">$930.00</td>
+                                        </tr>
                                     @endforelse
-
-                                    <!-- subtotal -->
-                                    <tr>
-                                        <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:center;font-weight:700">=</td>
-                                        <td id="manufacturer-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8">$ -</td>
-                                    </tr>
                                 </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Margin Markup -->
-                        <div style="margin-bottom:30px;">
-                            <h3 style="background-color:#f5f5f5;padding:10px;margin:0;border-bottom:1px solid #e0e0e0;">MARGIN MARKUP</h3>
-
-                            <table class="table" style="margin-bottom:20px;width:100%;">
-                                <thead>
-                                    <tr>
-                                        <th style="width:55%;padding:8px;border:1px solid #e0e0e0;text-align:left;">DESCRIPTION</th>
-                                        <th style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:center;">MULTIPLIER</th>
-                                        <th style="width:25%;padding:8px;border:1px solid #e0e0e0;text-align:right;">RESULT</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="margin-markup-rows">
-                                    @forelse($KITCHEN_MARGIN_MARKUP as $project => $cost)
-                                        @php
-                                            $slug = Str::slug($project, '_');
-                                            $mult = (float) $cost;
-                                        @endphp
-
-                                        <tr data-key="{{ $slug }}">
-                                            <td style="padding:8px;border:1px solid #e0e0e0;">
-                                                {{ $project }}
-                                                <input type="hidden" name="margin[{{ $slug }}][name]" value="{{ $project }}">
-                                            </td>
-
-                                            <td style="padding:8px;border:1px solid #e0e0e0;text-align:center;">
-                                                <input type="number" name="margin[{{ $slug }}][value]" class="qty-input margin-input" step="0.01" min="0" id="margin-{{ $slug }}" value="{{ old('margin.' . $slug . '.value', number_format($mult,2,'.','')) }}" style="width:100%;text-align:center;">
-                                            </td>
-
-                                            <td class="markup-result" id="markup-{{ $slug }}" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
-                                                {{ number_format($mult * 100, 2, '.', '') }}%
-                                                <input type="hidden" name="margin[{{ $slug }}][result]" value="{{ number_format($mult * 100, 2, '.', '') }}">
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr><td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:center;color:#999;">No margin markup configured.</td></tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        @php
-                            $taxRate = isset($KITCHEN_MARGIN_MARKUP['TAX_RATE']) ? (float) $KITCHEN_MARGIN_MARKUP['TAX_RATE'] : 0;
-                        @endphp
-
-                        <!-- ===== BUFFER SECTION ===== -->
-                        @php
-                            $KITCHEN_BUFFER = $KITCHEN_BUFFER ?? [];
-                            $preferredOrder = ['TSC BUFFER','HARDWARE QUANTITY','PRICE CHANGE BUFFER','MORE THAN 1 PHONE CALL/DAY'];
-                            $rows = [];
-                            foreach($preferredOrder as $k) if(array_key_exists($k, $KITCHEN_BUFFER)) $rows[$k] = (float)$KITCHEN_BUFFER[$k];
-                            foreach($KITCHEN_BUFFER as $proj => $val) if($proj !== 'TAX_RATE' && !isset($rows[$proj])) $rows[$proj] = (float)$val;
-                        @endphp
-
-                        <div style="margin-bottom:30px;">
-                            <h3 style="background:#fff3cd;padding:10px;margin:0;border-bottom:1px solid #e0e0e0;">BUFFER & TOTALS</h3>
-
-                            <table class="table" style="width:100%;margin-top:8px;">
-                                <thead>
-                                    <tr>
-                                        <th style="width:50%;padding:8px;border:1px solid #e0e0e0;text-align:left;">DESCRIPTION</th>
-                                        <th style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">UNIT</th>
-                                        <th style="width:15%;padding:8px;border:1px solid #e0e0e0;text-align:center;background:#fffbf0;">QTY</th>
-                                        <th style="width:15%;padding:8px;border:1px solid #e0e0e0;text-align:right;">LINE TOTAL</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="buffer-rows">
-                                    @if(empty($rows))
-                                        <tr><td colspan="4" style="padding:12px;border:1px solid #e0e0e0;text-align:center;color:#999;">No buffer items configured.</td></tr>
-                                    @else
-                                        @foreach($rows as $project => $unitVal)
-                                            @php
-                                                $slug = Str::slug($project, '_');
-                                                if(strtoupper($project) === 'TSC BUFFER') $mode = 'fixed';
-                                                elseif(strtoupper($project) === 'HARDWARE QUANTITY') $mode = 'qty';
-                                                elseif(stripos($project,'PRICE') !== false) $mode = 'input';
-                                                elseif(stripos($project,'PHONE') !== false) $mode = 'input';
-                                                else $mode = 'input';
-                                                $defaultQty = $mode === 'fixed' ? 1 : 0;
-                                            @endphp
-
-                                            <tr data-key="{{ $slug }}" data-type="buffer" data-mode="{{ $mode }}" data-unit="{{ number_format($unitVal,2,'.','') }}">
-                                                <td style="padding:8px;border:1px solid #e0e0e0;">
-                                                    {{ $project }}
-                                                    <input type="hidden" name="buffer[{{ $slug }}][name]" value="{{ $project }}">
-                                                </td>
-
-                                                <td class="unit-cell" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
-                                                    {{ $mode === 'input' ? '-' : number_format($unitVal, 2, '.', '') }}
-                                                    <input type="hidden" name="buffer[{{ $slug }}][unit]" value="{{ $mode === 'input' ? '0.00' : number_format($unitVal,2,'.','') }}">
-                                                </td>
-
-                                                <td style="padding:8px;border:1px solid #e0e0e0;background:#fffbf0;text-align:center;">
-                                                    <input type="number" name="buffer[{{ $slug }}][qty]" class="qty-input buffer-qty" step="0.01" min="0" value="{{ old('buffer.' . $slug . '.qty', $defaultQty) }}" style="width:100%;" />
-                                                </td>
-
-                                                <td class="line-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
-                                                    0.00
-                                                    <input type="hidden" name="buffer[{{ $slug }}][line_total]" class="line-hidden" value="0.00">
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-                                        <tr>
-                                            <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;background:#e8f5e8;font-weight:700;text-align:right;">TOTAL RETAIL</td>
-                                            <td id="total-retail" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8;">0.00</td>
-                                        </tr>
-
-                                        <tr>
-                                            <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">TAX</td>
-                                            <td id="tax-amount" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- DELIVERY -->
-                        @php $KITCHEN_DELIVERY = $KITCHEN_DELIVERY ?? []; @endphp
-                        <div style="margin-bottom: 30px;">
-                            <h3 style="background-color:#fff3cd;padding:10px;margin:0;border-bottom:1px solid #e0e0e0;">DELIVERY</h3>
-
-                            <table class="table" style="margin-bottom:20px;width:100%;">
-                                <thead>
-                                    <tr>
-                                        <th style="width:30%;padding:8px;border:1px solid #e0e0e0;text-align:left;">Description</th>
-                                        <th style="width:20%;padding:8px;border:1px solid #e0e0e0;text-align:right;">Unit Price</th>
-                                        <th style="width:20%;padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;text-align:center;">Qty</th>
-                                        <th style="width:30%;padding:8px;border:1px solid #e0e0e0;text-align:right;">Line Total</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="delivery-rows">
-                                    @forelse ($KITCHEN_DELIVERY as $project => $cost)
-                                        @php
-                                            $unit = number_format((float)$cost, (round((float)$cost,2) != (float)$cost ? 4 : 2), '.', '');
-                                            $id = 'delivery_' . Str::slug($project, '_');
-                                        @endphp
-
-                                        <tr data-key="{{ $id }}" data-project="{{ $project }}">
-                                            <td style="padding:8px;border:1px solid #e0e0e0;">
-                                                {{ $project }}
-                                                <input type="hidden" name="delivery[{{ $id }}][name]" value="{{ $project }}">
-                                            </td>
-
-                                            <td class="delivery-unit" style="padding:8px;border:1px solid #e0e0e0;text-align:right;" data-unit="{{ $unit }}">
-                                                {{ $unit }}
-                                                <input type="hidden" name="delivery[{{ $id }}][unit_price]" value="{{ $unit }}">
-                                            </td>
-
-                                            <td style="padding:8px;border:1px solid #e0e0e0;background:#f5f5f5;text-align:center;">
-                                                <input type="number" id="{{ $id }}_qty" name="delivery[{{ $id }}][qty]" class="qty-input delivery-qty" placeholder="" min="0" step="0.01" value="{{ old('delivery.' . $id . '.qty', 0) }}" style="width:100%;">
-                                            </td>
-
-                                            <td id="{{ $id }}_total" class="delivery-line" style="padding:8px;border:1px solid #e0e0e0;text-align:right;">
-                                                0.00
-                                                <input type="hidden" name="delivery[{{ $id }}][line_total]" value="0" class="delivery-line-hidden">
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr><td colspan="4" style="text-align:center;color:#999;padding:12px;border:1px solid #e0e0e0;">No delivery items configured.</td></tr>
-                                    @endforelse
-
-                                    <!-- TOTAL -->
-                                    <tr>
-                                        <td colspan="3" style="padding:8px;border:1px solid #e0e0e0;text-align:right;font-weight:bold;background:#e8f5e8;">TOTAL</td>
-                                        <td id="delivery-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;background:#e8f5e8;">0.00</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Final Surcharge -->
-                        <div>
-                            <table class="table" style="width:100%;margin-bottom:20px;">
-                                <tr>
-                                    <td style="width:30%;padding:8px;border:1px solid #e0e0e0;">DBA fee/fuel surcharge</td>
-                                    <td style="width:20%;padding:8px;border:1px solid #e0e0e0;">
-                                        <input type="number" id="dba-surcharge" name="dba_surcharge" class="qty-input" placeholder="0.03" min="0" step="0.01" value="{{ old('dba_surcharge', 0.03) }}">
-                                    </td>
-                                    <td id="step2-final-result" style="width:50%;padding:8px;border:1px solid #e0e0e0;text-align:right;">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding:8px;border:1px solid #e0e0e0;font-weight:bold;">step 2 subtotal</td>
-                                    <td style="padding:8px;border:1px solid #e0e0e0;"></td>
-                                    <td id="step2-final-total" style="padding:8px;border:1px solid #e0e0e0;text-align:right;font-weight:bold;">0.00</td>
-                                </tr>
                             </table>
                         </div>
                     </div>
-
-                    <div class="nav-footer">
-                        <button type="button" id="prev-tab-2" class="btn secondary" onclick="prevStep(2)"><span>←</span> Previous</button>
-                        <div class="steps-indicator">Step 2 of 3</div>
-                        <button type="button" id="next-tab-2" class="btn theme" data-current="2">Next <span>→</span></button>
+                    <div class="quote-stepview__right">
+                        <div class="stepview-title">
+                            <h3 class="title">Quote Summary</h3>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Subtotal</div>
+                            <div class="summary-amount" id="subtotal">$7,730.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Tax (8%)</div>
+                            <div class="summary-amount" id="tax">$618.40</div>
+                        </div>
+                        <div class="summary-item grand-total">
+                            <div class="summary-label">Grand Total</div>
+                            <div class="summary-amount" id="grand-total">$8,348.40</div>
+                        </div>
                     </div>
                 </div>
+                <!-- Second Step -->
+                <div class="quote-stepview first-step">
+                    <div class="quote-stepview__full">
+                        <div class="quote-accordion">
+                            <div class="quote-accordion__item">
+                                <div class="quote-accordion__header">
+                                    Box Manufacturer
+                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6"
+                                        fill="none">
+                                        <path
+                                            d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
+                                            fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="quote-accordion__body">
+                                    <div class="custom-table">
+                                        <table class="table" id="box-manufacturer-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 30%;">Manufacturer</th>
+                                                    <th style="width: 20%;">Unit Price</th>
+                                                    <th style="width: 20%;">Qty</th>
+                                                    <th style="width: 20%;">Line Total</th>
+                                                    <th style="width: 10%;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($KITCHEN_MANUFACTURER ?? [] as $manufacturerName => $item)
+                                                    <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
+                                                        <td class="label manufacturer-name-td">
+                                                            {{ $item->project }}
+                                                            @if($item->is_taxable)
+                                                                <span class="t_tag">T</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="label unit-price-td">{{ number_format($item->cost, 2) }}</td>
+                                                        <td class="label">
+                                                            <div class="quantity-controls">
+                                                                <button class="quantity-btn minus">−</button>
+                                                                <input type="number" class="quantity-input" value="1"
+                                                                    min="0" />
+                                                                <button class="quantity-btn plus">+</button>
+                                                            </div>
+                                                        </td>
+                                                        <td class="label line-total">${{ number_format($item->cost, 2) }}</td>
+                                                        <td class="label actions-td">
+                                                            <button class="btn edit-box">Edit</button>
+                                                            <button class="btn remove-row">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr data-taxable="0">
+                                                        <td class="label manufacturer-name-td">Premium Box Co.</td>
+                                                        <td class="label unit-price-td">350.00</td>
+                                                        <td class="label">
+                                                            <div class="quantity-controls">
+                                                                <button class="quantity-btn minus">−</button>
+                                                                <input type="number" class="quantity-input" value="10"
+                                                                    min="0" />
+                                                                <button class="quantity-btn plus">+</button>
+                                                            </div>
+                                                        </td>
+                                                        <td class="label line-total">$3,500.00</td>
+                                                        <td class="label actions-td">
+                                                            <button class="btn edit-box">Edit</button>
+                                                            <button class="btn remove-row">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr data-taxable="0">
+                                                        <td class="label manufacturer-name-td">Eco-Wood Designs</td>
+                                                        <td class="label unit-price-td">280.00</td>
+                                                        <td class="label">
+                                                            <div class="quantity-controls">
+                                                                <button class="quantity-btn minus">−</button>
+                                                                <input type="number" class="quantity-input" value="15"
+                                                                    min="0" />
+                                                                <button class="quantity-btn plus">+</button>
+                                                            </div>
+                                                        </td>
+                                                        <td class="label line-total">$4,200.00</td>
+                                                        <td class="label actions-td">
+                                                            <button class="btn edit-box">Edit</button>
+                                                            <button class="btn remove-row">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                                <!-- add-row (stays at bottom and is NOT replaced) -->
+                                                <tr class="add-row-box">
+                                                    <td class="label">
+                                                        <input type="text" class="form-input add-box-name"
+                                                            placeholder="Manufacturer Name" />
+                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                    </td>
+                                                    <td class="label">
+                                                        <input type="number" class="form-input text-align-center add-box-unit"
+                                                            placeholder="Unit Price" step="0.01" min="0" />
+                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                    </td>
+                                                    <td class="label">
+                                                        <div class="quantity-controls">
+                                                            <button class="quantity-btn minus">−</button>
+                                                            <input type="number" class="quantity-input add-box-qty" value="1"
+                                                                min="0" />
+                                                            <button class="quantity-btn plus">+</button>
+                                                        </div>
+                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                    </td>
+                                                    <td class="label add-box-line-total-display">
+                                                        $0.00
+                                                    </td>
+                                                    <td class="label">
+                                                        <button type="button" class="btn add-btn add-box-btn">+ Add</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
 
-                <!-- STEP 3: Summary & Submit -->
-                <div class="container step hidden" data-step="3" id="step-3">
-                    <div class="header-row">
-                        <h2 style="margin:0;color:#333">Summary</h2>
-                        <div style="text-align:right">
-                            <div style="font-size:14px;color:#666;margin-bottom:5px">Final Total</div>
-                            <div id="header-total-3" style="font-size:24px;font-weight:700;color:#2e7d32">$ -</div>
+                            <div class="quote-accordion__item">
+                                <div class="quote-accordion__header">
+                                    Margin Markup
+                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6"
+                                        fill="none">
+                                        <path
+                                            d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
+                                            fill="currentColor" />
+                                    </svg>
+                                </div>
+                                <div class="quote-accordion__body">
+                                    <div class="custom-table">
+                                        <table class="table" id="margin-markup-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 40%;">Description</th>
+                                                    <th style="width: 20%;">Multiplier</th>
+                                                    <th style="width: 20%;">Result</th>
+                                                    <th style="width: 20%;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($KITCHEN_MARGIN_MARKUP ?? [] as $marginDesc => $item)
+                                                    <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
+                                                        <td class="label margin-desc-td">
+                                                            {{ $item->project }}
+                                                            @if($item->is_taxable)
+                                                                <span class="t_tag">T</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="label margin-mul-td">{{ number_format($item->cost, 2) }}</td>
+                                                        <td class="label margin-result">$0.00</td>
+                                                        <td class="label actions-td">
+                                                            <button class="btn edit-margin">Edit</button>
+                                                            <button class="btn remove-row">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr data-taxable="0">
+                                                        <td class="label margin-desc-td">Standard Profit Margin</td>
+                                                        <td class="label margin-mul-td">1.25</td>
+                                                        <td class="label margin-result">$2,000.00</td>
+                                                        <td class="label actions-td">
+                                                            <button class="btn edit-margin">Edit</button>
+                                                            <button class="btn remove-row">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr data-taxable="0">
+                                                        <td class="label margin-desc-td">Design Fee</td>
+                                                        <td class="label margin-mul-td">1.15</td>
+                                                        <td class="label margin-result">$1,500.00</td>
+                                                        <td class="label actions-td">
+                                                            <button class="btn edit-margin">Edit</button>
+                                                            <button class="btn remove-row">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+
+                                                <!-- add-row (stays at bottom and is NOT replaced) -->
+                                                <tr class="add-row-margin">
+                                                    <td class="label">
+                                                        <input type="text" class="form-input add-margin-desc"
+                                                            placeholder="e.g., Design Fee" />
+                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                    </td>
+                                                    <td class="label">
+                                                        <input type="number" class="form-input text-align-center add-margin-mul"
+                                                            placeholder="e.g., 1.15" step="0.01" min="0" />
+                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                    </td>
+                                                    <td class="label add-margin-result">$0.00</td>
+                                                    <td class="label">
+                                                        <button type="button" class="btn add-btn add-margin-btn">+ Add</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
-                    </div>
-
-                    <div class="table-container summary-box">
-                        <div id="summary-list"></div>
-
-                        <div class="summary-row total">
-                            <div>Total</div>
-                            <div id="final-total" style="font-weight:700">$ -</div>
-                        </div>
-                    </div>
-
-                    <div class="nav-footer">
-                        <button type="button" class="btn secondary" onclick="prevStep(3)"><span>←</span> Previous</button>
-                        <div class="steps-indicator">Step 3 of 3</div>
-                        <button type="submit" class="btn theme" id="save-quote">Save & Finish</button>
                     </div>
                 </div>
-            </form>
+                <!-- Fourth Step: Review & Submit -->
+                <div class="quote-stepview review-step">
+                    <div class="quote-stepview__full">
+                        <div class="stepview-title" style="text-align: center; margin-bottom: 30px;">
+                            <h3 class="title mb-8">Review Your Quote</h3>
+                            <p>Please review all details before submitting</p>
+                        </div>
+                        
+                        <div class="quote-stepview__summary">
+                            <div class="summary-card">
+                                <div class="summary-header">
+                                    <h2 class="summary-title">Quote Summary</h2>
+                                    <div class="final-total-section">
+                                        <div class="final-total-label">Final Total</div>
+                                        <div class="final-total-amount" id="review-grand-total">$0.00</div>
+                                    </div>
+                                </div>
+
+                                <div class="summary-divider"></div>
+                                
+                                <div class="summary-section">
+                                    <h4 style="margin-bottom: 10px; color: #333;">Project Information</h4>
+                                    <p><strong>Project:</strong> <span id="review-project-name">-</span></p>
+                                    <p><strong>Customer:</strong> <span id="review-customer-name">-</span></p>
+                                </div>
+
+                                <div class="summary-divider"></div>
+
+                                <div class="summary-section">
+                                    <h4 style="margin-bottom: 10px; color: #333;">Quote Items</h4>
+                                    <div id="review-items-list">
+                                        <!-- Items will be populated by JavaScript -->
+                                    </div>
+                                </div>
+
+                                <div class="summary-divider"></div>
+
+                                <div class="summary-section">
+                                    <h4 style="margin-bottom: 10px; color: #333;">Box Manufacturers</h4>
+                                    <div id="review-manufacturers-list">
+                                        <!-- Manufacturers will be populated by JavaScript -->
+                                    </div>
+                                </div>
+
+                                <div class="summary-divider"></div>
+
+                                <div class="summary-section">
+                                    <h4 style="margin-bottom: 10px; color: #333;">Margin Markups</h4>
+                                    <div id="review-margins-list">
+                                        <!-- Margins will be populated by JavaScript -->
+                                    </div>
+                                </div>
+
+                                <div class="summary-divider"></div>
+
+                                <div class="summary-item total-row">
+                                    <div class="item-description">Subtotal</div>
+                                    <div class="item-price" id="review-subtotal">$0.00</div>
+                                </div>
+                                
+                                <div class="summary-item">
+                                    <div class="item-description">Tax (8%)</div>
+                                    <div class="item-price" id="review-tax">$0.00</div>
+                                </div>
+                                
+                                <div class="summary-item total-row" style="font-size: 20px; font-weight: bold;">
+                                    <div class="item-description">Grand Total</div>
+                                    <div class="item-price" id="review-total">$0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Success Step -->
+                <div class="quote-stepview success-step" style="display: none;">
+                    <div class="quote-stepview__full" style="text-align: center; padding: 50px;">
+                        <div style="font-size: 60px; color: #22c55e; margin-bottom: 20px;">✓</div>
+                        <h2 style="color: #22c55e; margin-bottom: 15px;">Quote Created Successfully!</h2>
+                        <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+                            Your quote has been created and PDF has been generated.
+                        </p>
+                        <div style="margin-bottom: 20px;">
+                            <p><strong>Quote Number:</strong> <span id="success-quote-number">-</span></p>
+                        </div>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="{{ route('admin.quotes.index') }}" class="btn theme">View All Quotes</a>
+                            <a href="{{ route('admin.quotes.create') }}" class="btn secondary">Create Another Quote</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
+        <!-- Footer -->
+        <footer class="step-footer">
+            <div class="footer-content">
+                <div class="step-indicator">Step 1 of 3</div>
+                <div class="footer-actions">
+                    <button class="btn secondary">Previous</button>
+                    <button class="btn theme">Next</button>
+                </div>
+            </div>
+        </footer>
+
+    </div>
 @endsection
 
 @push('scripts')
     <script>
-        jQuery(function($) {
-            // Utilities
-            function parseNum(v) {
-                if (v === null || v === undefined) return 0;
-                v = String(v).replace(/\$/g, '').replace(/,/g, '').trim();
-                if (v === '') return 0;
-                if (/^\(.*\)$/.test(v)) v = '-' + v.replace(/[()]/g, '');
-                var n = parseFloat(v);
-                return isNaN(n) ? 0 : n;
+        jQuery(function($){
+        // --- CONFIG & HELPERS ---
+        const TAX_RATE = 0.08; // 8% tax
+        const currency = (n) => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n||0));
+        const parseNumber = (v) => {
+            if (v === null || v === undefined) return NaN;
+            if (typeof v === 'number') return v;
+            v = String(v).replace(/[^0-9\.\-]/g,'').trim();
+            return v === '' ? NaN : parseFloat(v);
+        };
+        function escapeHtml(s){ return String(s||'').replace(/[&<>"'`=\/]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'}[c]; }); }
+        
+        // Safe toastr notification
+        function showToast(type, message) {
+            if (typeof toastr !== 'undefined') {
+                toastr[type](message);
+            } else {
+                console.log(`[${type.toUpperCase()}] ${message}`);
             }
-            function fmt2(n) { return (isNaN(n) ? 0 : n).toFixed(2); }
-            function fmt4(n) { return (isNaN(n) ? 0 : n).toFixed(4); }
+        }
 
-            // Welcome toggles
-            var selected = { kitchen: false, vanity: false };
-            $('#kitchen-quote').prop('checked', selected.kitchen);
-            $('#vanity-quote').prop('checked', selected.vanity);
-
-            window.toggleCheckbox = function(key) {
-                selected[key] = !selected[key];
-                var chk = $('#' + key + '-quote');
-                if (chk.length) chk.prop('checked', selected[key]);
-                var box = $('#chk-' + key);
-                if (box.length) {
-                    if (selected[key]) box.addClass('selected'); else box.removeClass('selected');
-                }
-            };
-
-            window.beginQuote = function() {
-                var projectId = $('#project-select').val();
-                if (!selected.kitchen && !selected.vanity) { $('#welcome-error').text('Please select at least one quote type to continue.').show(); return; }
-                if (!projectId) { $('#welcome-error').text('Please select a project to continue.').show(); return; }
-                $('#welcome-error').hide();
-                $('#welcome-panel').addClass('hidden');
-                $('#multi-step-form').removeClass('hidden');
-                showStep(1);
-            };
-
-            // Navigation
-            function showStep(step) {
-                $('.step').addClass('hidden');
-                $('.step[data-step="' + step + '"]').removeClass('hidden');
-                recalcAll();
+        // --- Step navigation ---
+        const $steps = $('.quote-stepview'); 
+        const totalSteps = $steps.length - 1; // Exclude success step
+        let currentStep = 1;
+        let selectedProjectId = null;
+        let selectedProjectData = {};
+        
+        function showStep(step){ 
+            if(step<1) step=1; 
+            if(step>totalSteps) step=totalSteps; 
+            currentStep=step; 
+            $steps.hide(); 
+            $steps.eq(step-1).show();
+            $('.progress-step').each(function(i){ $(this).toggleClass('active',(i+1)<=step); });
+            $('.progress-label').each(function(i){ $(this).toggleClass('active',(i+1)===step); });
+            $('.step-indicator').text('Step ' + step + ' of ' + totalSteps);
+            $('.breadcrumb-item').text('Quote Generation – Step ' + step + ' of ' + totalSteps);
+            
+            // Update subtitle based on step
+            const subtitles = [
+                'Step 1 of 4 – Select Project',
+                'Step 2 of 4 – Enter Item Quantities',
+                'Step 3 of 4 – Box Manufacturer & Margins',
+                'Step 4 of 4 – Review & Submit'
+            ];
+            $('.content-header .subtitle').text(subtitles[step-1] || '');
+            
+            // If moving to review step, populate review data
+            if(step === 4) {
+                populateReviewStep();
             }
-            window.nextStep = function(current) {
-                if (!validateStep(current)) return;
-                var next = current + 1;
-                showStep(next);
-                if (next === 3) buildSummary();
-            };
-            window.prevStep = function(current) {
-                var prev = current - 1;
-                if (prev < 1) return;
-                showStep(prev);
-            };
-
-            function validateStep(step) {
-                if (step === 1) {
-                    var ok = true;
-                    $('#kitchen-rows input.kitchen-qty').each(function() {
-                        var v = parseNum($(this).val());
-                        if (v < 0) { $(this).addClass('invalid'); ok = false; } else $(this).removeClass('invalid');
-                    });
-                    if (!ok) alert('Please correct kitchen quantities (numbers >= 0).');
-                    return ok;
-                }
-                if (step === 2) {
-                    var ok = true;
-                    $('#manufacturer-rows input.manufacturer-qty').each(function() {
-                        var v = parseNum($(this).val());
-                        if (v < 0) { $(this).addClass('invalid'); ok = false; } else $(this).removeClass('invalid');
-                    });
-                    if (!ok) alert('Please correct manufacturer quantities (numbers >= 0).');
-                    return ok;
-                }
-                return true;
-            }
-
-            // Recalculations
-            function recalcKitchen() {
-                var grand = 0;
-                $('#kitchen-rows tr[data-name]').each(function() {
-                    var $tr = $(this);
-                    var qty = parseNum($tr.find('input[name="kitchen[qty][]"]').val() || 0);
-                    var unit = parseNum($tr.find('input[name="kitchen[unit_price][]"]').val() || $tr.find('.cost-value').data('cost') || 0);
-                    var line = qty * unit;
-                    grand += line;
-                    var $lineCell = $tr.find('.line-total');
-                    if (line > 0) $lineCell.text('$' + fmt2(line)).removeClass('empty-value'); else $lineCell.text('$ -').addClass('empty-value');
-                });
-                $('#grand-total-1').text(grand > 0 ? '$' + fmt2(grand) : '$ -');
-                $('#header-total-1').text(grand > 0 ? '$' + fmt2(grand) : '$ -');
-                return grand;
-            }
-
-            function recalcManufacturer() {
-                var total = 0;
-                $('#manufacturer-rows tr[data-name]').each(function() {
-                    var $tr = $(this);
-                    var qty = parseNum($tr.find('input[name="manufacturer[qty][]"]').val() || 0);
-                    var unit = parseNum($tr.find('input[name="manufacturer[unit_price][]"]').val() || $tr.find('td').eq(1).text() || 0);
-                    var line = qty * unit;
-                    total += line;
-                    var $display = $tr.find('.manufacturer-line');
-                    var $hiddenLine = $tr.find('input.manufacturer-line-hidden[name="manufacturer[line_total][]"]');
-                    if (line > 0) {
-                        $display.text('$' + fmt4(line)).removeClass('empty-value');
-                        if ($hiddenLine.length) $hiddenLine.val(fmt4(line));
-                    } else {
-                        $display.text('$ -').addClass('empty-value');
-                        if ($hiddenLine.length) $hiddenLine.val('0');
-                    }
-                });
-                $('#manufacturer-total').text(total > 0 ? '$' + fmt4(total) : '$ -');
-                $('#header-total-2').text(total > 0 ? '$' + fmt4(total) : '$ -');
-                return total;
-            }
-
-            function recalcDelivery() {
-                var deliveryTotal = 0;
-                $('#delivery-rows tr[data-key]').each(function() {
-                    var $tr = $(this);
-                    var qty = parseNum($tr.find('.delivery-qty').val() || 0);
-                    var unit = parseNum($tr.find('.delivery-unit').data('unit') || $tr.find('input[name$="[unit_price]"]').val() || 0);
-                    var line = qty * unit;
-                    deliveryTotal += line;
-                    var idTotal = $tr.attr('id') || ($tr.data('key') + '_total');
-                    // Update visible cell
-                    $tr.find('.delivery-line').first().contents().filter(function(){ return this.nodeType===3; }).first().replaceWith(fmt2(line));
-                    $tr.find('.delivery-line-hidden').val(fmt2(line));
-                });
-
-                $('#delivery-total').text(deliveryTotal > 0 ? '$' + fmt2(deliveryTotal) : '0.00');
-                return deliveryTotal;
-            }
-
-            function recalcBufferRows() {
-                var total = 0;
-                $('#buffer-rows tr[data-type="buffer"]').each(function(){
-                    var $tr = $(this);
-                    var mode = $tr.data('mode');
-                    var unit = parseNum($tr.data('unit')) || 0;
-                    var qty = parseNum($tr.find('.buffer-qty').val()) || 0;
-                    var line = 0;
-                    if(mode === 'fixed'){ if(qty <= 0) qty = 1; line = unit * qty; }
-                    else if(mode === 'qty'){ line = unit * qty; }
-                    else { line = qty; } // input absolute
-                    total += line;
-                    $tr.find('.line-total').first().contents().filter(function(){ return this.nodeType===3; }).first().replaceWith(fmt2(line));
-                    $tr.find('.line-hidden').val(fmt2(line));
-                });
-                $('#total-retail').text(total ? ('$' + fmt2(total)) : '0.00');
-                var taxAmount = total * (parseFloat('{{ $taxRate ?? 0 }}') || 0);
-                $('#tax-amount').text(fmt2(taxAmount));
-                return total;
-            }
-
-            function recalcMargins() {
-                $('#margin-markup-rows tr[data-key]').each(function(){
-                    var $tr = $(this);
-                    var $input = $tr.find('.margin-input');
-                    var mult = parseNum($input.val()) || 0;
-                    var pct = mult * 100;
-                    $tr.find('.markup-result').first().contents().filter(function(){ return this.nodeType===3; }).first().replaceWith(fmt2(pct) + '%');
-                    $tr.find('input[name$="[result]"]').val(fmt2(pct));
-                });
-            }
-
-            function recalcAll() {
-                var kitchenSum = recalcKitchen();
-                var manufacturerSum = recalcManufacturer();
-
-                // multiplier logic: if you have a list price input, you can multiply here - we keep it flexible
-                var listPriceValue = parseNum($('#list-price').val() || 0);
-                var multiplierResult = listPriceValue * manufacturerSum;
-                if ($('#multiplier-result').length) $('#multiplier-result').text(multiplierResult ? fmt4(multiplierResult) : '0.000');
-                if ($('#cost-total').length) $('#cost-total').text(multiplierResult ? ('$' + fmt2(multiplierResult)) : '$0.00');
-
-                var step2Subtotal = manufacturerSum + multiplierResult;
-                if ($('#step2-final-total').length) $('#step2-final-total').text(step2Subtotal ? ('$' + fmt4(step2Subtotal)) : '$0.00');
-                if ($('#step2-final-result').length) $('#step2-final-result').text(step2Subtotal ? ('$' + fmt4(step2Subtotal)) : '$0.00');
-
-                var deliverySum = recalcDelivery();
-                recalcMargins();
-                var bufferSum = recalcBufferRows();
-
-                var priceBuffer = parseNum($('#price-buffer').val() || 0);
-                var phoneBuffer = parseNum($('#phone-call-buffer').val() || 0);
-                var hardwareQty = parseNum($('#hardware-qty').val() || 0);
-                var dba = parseNum($('#dba-surcharge').val() || 0);
-
-                // Note: our bufferSum already includes price/phone/hardware lines if they exist in DB iteration.
-                // To avoid double counting, ensure price/phone/hardware are part of buffer rows or use these inputs separately.
-                // Here we add explicit inputs as fallback:
-                var totalRetail = step2Subtotal + deliverySum + (bufferSum || 0);
-                $('#total-retail').text(totalRetail ? ('$' + fmt2(totalRetail)) : '0.00');
-
-                var taxAmount = 0; // if you want tax applied elsewhere, compute it here
-                $('#tax-amount').text(fmt2(taxAmount));
-
-                var step2FinalWithDba = step2Subtotal + dba;
-                $('#step2-final-result').text(step2FinalWithDba ? ('$' + fmt4(step2FinalWithDba)) : '$0.00');
-                $('#step2-final-total').text(step2FinalWithDba ? ('$' + fmt4(step2FinalWithDba)) : '$0.00');
-
-                var final = kitchenSum + step2Subtotal + deliverySum + (bufferSum || 0) + dba + taxAmount;
-                $('#final-total').text(final ? ('$' + fmt2(final)) : '$ -');
-                $('#header-total-3').text(final ? ('$' + fmt2(final)) : '$ -');
-
-                return {
-                    kitchenSum: kitchenSum,
-                    manufacturerSum: manufacturerSum,
-                    multiplierResult: multiplierResult,
-                    step2Subtotal: step2Subtotal,
-                    deliverySum: deliverySum,
-                    bufferSum: bufferSum,
-                    final: final
+        }
+        
+        showStep(1);
+        
+        // Project selection handler
+        $(document).on('change', '#project_id', function(){
+            selectedProjectId = $(this).val();
+            const $selected = $(this).find('option:selected');
+            
+            if(selectedProjectId) {
+                selectedProjectData = {
+                    id: selectedProjectId,
+                    name: $selected.text().split(' - ')[0],
+                    customer: $selected.data('customer'),
+                    customerId: $selected.data('customer-id')
                 };
+                
+                // Show project info
+                $('.project-info').show();
+                $('#selected-customer').text(selectedProjectData.customer);
+                $('#selected-project').text(selectedProjectData.name);
+                $('#selected-status').text('Active');
+                
+                // Clear error
+                $('.error-msg[data-for="project_id"]').hide();
+            } else {
+                $('.project-info').hide();
+                selectedProjectData = {};
+            }
+        });
+        
+        $(document).on('click', '.step-footer .btn.theme', function(e){ 
+            e.preventDefault(); 
+            
+            // Validate current step before proceeding
+            if(currentStep === 1) {
+                // Validate project selection
+                if(!selectedProjectId) {
+                    $('.error-msg[data-for="project_id"]').text('Please select a project').show();
+                    return;
+                }
+            }
+            
+            if(currentStep === 4) {
+                // Submit form
+                submitQuoteForm();
+                return;
+            }
+            
+            if(currentStep < totalSteps){ 
+                showStep(currentStep+1); 
+                if(currentStep === totalSteps) recalcAll(); 
+            } 
+        });
+        
+        $(document).on('click', '.step-footer .btn.secondary', function(e){ 
+            e.preventDefault(); 
+            if(currentStep>1) showStep(currentStep-1); 
+        });
+        
+        $(document).on('click', '.progress-step', function(){ 
+            const targetStep = $(this).index()+1;
+            // Don't allow skipping to steps beyond current progress
+            if(targetStep <= currentStep || (currentStep === 1 && selectedProjectId)) {
+                showStep(targetStep); 
+            }
+        });
+
+        // --- Quantity Controls (delegated) ---
+        function bindQuantityControls($container){
+            $container.find('.plus').off('click.plus').on('click.plus', function(e){ 
+                e.preventDefault(); 
+                const $row = $(this).closest('tr, .quantity-controls'); 
+                const $input = $row.find('.quantity-input').first(); 
+                let val = parseInt($input.val(),10) || 0; 
+                $input.val(val+1).trigger('change'); 
+            });
+            
+            $container.find('.minus').off('click.minus').on('click.minus', function(e){ 
+                e.preventDefault(); 
+                const $row = $(this).closest('tr, .quantity-controls'); 
+                const $input = $row.find('.quantity-input').first(); 
+                let val = parseInt($input.val(),10) || 0; 
+                if(val>0) $input.val(val-1).trigger('change'); 
+            });
+            
+            $container.find('.quantity-input').off('change.qty input.qty').on('change.qty input.qty', function(){ 
+                const $row = $(this).closest('tr'); 
+                recalcRow($row); 
+                recalcAll(); 
+            });
+        }
+        
+        bindQuantityControls($(document));
+
+        // --- Recalculation functions ---
+        function recalcRow($row){
+            if(!$row || !$row.length) return 0;
+            // skip add-rows
+            if($row.find('.add-box-btn, .add-margin-btn').length) return 0;
+
+            // If this row is a manufacturer row (has unit-price-td class)
+            if($row.find('.unit-price-td').length || $row.find('.manufacturer-name-td').length){
+                const $unitCell = $row.find('td').eq(1);
+                let unit = 0;
+                if($unitCell.find('input').length) {
+                    unit = parseNumber($unitCell.find('input').val());
+                } else {
+                    unit = parseNumber($unitCell.text());
+                }
+                let qty = parseNumber($row.find('.quantity-input').first().val()); 
+                if(isNaN(qty)) qty = 0;
+                const lineTotal = (isNaN(unit) ? 0 : unit) * qty;
+                const $totalCell = $row.find('td').eq(3);
+                if($totalCell.find('input').length) {
+                    $totalCell.find('input').val(currency(lineTotal));
+                } else {
+                    $totalCell.text(currency(lineTotal));
+                }
+                return lineTotal;
             }
 
-            // Event delegation for input changes
-            $(document).on('input change', [
-                '#kitchen-rows input.kitchen-qty',
-                '#manufacturer-rows input.manufacturer-qty',
-                '#list-price',
-                '#price-buffer',
-                '#phone-call-buffer',
-                '#hardware-qty',
-                '#delivery-rows input.delivery-qty',
-                '#dba-surcharge',
-                '.margin-input',
-                '.buffer-qty'
-            ].join(','), function() {
-                recalcAll();
+            // Main left items: unit in col 3, total in col 4
+            const $unitCell = $row.find('td').eq(3);
+            let unit = 0;
+            if($unitCell.find('input').length) {
+                unit = parseNumber($unitCell.find('input').val());
+            } else {
+                unit = parseNumber($unitCell.text());
+            }
+            let qty = parseNumber($row.find('.quantity-input').first().val()); 
+            if(isNaN(qty)) qty = 0;
+            const lineTotal = unit * qty;
+            const $totalCell = $row.find('td').eq(4);
+            if($totalCell.find('input').length) {
+                $totalCell.find('input').val(currency(lineTotal));
+            } else {
+                $totalCell.text(currency(lineTotal));
+            }
+            return lineTotal;
+        }
+
+        function recalcManufacturerRow($row){
+            return recalcRow($row);
+        }
+
+        function recalcMarginRow($row){
+            if($row.find('.add-box-btn, .add-margin-btn').length) return 0;
+            // multiplier is column 1, result is column 2 for margin table
+            let mul = parseNumber($row.find('td').eq(1).text() || $row.find('td').eq(1).find('input').val());
+            const base = subtotalValue();
+            const result = base * (isNaN(mul) ? 0 : mul);
+            $row.find('td').eq(2).text(currency(result));
+            return result;
+        }
+
+        function subtotalValue(){
+            let subtotal = 0;
+            
+            // Left tables (main items)
+            $('.quote-stepview__left .custom-table .table').each(function(){
+                $(this).find('tbody tr').each(function(){
+                    const $r = $(this);
+                    // skip add rows
+                    if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                    const $cells = $r.find('td'); 
+                    if($cells.length === 0) return;
+                    // prefer input value in last cell, then text
+                    const $last = $cells.last();
+                    const text = $last.find('input').length ? $last.find('input').val() : $last.text();
+                    subtotal += parseNumber(text) || 0;
+                });
             });
 
-            // Next buttons
-            $('#next-tab-1').on('click', function() { nextStep(1); });
-            $('#next-tab-2').on('click', function() { nextStep(2); });
-
-            // Build summary
-            function buildSummary() {
-                var $list = $('#summary-list');
-                if (!$list.length) return;
-                $list.empty();
-
-                $('#kitchen-rows tr[data-name]').each(function() {
-                    var $tr = $(this);
-                    var name = $tr.data('name');
-                    var qty = parseNum($tr.find('input[name="kitchen[qty][]"]').val() || 0);
-                    var unit = parseNum($tr.find('input[name="kitchen[unit_price][]"]').val() || $tr.find('.cost-value').data('cost') || 0);
-                    var line = qty * unit;
-                    if (line > 0) $list.append('<div class="summary-row"><div>' + name + ' × ' + qty + '</div><div>$' + fmt2(line) + '</div></div>');
-                });
-
-                $('#manufacturer-rows tr[data-name]').each(function(){
-                    var $tr = $(this);
-                    var name = $tr.data('name');
-                    var qty = parseNum($tr.find('input[name="manufacturer[qty][]"]').val() || 0);
-                    var unit = parseNum($tr.find('input[name="manufacturer[unit_price][]"]').val() || $tr.find('td').eq(1).text() || 0);
-                    var line = qty * unit;
-                    if(line > 0) $list.append('<div class="summary-row"><div>' + name + ' × ' + qty + '</div><div>$' + fmt4(line) + '</div></div>');
-                });
-
-                $('#delivery-rows tr[data-key]').each(function(){
-                    var $tr = $(this);
-                    var label = $tr.find('td').first().text().trim();
-                    var qty = parseNum($tr.find('.delivery-qty').val() || 0);
-                    var unit = parseNum($tr.find('.delivery-unit').data('unit') || 0);
-                    var line = qty * unit;
-                    if (line > 0) $list.append('<div class="summary-row"><div>' + label + ' × ' + qty + '</div><div>$' + fmt2(line) + '</div></div>');
-                });
-
-                var state = recalcAll();
-                $('#final-total').text(state.final ? ('$' + fmt2(state.final)) : '$ -');
-                $('#header-total-3').text(state.final ? ('$' + fmt2(state.final)) : '$ -');
-            }
-
-            // Form submit via AJAX
-            var $form = $('#multi-step-form');
-            if ($form.length) {
-                $form.on('submit', function(e) {
-                    e.preventDefault();
-                    var state = recalcAll();
-                    if (!state.final || state.final <= 0) {
-                        if (!confirm('Final total is $0. Do you want to submit anyway?')) return;
+            // Accordion (manufacturer and others)
+            $('.quote-accordion__body .custom-table .table').each(function(){
+                $(this).find('tbody tr').each(function(){
+                    const $r = $(this);
+                    // skip add rows
+                    if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                    const $cells = $r.find('td'); 
+                    if($cells.length === 0) return;
+                    // many accordion tables use column index 3 for totals
+                    let text = '';
+                    if($cells.length >= 4){
+                        const $cell = $cells.eq(3);
+                        text = $cell.find('input').length ? $cell.find('input').val() : $cell.text();
+                    } else {
+                        // fallback: last cell
+                        const $last = $cells.last();
+                        text = $last.find('input').length ? $last.find('input').val() : $last.text();
                     }
-
-                    var fd = new FormData();
-                    fd.append('project_id', $('#project-select').val() || '');
-                    // kitchen
-                    $('#kitchen-rows tr[data-name]').each(function() {
-                        var $tr = $(this);
-                        fd.append('kitchen[name][]', $tr.data('name'));
-                        fd.append('kitchen[qty][]', parseNum($tr.find('input[name="kitchen[qty][]"]').val() || 0));
-                        fd.append('kitchen[unit_price][]', parseNum($tr.find('input[name="kitchen[unit_price][]"]').val() || $tr.find('.cost-value').data('cost') || 0));
-                    });
-                    // manufacturer
-                    $('#manufacturer-rows tr[data-name]').each(function() {
-                        var $tr = $(this);
-                        fd.append('manufacturer[name][]', $tr.data('name'));
-                        fd.append('manufacturer[qty][]', parseNum($tr.find('input[name="manufacturer[qty][]"]').val() || 0));
-                        fd.append('manufacturer[unit_price][]', parseNum($tr.find('input[name="manufacturer[unit_price][]"]').val() || $tr.find('td').eq(1).text() || 0));
-                        fd.append('manufacturer[line_total][]', parseNum($tr.find('input.manufacturer-line-hidden').val() || 0));
-                    });
-                    // deliveries
-                    $('#delivery-rows tr[data-key]').each(function(){
-                        var key = $(this).data('key');
-                        var qty = parseNum($(this).find('.delivery-qty').val() || 0);
-                        var unit = parseNum($(this).find('.delivery-unit').data('unit') || 0);
-                        var line = qty * unit;
-                        fd.append('delivery[' + key + '][qty]', qty);
-                        fd.append('delivery[' + key + '][unit_price]', unit);
-                        fd.append('delivery[' + key + '][line_total]', fmt2(line));
-                    });
-                    // buffers
-                    $('#buffer-rows tr[data-key]').each(function(){
-                        var key = $(this).data('key');
-                        var qty = parseNum($(this).find('.buffer-qty').val() || 0);
-                        var unit = parseNum($(this).data('unit') || 0);
-                        var line = parseNum($(this).find('.line-hidden').val() || 0);
-                        fd.append('buffer[' + key + '][qty]', qty);
-                        fd.append('buffer[' + key + '][unit]', unit);
-                        fd.append('buffer[' + key + '][line_total]', fmt2(line));
-                    });
-
-                    // simple named inputs (if present)
-                    var named = ['list-price','margin-markup','hardware-qty','price-buffer','phone-call-buffer','dba-surcharge'];
-                    $.each(named, function(_, id) {
-                        var node = $('#' + id);
-                        if (!node.length) return;
-                        var serverName = node.attr('name') || id.replace(/-/g, '_');
-                        fd.append(serverName, node.val());
-                    });
-
-                    fd.append('final_total', state.final ? state.final.toString() : '0');
-                    fd.append('is_kitchen', selected.kitchen ? '1' : '0');
-                    fd.append('is_vanity', selected.vanity ? '1' : '0');
-
-                    var $btn = $('#save-quote');
-                    var oldLabel = $btn.text();
-                    $btn.prop('disabled', true).text('Saving...');
-
-                    fetch($form.attr('action'), {
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': $('input[name="_token"]').val(), 'Accept': 'application/json' },
-                        body: fd
-                    }).then(function(r){ return r.json().catch(()=>({})); }).then(function(json){
-                        $btn.prop('disabled', false).text(oldLabel);
-                        if (json && json.success) {
-                            if (json.redirect) window.location.href = json.redirect;
-                            else window.location.reload();
-                        } else {
-                            alert((json && json.message) ? json.message : 'Save failed');
-                            console.error('Save response:', json);
-                        }
-                    }).catch(function(err){
-                        $btn.prop('disabled', false).text(oldLabel);
-                        alert('Save failed (network or server error)');
-                        console.error(err);
-                    });
+                    subtotal += parseNumber(text) || 0;
                 });
+            });
+
+            return subtotal;
+        }
+
+        function recalcTotals(){
+            // recalc main items
+            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){ 
+                const $tr = $(this); 
+                if(!$tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) recalcRow($tr); 
+            });
+            
+            // recalc manufacturers
+            $('.quote-accordion__body .custom-table .table tbody tr').each(function(){ 
+                const $tr = $(this); 
+                if(!$tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) recalcManufacturerRow($tr); 
+            });
+
+            // recalc margins
+            $('.quote-accordion__item').each(function(){
+                const headerText = $(this).find('.quote-accordion__header').text() || '';
+                if(headerText.toLowerCase().indexOf('margin') !== -1){
+                    $(this).find('.custom-table .table tbody tr').each(function(){
+                        const $tr = $(this);
+                        // skip add row
+                        if($tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                        // skip rows that don't look like margin rows
+                        if($tr.find('td').length >= 3) recalcMarginRow($tr);
+                    });
+                }
+            });
+
+            const subtotal = subtotalValue();
+            const taxableSubtotal = calculateTaxableSubtotal();
+            const tax = taxableSubtotal * TAX_RATE;
+            const grand = subtotal + tax;
+            $('#subtotal').text(currency(subtotal));
+            $('#tax').text(currency(tax));
+            $('#grand-total').text(currency(grand));
+            $('.final-total-amount').text(currency(grand));
+        }
+        
+        // Calculate subtotal only for taxable items
+        function calculateTaxableSubtotal(){
+            let taxableSubtotal = 0;
+            
+            // Left tables (main items) - only taxable ones
+            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){
+                const $r = $(this);
+                // skip add rows
+                if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                
+                // check if row is taxable
+                const isTaxable = $r.attr('data-taxable') === '1';
+                if(!isTaxable) return;
+                
+                const $cells = $r.find('td'); 
+                if($cells.length === 0) return;
+                const $last = $cells.last();
+                const text = $last.find('input').length ? $last.find('input').val() : $last.text();
+                taxableSubtotal += parseNumber(text) || 0;
+            });
+
+            // Accordion tables (manufacturers) - only taxable ones
+            $('.quote-accordion__body .custom-table .table tbody tr').each(function(){
+                const $r = $(this);
+                // skip add rows
+                if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                
+                // check if row is taxable
+                const isTaxable = $r.attr('data-taxable') === '1';
+                if(!isTaxable) return;
+                
+                const $cells = $r.find('td'); 
+                if($cells.length === 0) return;
+                let text = '';
+                if($cells.length >= 4){
+                    const $cell = $cells.eq(3);
+                    text = $cell.find('input').length ? $cell.find('input').val() : $cell.text();
+                } else {
+                    const $last = $cells.last();
+                    text = $last.find('input').length ? $last.find('input').val() : $last.text();
+                }
+                taxableSubtotal += parseNumber(text) || 0;
+            });
+
+            return taxableSubtotal;
+        }
+        
+        function recalcAll(){ 
+            recalcTotals(); 
+        }
+        
+        $(document).on('change input', '.quantity-input, .form-input, .unit-price, .margin-mul, .add-box-unit, .add-box-qty, .add-margin-mul', function(){ 
+            recalcAll(); 
+        });
+        
+        recalcAll();
+
+        // --- ADD ROWS ---
+        
+        // Live calculation for add-row line total (Box Manufacturer)
+        $(document).on('input change', '.add-box-unit, .add-box-qty', function(){
+            const $addRow = $(this).closest('.add-row-box');
+            const unitVal = parseNumber($addRow.find('.add-box-unit').val());
+            const qtyVal = parseNumber($addRow.find('.add-box-qty').val());
+            const lineTotal = (isNaN(unitVal) ? 0 : unitVal) * (isNaN(qtyVal) ? 0 : qtyVal);
+            $addRow.find('.add-box-line-total-display').text(currency(lineTotal));
+        });
+
+        $(document).on('click', '.add-box-btn', function(e){
+            e.preventDefault();
+            const $triggerRow = $(this).closest('tr');
+
+            // read name / unit / qty from inputs in trigger row
+            const name = $.trim($triggerRow.find('.add-box-name').val() || '');
+            const unitRaw = $triggerRow.find('.add-box-unit').val() || '';
+            const qtyRaw = $triggerRow.find('.add-box-qty').val() || '0';
+
+            // clear previous validation messages
+            $triggerRow.find('.validation-msg').hide().text('');
+
+            // validation
+            if(name === '') { 
+                $triggerRow.find('.validation-msg').eq(0).text('Please enter manufacturer name.').show(); 
+                return; 
+            }
+            const unit = parseNumber(unitRaw);
+            if(isNaN(unit) || unit <= 0) { 
+                $triggerRow.find('.validation-msg').eq(1).text('Please enter a valid unit price (greater than 0).').show(); 
+                return; 
+            }
+            let qty = parseInt(qtyRaw,10); 
+            if(isNaN(qty) || qty < 0) { 
+                $triggerRow.find('.validation-msg').eq(2).text('Please enter a valid quantity (0 or greater).').show(); 
+                return; 
             }
 
-            // wire next buttons to functions
-            $('#next-tab-1').on('click', function(){ nextStep(1); });
-            $('#next-tab-2').on('click', function(){ nextStep(2); });
+            // build new row (default to non-taxable for manually added items)
+            const lineTotal = unit * qty;
+            const newRow = $(`
+            <tr data-taxable="0">
+                <td class="label manufacturer-name-td">${escapeHtml(name)}</td>
+                <td class="label unit-price-td">${unit.toFixed(2)}</td>
+                <td class="label">
+                    <div class="quantity-controls">
+                        <button class="quantity-btn minus">−</button>
+                        <input type="number" class="quantity-input" value="${qty}" min="0" />
+                        <button class="quantity-btn plus">+</button>
+                    </div>
+                </td>
+                <td class="label line-total">${currency(lineTotal)}</td>
+                <td class="label actions-td">
+                    <button class="btn edit-box">Edit</button>
+                    <button class="btn remove-row">Delete</button>
+                </td>
+            </tr>
+            `);
 
-            // initial calc
+            // insert BEFORE the trigger row (so add row remains at bottom)
+            $triggerRow.before(newRow);
+
+            // clear the add-row inputs for next entry
+            $triggerRow.find('.add-box-name').val('');
+            $triggerRow.find('.add-box-unit').val('');
+            $triggerRow.find('.add-box-qty').val('1');
+            $triggerRow.find('.add-box-line-total-display').text('$0.00');
+
+            // bind quantity handlers
+            bindQuantityControls(newRow);
             recalcAll();
+            
+            // Show success message
+            showToast('success', 'Box manufacturer added successfully!');
         });
+
+        // Live calculation for add-row margin result
+        $(document).on('input change', '.add-margin-mul', function(){
+            const $addRow = $(this).closest('.add-row-margin');
+            const mulVal = parseNumber($addRow.find('.add-margin-mul').val());
+            const base = subtotalValue();
+            const resultValue = base * (isNaN(mulVal) ? 0 : mulVal);
+            $addRow.find('.add-margin-result').text(currency(resultValue));
+        });
+
+        $(document).on('click', '.add-margin-btn', function(e){
+            e.preventDefault();
+            const $triggerRow = $(this).closest('tr');
+            $triggerRow.find('.validation-msg').hide().text('');
+
+            const desc = $.trim($triggerRow.find('.add-margin-desc').val() || '');
+            const mulRaw = $triggerRow.find('.add-margin-mul').val() || '';
+            const mul = parseNumber(mulRaw);
+
+            // validation
+            if(desc === '') { 
+                $triggerRow.find('.validation-msg').eq(0).text('Please enter margin description.').show(); 
+                return; 
+            }
+            if(isNaN(mul) || mul <= 0) { 
+                $triggerRow.find('.validation-msg').eq(1).text('Please enter a valid multiplier (e.g. 1.15, must be greater than 0).').show(); 
+                return; 
+            }
+
+            // compute immediate result
+            const base = subtotalValue();
+            const resultValue = base * mul;
+
+            const newRow = $(`
+            <tr data-taxable="0">
+                <td class="label margin-desc-td">${escapeHtml(desc)}</td>
+                <td class="label margin-mul-td">${mul.toFixed(2)}</td>
+                <td class="label margin-result">${currency(resultValue)}</td>
+                <td class="label actions-td">
+                    <button class="btn edit-margin">Edit</button>
+                    <button class="btn remove-row">Delete</button>
+                </td>
+            </tr>
+            `);
+
+            // insert before add-row
+            $triggerRow.before(newRow);
+            
+            // clear the add-row inputs for next entry
+            $triggerRow.find('.add-margin-desc').val('');
+            $triggerRow.find('.add-margin-mul').val('');
+            $triggerRow.find('.add-margin-result').text('$0.00');
+            
+            recalcAll();
+            
+            // Show success message
+            showToast('success', 'Margin markup added successfully!');
+        });
+
+        // --- EDIT FUNCTIONALITY ---
+
+        // Enter edit mode for manufacturer row
+        function enterEditManufacturer($row){
+            if($row.data('editing')) return;
+            $row.data('editing', true);
+
+            const $nameCell = $row.find('td').eq(0);
+            const $unitCell = $row.find('td').eq(1);
+            const $qtyCell = $row.find('td').eq(2);
+            const orig = {
+                name: $nameCell.text().trim(),
+                unit: $unitCell.text().trim(),
+                qty: $qtyCell.find('.quantity-input').val() || $qtyCell.find('input').val() || '0'
+            };
+            $row.data('orig', orig);
+
+            $nameCell.html(`<input type="text" class="form-input inline-name" value="${escapeHtml(orig.name)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+            $unitCell.html(`<input type="number" class="form-input inline-unit" value="${escapeHtml(orig.unit)}" step="0.01" min="0"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+            
+            // qty input already exists — add inline validation area if missing
+            if($qtyCell.find('.validation-msg').length === 0) {
+                $qtyCell.append('<div class="validation-msg small text-danger" style="display:none;"></div>');
+            }
+
+            // actions: hide edit/delete and show save/cancel
+            const $actions = $row.find('.actions-td');
+            $actions.find('.edit-box').hide();
+            $actions.find('.remove-row').hide();
+            $actions.prepend('<button class="btn save-inline">Save</button><button class="btn cancel-inline">Cancel</button>');
+
+            // live update and validation
+            $row.find('.inline-unit').on('input', function(){
+                const val = $(this).val();
+                const num = parseNumber(val);
+                if(isNaN(num) || num <= 0){ 
+                    $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show(); 
+                } else { 
+                    $unitCell.find('.validation-msg').hide().text(''); 
+                }
+                recalcRow($row); 
+                recalcAll();
+            });
+            
+            $row.find('.quantity-input').on('input', function(){
+                const val = $(this).val();
+                const num = parseNumber(val);
+                if(val === '' || isNaN(num) || num < 0){ 
+                    $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show(); 
+                } else { 
+                    $qtyCell.find('.validation-msg').hide().text(''); 
+                }
+                recalcRow($row); 
+                recalcAll();
+            });
+        }
+
+        function saveEditManufacturer($row){
+            const $nameCell = $row.find('td').eq(0);
+            const $unitCell = $row.find('td').eq(1);
+            const $qtyCell = $row.find('td').eq(2);
+
+            const name = $nameCell.find('.inline-name').val().trim();
+            const unitRaw = $unitCell.find('.inline-unit').val().trim();
+            const qtyRaw = $qtyCell.find('.quantity-input').val().trim();
+
+            $nameCell.find('.validation-msg').hide().text('');
+            $unitCell.find('.validation-msg').hide().text('');
+            $qtyCell.find('.validation-msg').hide().text('');
+
+            let hasError = false;
+            if(name === '') { 
+                $nameCell.find('.validation-msg').text('Manufacturer name is required').show(); 
+                hasError = true; 
+            }
+            const unit = parseNumber(unitRaw);
+            if(isNaN(unit) || unit <= 0) { 
+                $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show(); 
+                hasError = true; 
+            }
+            const qty = parseNumber(qtyRaw);
+            if(qtyRaw === '' || isNaN(qty) || qty < 0) { 
+                $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show(); 
+                hasError = true; 
+            }
+
+            if(hasError) return false;
+
+            // persist values
+            $nameCell.text(name);
+            $unitCell.text(unit.toFixed(2));
+            $qtyCell.html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${parseInt(qtyRaw,10)}" min="0"/><button class="quantity-btn plus">+</button></div>`);
+
+            // restore actions
+            $row.find('.save-inline, .cancel-inline').remove();
+            $row.find('.edit-box').show();
+            $row.find('.remove-row').show();
+
+            bindQuantityControls($row);
+            recalcAll();
+            $row.data('editing', false);
+            
+            showToast('success', 'Changes saved successfully!');
+            return true;
+        }
+
+        function cancelEditManufacturer($row){
+            const orig = $row.data('orig') || {};
+            $row.find('td').eq(0).text(orig.name || '');
+            $row.find('td').eq(1).text(orig.unit || '');
+            $row.find('td').eq(2).html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${orig.qty||0}" min="0"/><button class="quantity-btn plus">+</button></div>`);
+            $row.find('.save-inline, .cancel-inline').remove();
+            $row.find('.edit-box').show();
+            $row.find('.remove-row').show();
+            bindQuantityControls($row);
+            recalcAll();
+            $row.data('editing', false);
+        }
+
+        // Margin edit
+        function enterEditMargin($row){
+            if($row.data('editing')) return;
+            $row.data('editing', true);
+            const $desc = $row.find('td').eq(0);
+            const $mul = $row.find('td').eq(1);
+            const orig = {desc: $desc.text().trim(), mul: $mul.text().trim()};
+            $row.data('orig', orig);
+            $desc.html(`<input type="text" class="form-input inline-desc" value="${escapeHtml(orig.desc)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+            $mul.html(`<input type="number" class="form-input inline-mul" value="${escapeHtml(orig.mul)}" step="0.01" min="0"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+            const $actions = $row.find('.actions-td');
+            $actions.find('.edit-margin').hide();
+            $actions.find('.remove-row').hide();
+            $actions.prepend('<button class="btn save-inline-margin">Save</button><button class="btn cancel-inline-margin">Cancel</button>');
+
+            $row.find('.inline-mul').on('input', function(){
+                const mul = parseNumber($(this).val());
+                if(isNaN(mul) || mul <= 0){ 
+                    $mul.find('.validation-msg').text('Multiplier must be greater than 0').show(); 
+                } else { 
+                    $mul.find('.validation-msg').hide().text(''); 
+                }
+                const base = subtotalValue();
+                $row.find('td').eq(2).text(currency(base * (isNaN(mul)?0:mul)));
+            });
+        }
+
+        function saveEditMargin($row){
+            const $desc = $row.find('td').eq(0);
+            const $mul = $row.find('td').eq(1);
+            const desc = $desc.find('.inline-desc').val().trim();
+            const mulRaw = $mul.find('.inline-mul').val().trim();
+            $desc.find('.validation-msg').hide().text('');
+            $mul.find('.validation-msg').hide().text('');
+            let hasError = false;
+            if(desc === '') { 
+                $desc.find('.validation-msg').text('Description is required').show(); 
+                hasError = true; 
+            }
+            const mul = parseNumber(mulRaw);
+            if(isNaN(mul) || mul <= 0) { 
+                $mul.find('.validation-msg').text('Multiplier must be greater than 0').show(); 
+                hasError = true; 
+            }
+            if(hasError) return false;
+
+            $desc.text(desc);
+            $mul.text(mul.toFixed(2));
+            const base = subtotalValue();
+            $row.find('td').eq(2).text(currency(base * mul));
+
+            $row.find('.save-inline-margin, .cancel-inline-margin').remove();
+            $row.find('.edit-margin').show();
+            $row.find('.remove-row').show();
+            recalcAll();
+            $row.data('editing', false);
+            
+            showToast('success', 'Margin updated successfully!');
+            return true;
+        }
+
+        function cancelEditMargin($row){
+            const orig = $row.data('orig') || {};
+            $row.find('td').eq(0).text(orig.desc || '');
+            $row.find('td').eq(1).text(orig.mul || '');
+            const mul = parseNumber(orig.mul || 0);
+            $row.find('td').eq(2).text(currency(subtotalValue() * (isNaN(mul)?0:mul)));
+            $row.find('.save-inline-margin, .cancel-inline-margin').remove();
+            $row.find('.edit-margin').show();
+            $row.find('.remove-row').show();
+            recalcAll();
+            $row.data('editing', false);
+        }
+
+        // delegated event handlers
+        $(document).on('click', '.edit-box', function(e){ 
+            e.preventDefault(); 
+            enterEditManufacturer($(this).closest('tr')); 
+        });
+        
+        $(document).on('click', '.save-inline', function(e){ 
+            e.preventDefault(); 
+            saveEditManufacturer($(this).closest('tr')); 
+        });
+        
+        $(document).on('click', '.cancel-inline', function(e){ 
+            e.preventDefault(); 
+            cancelEditManufacturer($(this).closest('tr')); 
+        });
+
+        $(document).on('click', '.edit-margin', function(e){ 
+            e.preventDefault(); 
+            enterEditMargin($(this).closest('tr')); 
+        });
+        
+        $(document).on('click', '.save-inline-margin', function(e){ 
+            e.preventDefault(); 
+            saveEditMargin($(this).closest('tr')); 
+        });
+        
+        $(document).on('click', '.cancel-inline-margin', function(e){ 
+            e.preventDefault(); 
+            cancelEditMargin($(this).closest('tr')); 
+        });
+
+        // remove row with better confirmation
+        $(document).on('click', '.remove-row', function(e){ 
+            e.preventDefault(); 
+            const $row = $(this).closest('tr'); 
+            const itemName = $row.find('td').first().text().trim() || 'this item';
+            
+            if(!confirm(`Are you sure you want to delete "${itemName}"?\n\nThis action cannot be undone.`)) return; 
+            
+            $row.fadeOut(300, function(){
+                $(this).remove(); 
+                recalcAll();
+                showToast('info', 'Item deleted successfully.');
+            });
+        });
+
+        // inline save on Enter, cancel on Esc
+        $(document).on('keydown', '.inline-name, .inline-unit, .inline-desc, .inline-mul', function(e){
+            if(e.key === 'Enter'){
+                e.preventDefault();
+                const $row = $(this).closest('tr');
+                if($row.find('.save-inline').length) {
+                    $row.find('.save-inline').trigger('click');
+                } else if($row.find('.save-inline-margin').length) {
+                    $row.find('.save-inline-margin').trigger('click');
+                }
+            } else if(e.key === 'Escape'){
+                e.preventDefault();
+                const $row = $(this).closest('tr');
+                if($row.find('.cancel-inline').length) {
+                    $row.find('.cancel-inline').trigger('click');
+                }
+                if($row.find('.cancel-inline-margin').length) {
+                    $row.find('.cancel-inline-margin').trigger('click');
+                }
+            }
+        });
+
+        // accordion toggle
+        $(document).on('click', '.quote-accordion__header', function(){ 
+            const body = $(this).next('.quote-accordion__body'); 
+            $('.quote-accordion__body').not(body).slideUp(); 
+            $('.quote-accordion__header').not(this).removeClass('active'); 
+            $(this).toggleClass('active'); 
+            body.stop(true,true).slideToggle(); 
+        });
+
+        // final recalc on step change
+        $(document).on('click', '.step-footer .btn.theme', function(){ 
+            if(currentStep+1 === totalSteps){ 
+                recalcAll(); 
+            } 
+        });
+
+        // ensure initial calculation
+        recalcAll();
+
+        // --- Populate Review Step ---
+        function populateReviewStep() {
+            // Project info
+            $('#review-project-name').text(selectedProjectData.name || '-');
+            $('#review-customer-name').text(selectedProjectData.customer || '-');
+            
+            // Quote items from step 2
+            let itemsHtml = '';
+            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){
+                const $row = $(this);
+                if($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                
+                const itemName = $row.find('td').eq(0).text().trim();
+                const qty = $row.find('.quantity-input').val() || 0;
+                const unitPrice = $row.find('td').eq(3).text().trim();
+                const total = $row.find('td').eq(4).text().trim();
+                
+                if(parseInt(qty) > 0) {
+                    itemsHtml += `<div class="summary-item">
+                        <div class="item-description">${escapeHtml(itemName)} × ${qty}</div>
+                        <div class="item-price">${total}</div>
+                    </div>`;
+                }
+            });
+            $('#review-items-list').html(itemsHtml || '<p style="color: #999;">No items added</p>');
+            
+            // Box manufacturers
+            let manufacturersHtml = '';
+            $('#box-manufacturer-table tbody tr').each(function(){
+                const $row = $(this);
+                if($row.find('.add-box-btn').length) return;
+                
+                const name = $row.find('.manufacturer-name-td').text().trim();
+                const qty = $row.find('.quantity-input').val() || 0;
+                const unitPrice = $row.find('.unit-price-td').text().trim();
+                const total = $row.find('.line-total').text().trim();
+                
+                if(name) {
+                    manufacturersHtml += `<div class="summary-item">
+                        <div class="item-description">${escapeHtml(name)} × ${qty} @ $${unitPrice}</div>
+                        <div class="item-price">${total}</div>
+                    </div>`;
+                }
+            });
+            $('#review-manufacturers-list').html(manufacturersHtml || '<p style="color: #999;">No manufacturers added</p>');
+            
+            // Margins
+            let marginsHtml = '';
+            $('#margin-markup-table tbody tr').each(function(){
+                const $row = $(this);
+                if($row.find('.add-margin-btn').length) return;
+                
+                const desc = $row.find('.margin-desc-td').text().trim();
+                const multiplier = $row.find('.margin-mul-td').text().trim();
+                const result = $row.find('.margin-result').text().trim();
+                
+                if(desc) {
+                    marginsHtml += `<div class="summary-item">
+                        <div class="item-description">${escapeHtml(desc)} (${multiplier}x)</div>
+                        <div class="item-price">${result}</div>
+                    </div>`;
+                }
+            });
+            $('#review-margins-list').html(marginsHtml || '<p style="color: #999;">No margins added</p>');
+            
+            // Totals
+            const subtotal = $('#subtotal').text();
+            const tax = $('#tax').text();
+            const grandTotal = $('#grand-total').text();
+            
+            $('#review-subtotal').text(subtotal);
+            $('#review-tax').text(tax);
+            $('#review-total').text(grandTotal);
+            $('#review-grand-total').text(grandTotal);
+        }
+
+        // --- Submit Quote Form via AJAX ---
+        function submitQuoteForm() {
+            // Collect all form data
+            const formData = {
+                _token: '{{ csrf_token() }}',
+                project_id: selectedProjectId,
+                customer_name: selectedProjectData.customer,
+                project_name: selectedProjectData.name,
+                subtotal: parseNumber($('#subtotal').text()),
+                tax: parseNumber($('#tax').text()),
+                total: parseNumber($('#grand-total').text()),
+                discount: 0,
+                items: [],
+                manufacturers: [],
+                margins: []
+            };
+            
+            // Collect quote items
+            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){
+                const $row = $(this);
+                if($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                
+                const itemName = $row.find('td').eq(0).text().trim();
+                const qty = parseNumber($row.find('.quantity-input').val());
+                const unitPrice = parseNumber($row.find('td').eq(3).text());
+                const total = parseNumber($row.find('td').eq(4).text());
+                const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
+                
+                if(qty > 0) {
+                    formData.items.push({
+                        name: itemName,
+                        qty: qty,
+                        unit_price: unitPrice,
+                        line_total: total,
+                        is_taxable: isTaxable
+                    });
+                }
+            });
+            
+            // Collect manufacturers
+            $('#box-manufacturer-table tbody tr').each(function(){
+                const $row = $(this);
+                if($row.find('.add-box-btn').length) return;
+                
+                const name = $row.find('.manufacturer-name-td').text().trim();
+                const qty = parseNumber($row.find('.quantity-input').val());
+                const unitPrice = parseNumber($row.find('.unit-price-td').text());
+                const total = parseNumber($row.find('.line-total').text());
+                const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
+                
+                if(name) {
+                    formData.manufacturers.push({
+                        name: name,
+                        qty: qty,
+                        unit_price: unitPrice,
+                        line_total: total,
+                        is_taxable: isTaxable
+                    });
+                }
+            });
+            
+            // Collect margins
+            $('#margin-markup-table tbody tr').each(function(){
+                const $row = $(this);
+                if($row.find('.add-margin-btn').length) return;
+                
+                const desc = $row.find('.margin-desc-td').text().trim();
+                const multiplier = parseNumber($row.find('.margin-mul-td').text());
+                const result = parseNumber($row.find('.margin-result').text());
+                const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
+                
+                if(desc) {
+                    formData.margins.push({
+                        description: desc,
+                        multiplier: multiplier,
+                        result: result,
+                        is_taxable: isTaxable
+                    });
+                }
+            });
+            
+            // Show loading state
+            const $submitBtn = $('.step-footer .btn.theme');
+            const originalText = $submitBtn.html();
+            $submitBtn.prop('disabled', true).html('<span style="display: inline-block; width: 20px; height: 20px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Creating Quote...');
+            
+            // Submit via AJAX
+            $.ajax({
+                url: '{{ route("admin.quotes.store") }}',
+                method: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if(response.success) {
+                        // Show success step
+                        $('#success-quote-number').text(response.quote_number || '-');
+                        $('.quote-stepview').hide();
+                        $('.success-step').show();
+                        $('.step-footer').hide();
+                        $('.progress-container, .progress-labels, .breadcrumb').hide();
+                        
+                        showToast('success', 'Quote created successfully!');
+                    } else {
+                        showToast('error', response.message || 'Failed to create quote');
+                        $submitBtn.prop('disabled', false).html(originalText);
+                    }
+                },
+                error: function(xhr) {
+                    let errorMsg = 'An error occurred while creating the quote.';
+                    
+                    if(xhr.status === 422) {
+                        // Validation errors
+                        const errors = xhr.responseJSON?.errors || {};
+                        const errorMessages = [];
+                        $.each(errors, function(field, messages) {
+                            errorMessages.push(messages.join(' '));
+                        });
+                        errorMsg = errorMessages.join('<br>') || errorMsg;
+                    } else if(xhr.responseJSON?.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    
+                    showToast('error', errorMsg);
+                    $submitBtn.prop('disabled', false).html(originalText);
+                    
+                    console.error('Quote submission error:', xhr);
+                }
+            });
+        }
+
+        }); // end jQuery ready
     </script>
+    
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .summary-section {
+            margin-bottom: 20px;
+        }
+        .summary-section h4 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .summary-section p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .summary-item.total-row {
+            font-weight: bold;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+            padding: 12px 0;
+        }
+        .item-description {
+            flex: 1;
+            color: #333;
+        }
+        .item-price {
+            font-weight: 600;
+            color: #333;
+        }
+        .summary-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+    </style>
 @endpush
