@@ -27,19 +27,8 @@
       </div>
     </div>
 
-    <div class="header-actions">
-      {{-- <button class="header-btn secondary">
-        <i>📤</i> Export
-      </button>
-      <button class="header-btn primary">
-        <i>➕</i> New Quote
-      </button> --}}
-      <a href="{{ route('admin.profile.edit') }}"
-        class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U', 0, 2)) : 'U' }}</a>
-    </div>
-
     <div class="content bg-content">
-      <div class="quote-details">
+      <div class="quote-details quote-details__listing">
         <div class="content-header">
           <h2 class="title">Kitchen Top — Unit Price Update</h2>
           <a href="javascript:;" class="btn primary open-modal" data-target="#addQuoteModal">
