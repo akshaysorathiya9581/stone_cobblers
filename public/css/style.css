@@ -1751,9 +1751,12 @@ select {
 .quote-details {
     width: 100%;
     text-align: left;
-    /* padding: 20px; */
     border-radius: 8px;
-    /* background-color: var(--white-color); */
+}
+
+.quote-details__listing {
+    padding: 20px;
+    background-color: var(--white-color);
 }
 
 .quote-details__inside {
@@ -2528,6 +2531,14 @@ select {
     gap: 8px;
 }
 
+.quote-steps .progress-item {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
 .quote-steps .progress-step {
     width: 32px;
     height: 32px;
@@ -2538,6 +2549,8 @@ select {
     font-size: 14px;
     font-weight: 500;
     line-height: 16px;
+    background-color: #f3f4f6;
+    color: #565e6c;
 }
 
 .quote-steps .progress-step.inactive {
@@ -2566,6 +2579,7 @@ select {
 .quote-steps .progress-labels {
     display: flex;
     justify-content: space-between;
+    padding-left: 5px;
 }
 
 .quote-steps .progress-label {
@@ -2575,6 +2589,14 @@ select {
     color: #565e6c;
     flex: 1;
     text-align: center;
+}
+
+.quote-steps .progress-label:nth-child(2) {
+    padding-left: 0.2%;
+}
+
+.quote-steps .progress-label:nth-child(3) {
+    padding-left: 9.4%;
 }
 
 .quote-steps .progress-label.active {
@@ -2634,6 +2656,14 @@ select {
 .quote-stepview .custom-table .label {
     font-size: 14px;
     font-weight: 500;
+}
+
+.quote-stepview .custom-table .actions-td {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    gap: 8px;
 }
 
 .quote-stepview .custom-table .form-input {
@@ -2881,7 +2911,7 @@ select {
 }
 
 .quote-stepview__summary .final-total-amount {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     line-height: 27px;
     color: #0f8300;
@@ -2906,14 +2936,14 @@ select {
 }
 
 .quote-stepview__summary .item-description {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
     line-height: 22px;
     color: #171a1f;
 }
 
 .quote-stepview__summary .item-price {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
     line-height: 22px;
     color: #323842;

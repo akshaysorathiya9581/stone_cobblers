@@ -30,7 +30,6 @@
                     <h2 class="title">Stone by Stone: Your Perfect Kitchen Quote</h2>
                     <h3 class="subtitle">Step 1 of 4 – Select Project</h3>
                     <div class="quote-steps">
-                        <!-- Progress Indicator -->
                         <div class="progress-container">
                             <div class="progress-step active">1</div>
                             <div class="progress-line"></div>
@@ -48,36 +47,39 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Step 0: Project Selection -->
                 <div class="quote-stepview project-step">
-                    <div class="quote-stepview__full">
-                        <div class="stepview-title" style="text-align: center; margin-bottom: 30px;">
+                    <div class="quote-stepview__full" style="max-width: 600px;">
+                        <div class="stepview-title text-align-left">
                             <h3 class="title mb-8">Select a Project</h3>
                             <p>Choose the project for which you want to create a quote</p>
                         </div>
-                        <div class="form-fields" style="max-width: 600px; margin: 0 auto;">
+                        <div class="form-fields">
                             <div class="form-field">
                                 <label class="form-label required">Project</label>
-                                <select class="form-input custom-select" name="project_id" id="project_id" data-placeholder="Select Project" required>
+                                <select class="form-input custom-select" name="project_id" id="project_id"
+                                    data-placeholder="Select Project" required>
                                     <option value="">-- Select Project --</option>
                                     @foreach($projects as $project)
-                                        <option value="{{ $project->id }}" 
-                                                data-customer="{{ $project->customer->first_name ?? '' }} {{ $project->customer->last_name ?? '' }}"
-                                                data-customer-id="{{ $project->user_id }}">
-                                            {{ $project->name }} - {{ $project->customer->first_name ?? '' }} {{ $project->customer->last_name ?? '' }}
+                                        <option value="{{ $project->id }}"
+                                            data-customer="{{ $project->customer->first_name ?? '' }} {{ $project->customer->last_name ?? '' }}"
+                                            data-customer-id="{{ $project->user_id }}">
+                                            {{ $project->name }} - {{ $project->customer->first_name ?? '' }}
+                                            {{ $project->customer->last_name ?? '' }}
                                         </option>
                                     @endforeach
                                 </select>
-                                <div class="error-msg" data-for="project_id" style="color: red; font-size: 14px; margin-top: 5px; display: none;"></div>
+                                <div class="error-msg" data-for="project_id"></div>
                             </div>
-                            
-                            <div class="project-info" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+
+                            <!-- <div class="project-info"
+                                style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
                                 <h4 style="margin-bottom: 10px; color: #333;">Project Details</h4>
                                 <p><strong>Customer:</strong> <span id="selected-customer">-</span></p>
                                 <p><strong>Project:</strong> <span id="selected-project">-</span></p>
                                 <p><strong>Status:</strong> <span id="selected-status">-</span></p>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -104,7 +106,7 @@
                                     @forelse($KITCHEN_TOP ?? [] as $projectName => $item)
                                         <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
                                             <td class="label">
-                                                {{ $item->project }} 
+                                                {{ $item->project }}
                                                 @if($item->is_taxable)
                                                     <span class="t_tag">T</span>
                                                 @endif
@@ -113,8 +115,7 @@
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
-                                                    <input type="number" class="quantity-input" value="1"
-                                                        min="0" />
+                                                    <input type="number" class="quantity-input" value="1" min="0" />
                                                     <button class="quantity-btn plus">+</button>
                                                 </div>
                                             </td>
@@ -128,8 +129,7 @@
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
-                                                    <input type="number" class="quantity-input" value="50"
-                                                        min="0" />
+                                                    <input type="number" class="quantity-input" value="50" min="0" />
                                                     <button class="quantity-btn plus">+</button>
                                                 </div>
                                             </td>
@@ -142,8 +142,7 @@
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
-                                                    <input type="number" class="quantity-input" value="12"
-                                                        min="0" />
+                                                    <input type="number" class="quantity-input" value="12" min="0" />
                                                     <button class="quantity-btn plus">+</button>
                                                 </div>
                                             </td>
@@ -156,8 +155,7 @@
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
-                                                    <input type="number" class="quantity-input" value="16"
-                                                        min="0" />
+                                                    <input type="number" class="quantity-input" value="16" min="0" />
                                                     <button class="quantity-btn plus">+</button>
                                                 </div>
                                             </td>
@@ -170,8 +168,7 @@
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
-                                                    <input type="number" class="quantity-input" value="1"
-                                                        min="0" />
+                                                    <input type="number" class="quantity-input" value="1" min="0" />
                                                     <button class="quantity-btn plus">+</button>
                                                 </div>
                                             </td>
@@ -184,8 +181,7 @@
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
-                                                    <input type="number" class="quantity-input" value="62"
-                                                        min="0" />
+                                                    <input type="number" class="quantity-input" value="62" min="0" />
                                                     <button class="quantity-btn plus">+</button>
                                                 </div>
                                             </td>
@@ -222,8 +218,7 @@
                             <div class="quote-accordion__item">
                                 <div class="quote-accordion__header">
                                     Box Manufacturer
-                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6"
-                                        fill="none">
+                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
                                         <path
                                             d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
                                             fill="currentColor" />
@@ -254,15 +249,18 @@
                                                         <td class="label">
                                                             <div class="quantity-controls">
                                                                 <button class="quantity-btn minus">−</button>
-                                                                <input type="number" class="quantity-input" value="1"
-                                                                    min="0" />
+                                                                <input type="number" class="quantity-input" value="1" min="0" />
                                                                 <button class="quantity-btn plus">+</button>
                                                             </div>
                                                         </td>
                                                         <td class="label line-total">${{ number_format($item->cost, 2) }}</td>
                                                         <td class="label actions-td">
-                                                            <button class="btn edit-box">Edit</button>
-                                                            <button class="btn remove-row">Delete</button>
+                                                            <button class="action-btn edit edit-box">
+                                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                            </button>
+                                                            <button class="action-btn delete remove-row">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button1>
                                                         </td>
                                                     </tr>
                                                 @empty
@@ -279,8 +277,12 @@
                                                         </td>
                                                         <td class="label line-total">$3,500.00</td>
                                                         <td class="label actions-td">
-                                                            <button class="btn edit-box">Edit</button>
-                                                            <button class="btn remove-row">Delete</button>
+                                                            <button class="action-btn edit edit-box">
+                                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                            </button>
+                                                            <button class="action-btn delete remove-row">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     <tr data-taxable="0">
@@ -296,31 +298,38 @@
                                                         </td>
                                                         <td class="label line-total">$4,200.00</td>
                                                         <td class="label actions-td">
-                                                            <button class="btn edit-box">Edit</button>
-                                                            <button class="btn remove-row">Delete</button>
+                                                            <button class="action-btn edit edit-box">
+                                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                            </button>
+                                                            <button class="action-btn delete remove-row">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 @endforelse
-                                                <!-- add-row (stays at bottom and is NOT replaced) -->
                                                 <tr class="add-row-box">
                                                     <td class="label">
                                                         <input type="text" class="form-input add-box-name"
                                                             placeholder="Manufacturer Name" />
-                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                        <div class="validation-msg small text-danger" style="display:none;">
+                                                        </div>
                                                     </td>
                                                     <td class="label">
-                                                        <input type="number" class="form-input text-align-center add-box-unit"
+                                                        <input type="number"
+                                                            class="form-input text-align-center add-box-unit"
                                                             placeholder="Unit Price" step="0.01" min="0" />
-                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                        <div class="validation-msg small text-danger" style="display:none;">
+                                                        </div>
                                                     </td>
                                                     <td class="label">
                                                         <div class="quantity-controls">
                                                             <button class="quantity-btn minus">−</button>
-                                                            <input type="number" class="quantity-input add-box-qty" value="1"
-                                                                min="0" />
+                                                            <input type="number" class="quantity-input add-box-qty"
+                                                                value="1" min="0" />
                                                             <button class="quantity-btn plus">+</button>
                                                         </div>
-                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                        <div class="validation-msg small text-danger" style="display:none;">
+                                                        </div>
                                                     </td>
                                                     <td class="label add-box-line-total-display">
                                                         $0.00
@@ -338,8 +347,7 @@
                             <div class="quote-accordion__item">
                                 <div class="quote-accordion__header">
                                     Margin Markup
-                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6"
-                                        fill="none">
+                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
                                         <path
                                             d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
                                             fill="currentColor" />
@@ -368,8 +376,12 @@
                                                         <td class="label margin-mul-td">{{ number_format($item->cost, 2) }}</td>
                                                         <td class="label margin-result">$0.00</td>
                                                         <td class="label actions-td">
-                                                            <button class="btn edit-margin">Edit</button>
-                                                            <button class="btn remove-row">Delete</button>
+                                                            <button class="action-btn edit edit-margin">
+                                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                            </button>
+                                                            <button class="action-btn delete remove-row">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 @empty
@@ -378,8 +390,12 @@
                                                         <td class="label margin-mul-td">1.25</td>
                                                         <td class="label margin-result">$2,000.00</td>
                                                         <td class="label actions-td">
-                                                            <button class="btn edit-margin">Edit</button>
-                                                            <button class="btn remove-row">Delete</button>
+                                                            <button class="action-btn edit edit-margin">
+                                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                            </button>
+                                                            <button class="action-btn delete remove-row">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                     <tr data-taxable="0">
@@ -387,8 +403,12 @@
                                                         <td class="label margin-mul-td">1.15</td>
                                                         <td class="label margin-result">$1,500.00</td>
                                                         <td class="label actions-td">
-                                                            <button class="btn edit-margin">Edit</button>
-                                                            <button class="btn remove-row">Delete</button>
+                                                            <button class="action-btn edit edit-margin">
+                                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                            </button>
+                                                            <button class="action-btn delete remove-row">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 @endforelse
@@ -398,16 +418,20 @@
                                                     <td class="label">
                                                         <input type="text" class="form-input add-margin-desc"
                                                             placeholder="e.g., Design Fee" />
-                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                        <div class="validation-msg small text-danger" style="display:none;">
+                                                        </div>
                                                     </td>
                                                     <td class="label">
-                                                        <input type="number" class="form-input text-align-center add-margin-mul"
+                                                        <input type="number"
+                                                            class="form-input text-align-center add-margin-mul"
                                                             placeholder="e.g., 1.15" step="0.01" min="0" />
-                                                        <div class="validation-msg small text-danger" style="display:none;"></div>
+                                                        <div class="validation-msg small text-danger" style="display:none;">
+                                                        </div>
                                                     </td>
                                                     <td class="label add-margin-result">$0.00</td>
                                                     <td class="label">
-                                                        <button type="button" class="btn add-btn add-margin-btn">+ Add</button>
+                                                        <button type="button" class="btn add-btn add-margin-btn">+
+                                                            Add</button>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -422,11 +446,11 @@
                 <!-- Fourth Step: Review & Submit -->
                 <div class="quote-stepview review-step">
                     <div class="quote-stepview__full">
-                        <div class="stepview-title" style="text-align: center; margin-bottom: 30px;">
+                        <div class="stepview-title">
                             <h3 class="title mb-8">Review Your Quote</h3>
                             <p>Please review all details before submitting</p>
                         </div>
-                        
+
                         <div class="quote-stepview__summary">
                             <div class="summary-card">
                                 <div class="summary-header">
@@ -438,7 +462,7 @@
                                 </div>
 
                                 <div class="summary-divider"></div>
-                                
+
                                 <div class="summary-section">
                                     <h4 style="margin-bottom: 10px; color: #333;">Project Information</h4>
                                     <p><strong>Project:</strong> <span id="review-project-name">-</span></p>
@@ -478,12 +502,12 @@
                                     <div class="item-description">Subtotal</div>
                                     <div class="item-price" id="review-subtotal">$0.00</div>
                                 </div>
-                                
+
                                 <div class="summary-item">
                                     <div class="item-description">Tax (8%)</div>
                                     <div class="item-price" id="review-tax">$0.00</div>
                                 </div>
-                                
+
                                 <div class="summary-item total-row" style="font-size: 20px; font-weight: bold;">
                                     <div class="item-description">Grand Total</div>
                                     <div class="item-price" id="review-total">$0.00</div>
@@ -492,7 +516,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Success Step -->
                 <div class="quote-stepview success-step" style="display: none;">
                     <div class="quote-stepview__full" style="text-align: center; padding: 50px;">
@@ -529,173 +553,193 @@
 
 @push('scripts')
     <script>
-        jQuery(function($){
-        // --- CONFIG & HELPERS ---
-        const TAX_RATE = 0.08; // 8% tax
-        const currency = (n) => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n||0));
-        const parseNumber = (v) => {
-            if (v === null || v === undefined) return NaN;
-            if (typeof v === 'number') return v;
-            v = String(v).replace(/[^0-9\.\-]/g,'').trim();
-            return v === '' ? NaN : parseFloat(v);
-        };
-        function escapeHtml(s){ return String(s||'').replace(/[&<>"'`=\/]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'}[c]; }); }
-        
-        // Safe toastr notification
-        function showToast(type, message) {
-            if (typeof toastr !== 'undefined') {
-                toastr[type](message);
-            } else {
-                console.log(`[${type.toUpperCase()}] ${message}`);
-            }
-        }
+        jQuery(function ($) {
+            // --- CONFIG & HELPERS ---
+            const TAX_RATE = 0.08; // 8% tax
+            const currency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(n || 0));
+            const parseNumber = (v) => {
+                if (v === null || v === undefined) return NaN;
+                if (typeof v === 'number') return v;
+                v = String(v).replace(/[^0-9\.\-]/g, '').trim();
+                return v === '' ? NaN : parseFloat(v);
+            };
+            function escapeHtml(s) { return String(s || '').replace(/[&<>"'`=\/]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;' }[c]; }); }
 
-        // --- Step navigation ---
-        const $steps = $('.quote-stepview'); 
-        const totalSteps = $steps.length - 1; // Exclude success step
-        let currentStep = 1;
-        let selectedProjectId = null;
-        let selectedProjectData = {};
-        
-        function showStep(step){ 
-            if(step<1) step=1; 
-            if(step>totalSteps) step=totalSteps; 
-            currentStep=step; 
-            $steps.hide(); 
-            $steps.eq(step-1).show();
-            $('.progress-step').each(function(i){ $(this).toggleClass('active',(i+1)<=step); });
-            $('.progress-label').each(function(i){ $(this).toggleClass('active',(i+1)===step); });
-            $('.step-indicator').text('Step ' + step + ' of ' + totalSteps);
-            $('.breadcrumb-item').text('Quote Generation – Step ' + step + ' of ' + totalSteps);
-            
-            // Update subtitle based on step
-            const subtitles = [
-                'Step 1 of 4 – Select Project',
-                'Step 2 of 4 – Enter Item Quantities',
-                'Step 3 of 4 – Box Manufacturer & Margins',
-                'Step 4 of 4 – Review & Submit'
-            ];
-            $('.content-header .subtitle').text(subtitles[step-1] || '');
-            
-            // If moving to review step, populate review data
-            if(step === 4) {
-                populateReviewStep();
-            }
-        }
-        
-        showStep(1);
-        
-        // Project selection handler
-        $(document).on('change', '#project_id', function(){
-            selectedProjectId = $(this).val();
-            const $selected = $(this).find('option:selected');
-            
-            if(selectedProjectId) {
-                selectedProjectData = {
-                    id: selectedProjectId,
-                    name: $selected.text().split(' - ')[0],
-                    customer: $selected.data('customer'),
-                    customerId: $selected.data('customer-id')
-                };
-                
-                // Show project info
-                $('.project-info').show();
-                $('#selected-customer').text(selectedProjectData.customer);
-                $('#selected-project').text(selectedProjectData.name);
-                $('#selected-status').text('Active');
-                
-                // Clear error
-                $('.error-msg[data-for="project_id"]').hide();
-            } else {
-                $('.project-info').hide();
-                selectedProjectData = {};
-            }
-        });
-        
-        $(document).on('click', '.step-footer .btn.theme', function(e){ 
-            e.preventDefault(); 
-            
-            // Validate current step before proceeding
-            if(currentStep === 1) {
-                // Validate project selection
-                if(!selectedProjectId) {
-                    $('.error-msg[data-for="project_id"]').text('Please select a project').show();
-                    return;
+            // Safe toastr notification
+            function showToast(type, message) {
+                if (typeof toastr !== 'undefined') {
+                    toastr[type](message);
+                } else {
+                    console.log(`[${type.toUpperCase()}] ${message}`);
                 }
             }
-            
-            if(currentStep === 4) {
-                // Submit form
-                submitQuoteForm();
-                return;
+
+            // --- Step navigation ---
+            const $steps = $('.quote-stepview');
+            const totalSteps = $steps.length - 1; // Exclude success step
+            let currentStep = 1;
+            let selectedProjectId = null;
+            let selectedProjectData = {};
+
+            function showStep(step) {
+                if (step < 1) step = 1;
+                if (step > totalSteps) step = totalSteps;
+                currentStep = step;
+                $steps.hide();
+                $steps.eq(step - 1).show();
+                $('.progress-step').each(function (i) { $(this).toggleClass('active', (i + 1) <= step); });
+                $('.progress-label').each(function (i) { $(this).toggleClass('active', (i + 1) === step); });
+                $('.step-indicator').text('Step ' + step + ' of ' + totalSteps);
+                $('.breadcrumb-item').text('Quote Generation – Step ' + step + ' of ' + totalSteps);
+
+                // Update subtitle based on step
+                const subtitles = [
+                    'Step 1 of 4 – Select Project',
+                    'Step 2 of 4 – Enter Item Quantities',
+                    'Step 3 of 4 – Box Manufacturer & Margins',
+                    'Step 4 of 4 – Review & Submit'
+                ];
+                $('.content-header .subtitle').text(subtitles[step - 1] || '');
+
+                // If moving to review step, populate review data
+                if (step === 4) {
+                    populateReviewStep();
+                }
             }
-            
-            if(currentStep < totalSteps){ 
-                showStep(currentStep+1); 
-                if(currentStep === totalSteps) recalcAll(); 
-            } 
-        });
-        
-        $(document).on('click', '.step-footer .btn.secondary', function(e){ 
-            e.preventDefault(); 
-            if(currentStep>1) showStep(currentStep-1); 
-        });
-        
-        $(document).on('click', '.progress-step', function(){ 
-            const targetStep = $(this).index()+1;
-            // Don't allow skipping to steps beyond current progress
-            if(targetStep <= currentStep || (currentStep === 1 && selectedProjectId)) {
-                showStep(targetStep); 
+
+            showStep(1);
+
+            // Project selection handler
+            $(document).on('change', '#project_id', function () {
+                selectedProjectId = $(this).val();
+                const $selected = $(this).find('option:selected');
+
+                if (selectedProjectId) {
+                    selectedProjectData = {
+                        id: selectedProjectId,
+                        name: $selected.text().split(' - ')[0],
+                        customer: $selected.data('customer'),
+                        customerId: $selected.data('customer-id')
+                    };
+
+                    // Show project info
+                    $('.project-info').show();
+                    $('#selected-customer').text(selectedProjectData.customer);
+                    $('#selected-project').text(selectedProjectData.name);
+                    $('#selected-status').text('Active');
+
+                    // Clear error
+                    $('.error-msg[data-for="project_id"]').hide();
+                } else {
+                    $('.project-info').hide();
+                    selectedProjectData = {};
+                }
+            });
+
+            $(document).on('click', '.step-footer .btn.theme', function (e) {
+                e.preventDefault();
+
+                // Validate current step before proceeding
+                if (currentStep === 1) {
+                    // Validate project selection
+                    if (!selectedProjectId) {
+                        $('.error-msg[data-for="project_id"]').text('Please select a project').show();
+                        return;
+                    }
+                }
+
+                if (currentStep === 4) {
+                    // Submit form
+                    submitQuoteForm();
+                    return;
+                }
+
+                if (currentStep < totalSteps) {
+                    showStep(currentStep + 1);
+                    if (currentStep === totalSteps) recalcAll();
+                }
+            });
+
+            $(document).on('click', '.step-footer .btn.secondary', function (e) {
+                e.preventDefault();
+                if (currentStep > 1) showStep(currentStep - 1);
+            });
+
+            $(document).on('click', '.progress-step', function () {
+                const targetStep = $(this).index() + 1;
+                // Don't allow skipping to steps beyond current progress
+                if (targetStep <= currentStep || (currentStep === 1 && selectedProjectId)) {
+                    showStep(targetStep);
+                }
+            });
+
+            // --- Quantity Controls (delegated) ---
+            function bindQuantityControls($container) {
+                $container.find('.plus').off('click.plus').on('click.plus', function (e) {
+                    e.preventDefault();
+                    const $row = $(this).closest('tr, .quantity-controls');
+                    const $input = $row.find('.quantity-input').first();
+                    let val = parseInt($input.val(), 10) || 0;
+                    $input.val(val + 1).trigger('change');
+                });
+
+                $container.find('.minus').off('click.minus').on('click.minus', function (e) {
+                    e.preventDefault();
+                    const $row = $(this).closest('tr, .quantity-controls');
+                    const $input = $row.find('.quantity-input').first();
+                    let val = parseInt($input.val(), 10) || 0;
+                    if (val > 0) $input.val(val - 1).trigger('change');
+                });
+
+                $container.find('.quantity-input').off('change.qty input.qty').on('change.qty input.qty', function () {
+                    const $row = $(this).closest('tr');
+                    recalcRow($row);
+                    recalcAll();
+                });
             }
-        });
 
-        // --- Quantity Controls (delegated) ---
-        function bindQuantityControls($container){
-            $container.find('.plus').off('click.plus').on('click.plus', function(e){ 
-                e.preventDefault(); 
-                const $row = $(this).closest('tr, .quantity-controls'); 
-                const $input = $row.find('.quantity-input').first(); 
-                let val = parseInt($input.val(),10) || 0; 
-                $input.val(val+1).trigger('change'); 
-            });
-            
-            $container.find('.minus').off('click.minus').on('click.minus', function(e){ 
-                e.preventDefault(); 
-                const $row = $(this).closest('tr, .quantity-controls'); 
-                const $input = $row.find('.quantity-input').first(); 
-                let val = parseInt($input.val(),10) || 0; 
-                if(val>0) $input.val(val-1).trigger('change'); 
-            });
-            
-            $container.find('.quantity-input').off('change.qty input.qty').on('change.qty input.qty', function(){ 
-                const $row = $(this).closest('tr'); 
-                recalcRow($row); 
-                recalcAll(); 
-            });
-        }
-        
-        bindQuantityControls($(document));
+            bindQuantityControls($(document));
 
-        // --- Recalculation functions ---
-        function recalcRow($row){
-            if(!$row || !$row.length) return 0;
-            // skip add-rows
-            if($row.find('.add-box-btn, .add-margin-btn').length) return 0;
+            // --- Recalculation functions ---
+            function recalcRow($row) {
+                if (!$row || !$row.length) return 0;
+                // skip add-rows
+                if ($row.find('.add-box-btn, .add-margin-btn').length) return 0;
 
-            // If this row is a manufacturer row (has unit-price-td class)
-            if($row.find('.unit-price-td').length || $row.find('.manufacturer-name-td').length){
-                const $unitCell = $row.find('td').eq(1);
+                // If this row is a manufacturer row (has unit-price-td class)
+                if ($row.find('.unit-price-td').length || $row.find('.manufacturer-name-td').length) {
+                    const $unitCell = $row.find('td').eq(1);
+                    let unit = 0;
+                    if ($unitCell.find('input').length) {
+                        unit = parseNumber($unitCell.find('input').val());
+                    } else {
+                        unit = parseNumber($unitCell.text());
+                    }
+                    let qty = parseNumber($row.find('.quantity-input').first().val());
+                    if (isNaN(qty)) qty = 0;
+                    const lineTotal = (isNaN(unit) ? 0 : unit) * qty;
+                    const $totalCell = $row.find('td').eq(3);
+                    if ($totalCell.find('input').length) {
+                        $totalCell.find('input').val(currency(lineTotal));
+                    } else {
+                        $totalCell.text(currency(lineTotal));
+                    }
+                    return lineTotal;
+                }
+
+                // Main left items: unit in col 3, total in col 4
+                const $unitCell = $row.find('td').eq(3);
                 let unit = 0;
-                if($unitCell.find('input').length) {
+                if ($unitCell.find('input').length) {
                     unit = parseNumber($unitCell.find('input').val());
                 } else {
                     unit = parseNumber($unitCell.text());
                 }
-                let qty = parseNumber($row.find('.quantity-input').first().val()); 
-                if(isNaN(qty)) qty = 0;
-                const lineTotal = (isNaN(unit) ? 0 : unit) * qty;
-                const $totalCell = $row.find('td').eq(3);
-                if($totalCell.find('input').length) {
+                let qty = parseNumber($row.find('.quantity-input').first().val());
+                if (isNaN(qty)) qty = 0;
+                const lineTotal = unit * qty;
+                const $totalCell = $row.find('td').eq(4);
+                if ($totalCell.find('input').length) {
                     $totalCell.find('input').val(currency(lineTotal));
                 } else {
                     $totalCell.text(currency(lineTotal));
@@ -703,838 +747,836 @@
                 return lineTotal;
             }
 
-            // Main left items: unit in col 3, total in col 4
-            const $unitCell = $row.find('td').eq(3);
-            let unit = 0;
-            if($unitCell.find('input').length) {
-                unit = parseNumber($unitCell.find('input').val());
-            } else {
-                unit = parseNumber($unitCell.text());
+            function recalcManufacturerRow($row) {
+                return recalcRow($row);
             }
-            let qty = parseNumber($row.find('.quantity-input').first().val()); 
-            if(isNaN(qty)) qty = 0;
-            const lineTotal = unit * qty;
-            const $totalCell = $row.find('td').eq(4);
-            if($totalCell.find('input').length) {
-                $totalCell.find('input').val(currency(lineTotal));
-            } else {
-                $totalCell.text(currency(lineTotal));
+
+            function recalcMarginRow($row) {
+                if ($row.find('.add-box-btn, .add-margin-btn').length) return 0;
+                // multiplier is column 1, result is column 2 for margin table
+                let mul = parseNumber($row.find('td').eq(1).text() || $row.find('td').eq(1).find('input').val());
+                const base = subtotalValue();
+                const result = base * (isNaN(mul) ? 0 : mul);
+                $row.find('td').eq(2).text(currency(result));
+                return result;
             }
-            return lineTotal;
-        }
 
-        function recalcManufacturerRow($row){
-            return recalcRow($row);
-        }
+            function subtotalValue() {
+                let subtotal = 0;
 
-        function recalcMarginRow($row){
-            if($row.find('.add-box-btn, .add-margin-btn').length) return 0;
-            // multiplier is column 1, result is column 2 for margin table
-            let mul = parseNumber($row.find('td').eq(1).text() || $row.find('td').eq(1).find('input').val());
-            const base = subtotalValue();
-            const result = base * (isNaN(mul) ? 0 : mul);
-            $row.find('td').eq(2).text(currency(result));
-            return result;
-        }
+                // Left tables (main items)
+                $('.quote-stepview__left .custom-table .table').each(function () {
+                    $(this).find('tbody tr').each(function () {
+                        const $r = $(this);
+                        // skip add rows
+                        if ($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                        const $cells = $r.find('td');
+                        if ($cells.length === 0) return;
+                        // prefer input value in last cell, then text
+                        const $last = $cells.last();
+                        const text = $last.find('input').length ? $last.find('input').val() : $last.text();
+                        subtotal += parseNumber(text) || 0;
+                    });
+                });
 
-        function subtotalValue(){
-            let subtotal = 0;
-            
-            // Left tables (main items)
-            $('.quote-stepview__left .custom-table .table').each(function(){
-                $(this).find('tbody tr').each(function(){
+                // Accordion (manufacturer and others)
+                $('.quote-accordion__body .custom-table .table').each(function () {
+                    $(this).find('tbody tr').each(function () {
+                        const $r = $(this);
+                        // skip add rows
+                        if ($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                        const $cells = $r.find('td');
+                        if ($cells.length === 0) return;
+                        // many accordion tables use column index 3 for totals
+                        let text = '';
+                        if ($cells.length >= 4) {
+                            const $cell = $cells.eq(3);
+                            text = $cell.find('input').length ? $cell.find('input').val() : $cell.text();
+                        } else {
+                            // fallback: last cell
+                            const $last = $cells.last();
+                            text = $last.find('input').length ? $last.find('input').val() : $last.text();
+                        }
+                        subtotal += parseNumber(text) || 0;
+                    });
+                });
+
+                return subtotal;
+            }
+
+            function recalcTotals() {
+                // recalc main items
+                $('.quote-stepview__left .custom-table .table tbody tr').each(function () {
+                    const $tr = $(this);
+                    if (!$tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) recalcRow($tr);
+                });
+
+                // recalc manufacturers
+                $('.quote-accordion__body .custom-table .table tbody tr').each(function () {
+                    const $tr = $(this);
+                    if (!$tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) recalcManufacturerRow($tr);
+                });
+
+                // recalc margins
+                $('.quote-accordion__item').each(function () {
+                    const headerText = $(this).find('.quote-accordion__header').text() || '';
+                    if (headerText.toLowerCase().indexOf('margin') !== -1) {
+                        $(this).find('.custom-table .table tbody tr').each(function () {
+                            const $tr = $(this);
+                            // skip add row
+                            if ($tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                            // skip rows that don't look like margin rows
+                            if ($tr.find('td').length >= 3) recalcMarginRow($tr);
+                        });
+                    }
+                });
+
+                const subtotal = subtotalValue();
+                const taxableSubtotal = calculateTaxableSubtotal();
+                const tax = taxableSubtotal * TAX_RATE;
+                const grand = subtotal + tax;
+                $('#subtotal').text(currency(subtotal));
+                $('#tax').text(currency(tax));
+                $('#grand-total').text(currency(grand));
+                $('.final-total-amount').text(currency(grand));
+            }
+
+            // Calculate subtotal only for taxable items
+            function calculateTaxableSubtotal() {
+                let taxableSubtotal = 0;
+
+                // Left tables (main items) - only taxable ones
+                $('.quote-stepview__left .custom-table .table tbody tr').each(function () {
                     const $r = $(this);
                     // skip add rows
-                    if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
-                    const $cells = $r.find('td'); 
-                    if($cells.length === 0) return;
-                    // prefer input value in last cell, then text
+                    if ($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+
+                    // check if row is taxable
+                    const isTaxable = $r.attr('data-taxable') === '1';
+                    if (!isTaxable) return;
+
+                    const $cells = $r.find('td');
+                    if ($cells.length === 0) return;
                     const $last = $cells.last();
                     const text = $last.find('input').length ? $last.find('input').val() : $last.text();
-                    subtotal += parseNumber(text) || 0;
+                    taxableSubtotal += parseNumber(text) || 0;
                 });
-            });
 
-            // Accordion (manufacturer and others)
-            $('.quote-accordion__body .custom-table .table').each(function(){
-                $(this).find('tbody tr').each(function(){
+                // Accordion tables (manufacturers) - only taxable ones
+                $('.quote-accordion__body .custom-table .table tbody tr').each(function () {
                     const $r = $(this);
                     // skip add rows
-                    if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
-                    const $cells = $r.find('td'); 
-                    if($cells.length === 0) return;
-                    // many accordion tables use column index 3 for totals
+                    if ($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+
+                    // check if row is taxable
+                    const isTaxable = $r.attr('data-taxable') === '1';
+                    if (!isTaxable) return;
+
+                    const $cells = $r.find('td');
+                    if ($cells.length === 0) return;
                     let text = '';
-                    if($cells.length >= 4){
+                    if ($cells.length >= 4) {
                         const $cell = $cells.eq(3);
                         text = $cell.find('input').length ? $cell.find('input').val() : $cell.text();
                     } else {
-                        // fallback: last cell
                         const $last = $cells.last();
                         text = $last.find('input').length ? $last.find('input').val() : $last.text();
                     }
-                    subtotal += parseNumber(text) || 0;
+                    taxableSubtotal += parseNumber(text) || 0;
+                });
+
+                return taxableSubtotal;
+            }
+
+            function recalcAll() {
+                recalcTotals();
+            }
+
+            $(document).on('change input', '.quantity-input, .form-input, .unit-price, .margin-mul, .add-box-unit, .add-box-qty, .add-margin-mul', function () {
+                recalcAll();
+            });
+
+            recalcAll();
+
+            // --- ADD ROWS ---
+
+            // Live calculation for add-row line total (Box Manufacturer)
+            $(document).on('input change', '.add-box-unit, .add-box-qty', function () {
+                const $addRow = $(this).closest('.add-row-box');
+                const unitVal = parseNumber($addRow.find('.add-box-unit').val());
+                const qtyVal = parseNumber($addRow.find('.add-box-qty').val());
+                const lineTotal = (isNaN(unitVal) ? 0 : unitVal) * (isNaN(qtyVal) ? 0 : qtyVal);
+                $addRow.find('.add-box-line-total-display').text(currency(lineTotal));
+            });
+
+            $(document).on('click', '.add-box-btn', function (e) {
+                e.preventDefault();
+                const $triggerRow = $(this).closest('tr');
+
+                // read name / unit / qty from inputs in trigger row
+                const name = $.trim($triggerRow.find('.add-box-name').val() || '');
+                const unitRaw = $triggerRow.find('.add-box-unit').val() || '';
+                const qtyRaw = $triggerRow.find('.add-box-qty').val() || '0';
+
+                // clear previous validation messages
+                $triggerRow.find('.validation-msg').hide().text('');
+
+                // validation
+                if (name === '') {
+                    $triggerRow.find('.validation-msg').eq(0).text('Please enter manufacturer name.').show();
+                    return;
+                }
+                const unit = parseNumber(unitRaw);
+                if (isNaN(unit) || unit <= 0) {
+                    $triggerRow.find('.validation-msg').eq(1).text('Please enter a valid unit price (greater than 0).').show();
+                    return;
+                }
+                let qty = parseInt(qtyRaw, 10);
+                if (isNaN(qty) || qty < 0) {
+                    $triggerRow.find('.validation-msg').eq(2).text('Please enter a valid quantity (0 or greater).').show();
+                    return;
+                }
+
+                // build new row (default to non-taxable for manually added items)
+                const lineTotal = unit * qty;
+                const newRow = $(`
+                <tr data-taxable="0">
+                    <td class="label manufacturer-name-td">${escapeHtml(name)}</td>
+                    <td class="label unit-price-td">${unit.toFixed(2)}</td>
+                    <td class="label">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus">−</button>
+                            <input type="number" class="quantity-input" value="${qty}" min="0" />
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                    </td>
+                    <td class="label line-total">${currency(lineTotal)}</td>
+                    <td class="label actions-td">
+                        <button class="action-btn edit edit-box">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="action-btn delete remove-row">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                `);
+
+                // insert BEFORE the trigger row (so add row remains at bottom)
+                $triggerRow.before(newRow);
+
+                // clear the add-row inputs for next entry
+                $triggerRow.find('.add-box-name').val('');
+                $triggerRow.find('.add-box-unit').val('');
+                $triggerRow.find('.add-box-qty').val('1');
+                $triggerRow.find('.add-box-line-total-display').text('$0.00');
+
+                // bind quantity handlers
+                bindQuantityControls(newRow);
+                recalcAll();
+
+                // Show success message
+                showToast('success', 'Box manufacturer added successfully!');
+            });
+
+            // Live calculation for add-row margin result
+            $(document).on('input change', '.add-margin-mul', function () {
+                const $addRow = $(this).closest('.add-row-margin');
+                const mulVal = parseNumber($addRow.find('.add-margin-mul').val());
+                const base = subtotalValue();
+                const resultValue = base * (isNaN(mulVal) ? 0 : mulVal);
+                $addRow.find('.add-margin-result').text(currency(resultValue));
+            });
+
+            $(document).on('click', '.add-margin-btn', function (e) {
+                e.preventDefault();
+                const $triggerRow = $(this).closest('tr');
+                $triggerRow.find('.validation-msg').hide().text('');
+
+                const desc = $.trim($triggerRow.find('.add-margin-desc').val() || '');
+                const mulRaw = $triggerRow.find('.add-margin-mul').val() || '';
+                const mul = parseNumber(mulRaw);
+
+                // validation
+                if (desc === '') {
+                    $triggerRow.find('.validation-msg').eq(0).text('Please enter margin description.').show();
+                    return;
+                }
+                if (isNaN(mul) || mul <= 0) {
+                    $triggerRow.find('.validation-msg').eq(1).text('Please enter a valid multiplier (e.g. 1.15, must be greater than 0).').show();
+                    return;
+                }
+
+                // compute immediate result
+                const base = subtotalValue();
+                const resultValue = base * mul;
+
+                const newRow = $(`
+                <tr data-taxable="0">
+                    <td class="label margin-desc-td">${escapeHtml(desc)}</td>
+                    <td class="label margin-mul-td">${mul.toFixed(2)}</td>
+                    <td class="label margin-result">${currency(resultValue)}</td>
+                    <td class="label actions-td">
+                        <button class="action-btn edit edit-margin">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="action-btn delete remove-row">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                `);
+
+                // insert before add-row
+                $triggerRow.before(newRow);
+
+                // clear the add-row inputs for next entry
+                $triggerRow.find('.add-margin-desc').val('');
+                $triggerRow.find('.add-margin-mul').val('');
+                $triggerRow.find('.add-margin-result').text('$0.00');
+
+                recalcAll();
+
+                // Show success message
+                showToast('success', 'Margin markup added successfully!');
+            });
+
+            // --- EDIT FUNCTIONALITY ---
+
+            // Enter edit mode for manufacturer row
+            function enterEditManufacturer($row) {
+                if ($row.data('editing')) return;
+                $row.data('editing', true);
+
+                const $nameCell = $row.find('td').eq(0);
+                const $unitCell = $row.find('td').eq(1);
+                const $qtyCell = $row.find('td').eq(2);
+                const orig = {
+                    name: $nameCell.text().trim(),
+                    unit: $unitCell.text().trim(),
+                    qty: $qtyCell.find('.quantity-input').val() || $qtyCell.find('input').val() || '0'
+                };
+                $row.data('orig', orig);
+
+                $nameCell.html(`<input type="text" class="form-input inline-name" value="${escapeHtml(orig.name)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+                $unitCell.html(`<input type="number" class="form-input inline-unit" value="${escapeHtml(orig.unit)}" step="0.01" min="0"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+
+                // qty input already exists — add inline validation area if missing
+                if ($qtyCell.find('.validation-msg').length === 0) {
+                    $qtyCell.append('<div class="validation-msg small text-danger" style="display:none;"></div>');
+                }
+
+                // actions: hide edit/delete and show save/cancel
+                const $actions = $row.find('.actions-td');
+                $actions.find('.edit-box').hide();
+                $actions.find('.remove-row').hide();
+                $actions.prepend('<button class="btn save-inline">Save</button><button class="btn cancel-inline">Cancel</button>');
+
+                // live update and validation
+                $row.find('.inline-unit').on('input', function () {
+                    const val = $(this).val();
+                    const num = parseNumber(val);
+                    if (isNaN(num) || num <= 0) {
+                        $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show();
+                    } else {
+                        $unitCell.find('.validation-msg').hide().text('');
+                    }
+                    recalcRow($row);
+                    recalcAll();
+                });
+
+                $row.find('.quantity-input').on('input', function () {
+                    const val = $(this).val();
+                    const num = parseNumber(val);
+                    if (val === '' || isNaN(num) || num < 0) {
+                        $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show();
+                    } else {
+                        $qtyCell.find('.validation-msg').hide().text('');
+                    }
+                    recalcRow($row);
+                    recalcAll();
+                });
+            }
+
+            function saveEditManufacturer($row) {
+                const $nameCell = $row.find('td').eq(0);
+                const $unitCell = $row.find('td').eq(1);
+                const $qtyCell = $row.find('td').eq(2);
+
+                const name = $nameCell.find('.inline-name').val().trim();
+                const unitRaw = $unitCell.find('.inline-unit').val().trim();
+                const qtyRaw = $qtyCell.find('.quantity-input').val().trim();
+
+                $nameCell.find('.validation-msg').hide().text('');
+                $unitCell.find('.validation-msg').hide().text('');
+                $qtyCell.find('.validation-msg').hide().text('');
+
+                let hasError = false;
+                if (name === '') {
+                    $nameCell.find('.validation-msg').text('Manufacturer name is required').show();
+                    hasError = true;
+                }
+                const unit = parseNumber(unitRaw);
+                if (isNaN(unit) || unit <= 0) {
+                    $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show();
+                    hasError = true;
+                }
+                const qty = parseNumber(qtyRaw);
+                if (qtyRaw === '' || isNaN(qty) || qty < 0) {
+                    $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show();
+                    hasError = true;
+                }
+
+                if (hasError) return false;
+
+                // persist values
+                $nameCell.text(name);
+                $unitCell.text(unit.toFixed(2));
+                $qtyCell.html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${parseInt(qtyRaw, 10)}" min="0"/><button class="quantity-btn plus">+</button></div>`);
+
+                // restore actions
+                $row.find('.save-inline, .cancel-inline').remove();
+                $row.find('.edit-box').show();
+                $row.find('.remove-row').show();
+
+                bindQuantityControls($row);
+                recalcAll();
+                $row.data('editing', false);
+
+                showToast('success', 'Changes saved successfully!');
+                return true;
+            }
+
+            function cancelEditManufacturer($row) {
+                const orig = $row.data('orig') || {};
+                $row.find('td').eq(0).text(orig.name || '');
+                $row.find('td').eq(1).text(orig.unit || '');
+                $row.find('td').eq(2).html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${orig.qty || 0}" min="0"/><button class="quantity-btn plus">+</button></div>`);
+                $row.find('.save-inline, .cancel-inline').remove();
+                $row.find('.edit-box').show();
+                $row.find('.remove-row').show();
+                bindQuantityControls($row);
+                recalcAll();
+                $row.data('editing', false);
+            }
+
+            // Margin edit
+            function enterEditMargin($row) {
+                if ($row.data('editing')) return;
+                $row.data('editing', true);
+                const $desc = $row.find('td').eq(0);
+                const $mul = $row.find('td').eq(1);
+                const orig = { desc: $desc.text().trim(), mul: $mul.text().trim() };
+                $row.data('orig', orig);
+                $desc.html(`<input type="text" class="form-input inline-desc" value="${escapeHtml(orig.desc)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+                $mul.html(`<input type="number" class="form-input inline-mul" value="${escapeHtml(orig.mul)}" step="0.01" min="0"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+                const $actions = $row.find('.actions-td');
+                $actions.find('.edit-margin').hide();
+                $actions.find('.remove-row').hide();
+                $actions.prepend('<button class="btn save-inline-margin">Save</button><button class="btn cancel-inline-margin">Cancel</button>');
+
+                $row.find('.inline-mul').on('input', function () {
+                    const mul = parseNumber($(this).val());
+                    if (isNaN(mul) || mul <= 0) {
+                        $mul.find('.validation-msg').text('Multiplier must be greater than 0').show();
+                    } else {
+                        $mul.find('.validation-msg').hide().text('');
+                    }
+                    const base = subtotalValue();
+                    $row.find('td').eq(2).text(currency(base * (isNaN(mul) ? 0 : mul)));
+                });
+            }
+
+            function saveEditMargin($row) {
+                const $desc = $row.find('td').eq(0);
+                const $mul = $row.find('td').eq(1);
+                const desc = $desc.find('.inline-desc').val().trim();
+                const mulRaw = $mul.find('.inline-mul').val().trim();
+                $desc.find('.validation-msg').hide().text('');
+                $mul.find('.validation-msg').hide().text('');
+                let hasError = false;
+                if (desc === '') {
+                    $desc.find('.validation-msg').text('Description is required').show();
+                    hasError = true;
+                }
+                const mul = parseNumber(mulRaw);
+                if (isNaN(mul) || mul <= 0) {
+                    $mul.find('.validation-msg').text('Multiplier must be greater than 0').show();
+                    hasError = true;
+                }
+                if (hasError) return false;
+
+                $desc.text(desc);
+                $mul.text(mul.toFixed(2));
+                const base = subtotalValue();
+                $row.find('td').eq(2).text(currency(base * mul));
+
+                $row.find('.save-inline-margin, .cancel-inline-margin').remove();
+                $row.find('.edit-margin').show();
+                $row.find('.remove-row').show();
+                recalcAll();
+                $row.data('editing', false);
+
+                showToast('success', 'Margin updated successfully!');
+                return true;
+            }
+
+            function cancelEditMargin($row) {
+                const orig = $row.data('orig') || {};
+                $row.find('td').eq(0).text(orig.desc || '');
+                $row.find('td').eq(1).text(orig.mul || '');
+                const mul = parseNumber(orig.mul || 0);
+                $row.find('td').eq(2).text(currency(subtotalValue() * (isNaN(mul) ? 0 : mul)));
+                $row.find('.save-inline-margin, .cancel-inline-margin').remove();
+                $row.find('.edit-margin').show();
+                $row.find('.remove-row').show();
+                recalcAll();
+                $row.data('editing', false);
+            }
+
+            // delegated event handlers
+            $(document).on('click', '.edit-box', function (e) {
+                e.preventDefault();
+                enterEditManufacturer($(this).closest('tr'));
+            });
+
+            $(document).on('click', '.save-inline', function (e) {
+                e.preventDefault();
+                saveEditManufacturer($(this).closest('tr'));
+            });
+
+            $(document).on('click', '.cancel-inline', function (e) {
+                e.preventDefault();
+                cancelEditManufacturer($(this).closest('tr'));
+            });
+
+            $(document).on('click', '.edit-margin', function (e) {
+                e.preventDefault();
+                enterEditMargin($(this).closest('tr'));
+            });
+
+            $(document).on('click', '.save-inline-margin', function (e) {
+                e.preventDefault();
+                saveEditMargin($(this).closest('tr'));
+            });
+
+            $(document).on('click', '.cancel-inline-margin', function (e) {
+                e.preventDefault();
+                cancelEditMargin($(this).closest('tr'));
+            });
+
+            // remove row with better confirmation
+            $(document).on('click', '.remove-row', function (e) {
+                e.preventDefault();
+                const $row = $(this).closest('tr');
+                const itemName = $row.find('td').first().text().trim() || 'this item';
+
+                if (!confirm(`Are you sure you want to delete "${itemName}"?\n\nThis action cannot be undone.`)) return;
+
+                $row.fadeOut(300, function () {
+                    $(this).remove();
+                    recalcAll();
+                    showToast('info', 'Item deleted successfully.');
                 });
             });
 
-            return subtotal;
-        }
-
-        function recalcTotals(){
-            // recalc main items
-            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){ 
-                const $tr = $(this); 
-                if(!$tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) recalcRow($tr); 
-            });
-            
-            // recalc manufacturers
-            $('.quote-accordion__body .custom-table .table tbody tr').each(function(){ 
-                const $tr = $(this); 
-                if(!$tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) recalcManufacturerRow($tr); 
-            });
-
-            // recalc margins
-            $('.quote-accordion__item').each(function(){
-                const headerText = $(this).find('.quote-accordion__header').text() || '';
-                if(headerText.toLowerCase().indexOf('margin') !== -1){
-                    $(this).find('.custom-table .table tbody tr').each(function(){
-                        const $tr = $(this);
-                        // skip add row
-                        if($tr.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
-                        // skip rows that don't look like margin rows
-                        if($tr.find('td').length >= 3) recalcMarginRow($tr);
-                    });
-                }
-            });
-
-            const subtotal = subtotalValue();
-            const taxableSubtotal = calculateTaxableSubtotal();
-            const tax = taxableSubtotal * TAX_RATE;
-            const grand = subtotal + tax;
-            $('#subtotal').text(currency(subtotal));
-            $('#tax').text(currency(tax));
-            $('#grand-total').text(currency(grand));
-            $('.final-total-amount').text(currency(grand));
-        }
-        
-        // Calculate subtotal only for taxable items
-        function calculateTaxableSubtotal(){
-            let taxableSubtotal = 0;
-            
-            // Left tables (main items) - only taxable ones
-            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){
-                const $r = $(this);
-                // skip add rows
-                if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
-                
-                // check if row is taxable
-                const isTaxable = $r.attr('data-taxable') === '1';
-                if(!isTaxable) return;
-                
-                const $cells = $r.find('td'); 
-                if($cells.length === 0) return;
-                const $last = $cells.last();
-                const text = $last.find('input').length ? $last.find('input').val() : $last.text();
-                taxableSubtotal += parseNumber(text) || 0;
-            });
-
-            // Accordion tables (manufacturers) - only taxable ones
-            $('.quote-accordion__body .custom-table .table tbody tr').each(function(){
-                const $r = $(this);
-                // skip add rows
-                if($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
-                
-                // check if row is taxable
-                const isTaxable = $r.attr('data-taxable') === '1';
-                if(!isTaxable) return;
-                
-                const $cells = $r.find('td'); 
-                if($cells.length === 0) return;
-                let text = '';
-                if($cells.length >= 4){
-                    const $cell = $cells.eq(3);
-                    text = $cell.find('input').length ? $cell.find('input').val() : $cell.text();
-                } else {
-                    const $last = $cells.last();
-                    text = $last.find('input').length ? $last.find('input').val() : $last.text();
-                }
-                taxableSubtotal += parseNumber(text) || 0;
-            });
-
-            return taxableSubtotal;
-        }
-        
-        function recalcAll(){ 
-            recalcTotals(); 
-        }
-        
-        $(document).on('change input', '.quantity-input, .form-input, .unit-price, .margin-mul, .add-box-unit, .add-box-qty, .add-margin-mul', function(){ 
-            recalcAll(); 
-        });
-        
-        recalcAll();
-
-        // --- ADD ROWS ---
-        
-        // Live calculation for add-row line total (Box Manufacturer)
-        $(document).on('input change', '.add-box-unit, .add-box-qty', function(){
-            const $addRow = $(this).closest('.add-row-box');
-            const unitVal = parseNumber($addRow.find('.add-box-unit').val());
-            const qtyVal = parseNumber($addRow.find('.add-box-qty').val());
-            const lineTotal = (isNaN(unitVal) ? 0 : unitVal) * (isNaN(qtyVal) ? 0 : qtyVal);
-            $addRow.find('.add-box-line-total-display').text(currency(lineTotal));
-        });
-
-        $(document).on('click', '.add-box-btn', function(e){
-            e.preventDefault();
-            const $triggerRow = $(this).closest('tr');
-
-            // read name / unit / qty from inputs in trigger row
-            const name = $.trim($triggerRow.find('.add-box-name').val() || '');
-            const unitRaw = $triggerRow.find('.add-box-unit').val() || '';
-            const qtyRaw = $triggerRow.find('.add-box-qty').val() || '0';
-
-            // clear previous validation messages
-            $triggerRow.find('.validation-msg').hide().text('');
-
-            // validation
-            if(name === '') { 
-                $triggerRow.find('.validation-msg').eq(0).text('Please enter manufacturer name.').show(); 
-                return; 
-            }
-            const unit = parseNumber(unitRaw);
-            if(isNaN(unit) || unit <= 0) { 
-                $triggerRow.find('.validation-msg').eq(1).text('Please enter a valid unit price (greater than 0).').show(); 
-                return; 
-            }
-            let qty = parseInt(qtyRaw,10); 
-            if(isNaN(qty) || qty < 0) { 
-                $triggerRow.find('.validation-msg').eq(2).text('Please enter a valid quantity (0 or greater).').show(); 
-                return; 
-            }
-
-            // build new row (default to non-taxable for manually added items)
-            const lineTotal = unit * qty;
-            const newRow = $(`
-            <tr data-taxable="0">
-                <td class="label manufacturer-name-td">${escapeHtml(name)}</td>
-                <td class="label unit-price-td">${unit.toFixed(2)}</td>
-                <td class="label">
-                    <div class="quantity-controls">
-                        <button class="quantity-btn minus">−</button>
-                        <input type="number" class="quantity-input" value="${qty}" min="0" />
-                        <button class="quantity-btn plus">+</button>
-                    </div>
-                </td>
-                <td class="label line-total">${currency(lineTotal)}</td>
-                <td class="label actions-td">
-                    <button class="btn edit-box">Edit</button>
-                    <button class="btn remove-row">Delete</button>
-                </td>
-            </tr>
-            `);
-
-            // insert BEFORE the trigger row (so add row remains at bottom)
-            $triggerRow.before(newRow);
-
-            // clear the add-row inputs for next entry
-            $triggerRow.find('.add-box-name').val('');
-            $triggerRow.find('.add-box-unit').val('');
-            $triggerRow.find('.add-box-qty').val('1');
-            $triggerRow.find('.add-box-line-total-display').text('$0.00');
-
-            // bind quantity handlers
-            bindQuantityControls(newRow);
-            recalcAll();
-            
-            // Show success message
-            showToast('success', 'Box manufacturer added successfully!');
-        });
-
-        // Live calculation for add-row margin result
-        $(document).on('input change', '.add-margin-mul', function(){
-            const $addRow = $(this).closest('.add-row-margin');
-            const mulVal = parseNumber($addRow.find('.add-margin-mul').val());
-            const base = subtotalValue();
-            const resultValue = base * (isNaN(mulVal) ? 0 : mulVal);
-            $addRow.find('.add-margin-result').text(currency(resultValue));
-        });
-
-        $(document).on('click', '.add-margin-btn', function(e){
-            e.preventDefault();
-            const $triggerRow = $(this).closest('tr');
-            $triggerRow.find('.validation-msg').hide().text('');
-
-            const desc = $.trim($triggerRow.find('.add-margin-desc').val() || '');
-            const mulRaw = $triggerRow.find('.add-margin-mul').val() || '';
-            const mul = parseNumber(mulRaw);
-
-            // validation
-            if(desc === '') { 
-                $triggerRow.find('.validation-msg').eq(0).text('Please enter margin description.').show(); 
-                return; 
-            }
-            if(isNaN(mul) || mul <= 0) { 
-                $triggerRow.find('.validation-msg').eq(1).text('Please enter a valid multiplier (e.g. 1.15, must be greater than 0).').show(); 
-                return; 
-            }
-
-            // compute immediate result
-            const base = subtotalValue();
-            const resultValue = base * mul;
-
-            const newRow = $(`
-            <tr data-taxable="0">
-                <td class="label margin-desc-td">${escapeHtml(desc)}</td>
-                <td class="label margin-mul-td">${mul.toFixed(2)}</td>
-                <td class="label margin-result">${currency(resultValue)}</td>
-                <td class="label actions-td">
-                    <button class="btn edit-margin">Edit</button>
-                    <button class="btn remove-row">Delete</button>
-                </td>
-            </tr>
-            `);
-
-            // insert before add-row
-            $triggerRow.before(newRow);
-            
-            // clear the add-row inputs for next entry
-            $triggerRow.find('.add-margin-desc').val('');
-            $triggerRow.find('.add-margin-mul').val('');
-            $triggerRow.find('.add-margin-result').text('$0.00');
-            
-            recalcAll();
-            
-            // Show success message
-            showToast('success', 'Margin markup added successfully!');
-        });
-
-        // --- EDIT FUNCTIONALITY ---
-
-        // Enter edit mode for manufacturer row
-        function enterEditManufacturer($row){
-            if($row.data('editing')) return;
-            $row.data('editing', true);
-
-            const $nameCell = $row.find('td').eq(0);
-            const $unitCell = $row.find('td').eq(1);
-            const $qtyCell = $row.find('td').eq(2);
-            const orig = {
-                name: $nameCell.text().trim(),
-                unit: $unitCell.text().trim(),
-                qty: $qtyCell.find('.quantity-input').val() || $qtyCell.find('input').val() || '0'
-            };
-            $row.data('orig', orig);
-
-            $nameCell.html(`<input type="text" class="form-input inline-name" value="${escapeHtml(orig.name)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
-            $unitCell.html(`<input type="number" class="form-input inline-unit" value="${escapeHtml(orig.unit)}" step="0.01" min="0"><div class="validation-msg small text-danger" style="display:none;"></div>`);
-            
-            // qty input already exists — add inline validation area if missing
-            if($qtyCell.find('.validation-msg').length === 0) {
-                $qtyCell.append('<div class="validation-msg small text-danger" style="display:none;"></div>');
-            }
-
-            // actions: hide edit/delete and show save/cancel
-            const $actions = $row.find('.actions-td');
-            $actions.find('.edit-box').hide();
-            $actions.find('.remove-row').hide();
-            $actions.prepend('<button class="btn save-inline">Save</button><button class="btn cancel-inline">Cancel</button>');
-
-            // live update and validation
-            $row.find('.inline-unit').on('input', function(){
-                const val = $(this).val();
-                const num = parseNumber(val);
-                if(isNaN(num) || num <= 0){ 
-                    $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show(); 
-                } else { 
-                    $unitCell.find('.validation-msg').hide().text(''); 
-                }
-                recalcRow($row); 
-                recalcAll();
-            });
-            
-            $row.find('.quantity-input').on('input', function(){
-                const val = $(this).val();
-                const num = parseNumber(val);
-                if(val === '' || isNaN(num) || num < 0){ 
-                    $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show(); 
-                } else { 
-                    $qtyCell.find('.validation-msg').hide().text(''); 
-                }
-                recalcRow($row); 
-                recalcAll();
-            });
-        }
-
-        function saveEditManufacturer($row){
-            const $nameCell = $row.find('td').eq(0);
-            const $unitCell = $row.find('td').eq(1);
-            const $qtyCell = $row.find('td').eq(2);
-
-            const name = $nameCell.find('.inline-name').val().trim();
-            const unitRaw = $unitCell.find('.inline-unit').val().trim();
-            const qtyRaw = $qtyCell.find('.quantity-input').val().trim();
-
-            $nameCell.find('.validation-msg').hide().text('');
-            $unitCell.find('.validation-msg').hide().text('');
-            $qtyCell.find('.validation-msg').hide().text('');
-
-            let hasError = false;
-            if(name === '') { 
-                $nameCell.find('.validation-msg').text('Manufacturer name is required').show(); 
-                hasError = true; 
-            }
-            const unit = parseNumber(unitRaw);
-            if(isNaN(unit) || unit <= 0) { 
-                $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show(); 
-                hasError = true; 
-            }
-            const qty = parseNumber(qtyRaw);
-            if(qtyRaw === '' || isNaN(qty) || qty < 0) { 
-                $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show(); 
-                hasError = true; 
-            }
-
-            if(hasError) return false;
-
-            // persist values
-            $nameCell.text(name);
-            $unitCell.text(unit.toFixed(2));
-            $qtyCell.html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${parseInt(qtyRaw,10)}" min="0"/><button class="quantity-btn plus">+</button></div>`);
-
-            // restore actions
-            $row.find('.save-inline, .cancel-inline').remove();
-            $row.find('.edit-box').show();
-            $row.find('.remove-row').show();
-
-            bindQuantityControls($row);
-            recalcAll();
-            $row.data('editing', false);
-            
-            showToast('success', 'Changes saved successfully!');
-            return true;
-        }
-
-        function cancelEditManufacturer($row){
-            const orig = $row.data('orig') || {};
-            $row.find('td').eq(0).text(orig.name || '');
-            $row.find('td').eq(1).text(orig.unit || '');
-            $row.find('td').eq(2).html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${orig.qty||0}" min="0"/><button class="quantity-btn plus">+</button></div>`);
-            $row.find('.save-inline, .cancel-inline').remove();
-            $row.find('.edit-box').show();
-            $row.find('.remove-row').show();
-            bindQuantityControls($row);
-            recalcAll();
-            $row.data('editing', false);
-        }
-
-        // Margin edit
-        function enterEditMargin($row){
-            if($row.data('editing')) return;
-            $row.data('editing', true);
-            const $desc = $row.find('td').eq(0);
-            const $mul = $row.find('td').eq(1);
-            const orig = {desc: $desc.text().trim(), mul: $mul.text().trim()};
-            $row.data('orig', orig);
-            $desc.html(`<input type="text" class="form-input inline-desc" value="${escapeHtml(orig.desc)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
-            $mul.html(`<input type="number" class="form-input inline-mul" value="${escapeHtml(orig.mul)}" step="0.01" min="0"><div class="validation-msg small text-danger" style="display:none;"></div>`);
-            const $actions = $row.find('.actions-td');
-            $actions.find('.edit-margin').hide();
-            $actions.find('.remove-row').hide();
-            $actions.prepend('<button class="btn save-inline-margin">Save</button><button class="btn cancel-inline-margin">Cancel</button>');
-
-            $row.find('.inline-mul').on('input', function(){
-                const mul = parseNumber($(this).val());
-                if(isNaN(mul) || mul <= 0){ 
-                    $mul.find('.validation-msg').text('Multiplier must be greater than 0').show(); 
-                } else { 
-                    $mul.find('.validation-msg').hide().text(''); 
-                }
-                const base = subtotalValue();
-                $row.find('td').eq(2).text(currency(base * (isNaN(mul)?0:mul)));
-            });
-        }
-
-        function saveEditMargin($row){
-            const $desc = $row.find('td').eq(0);
-            const $mul = $row.find('td').eq(1);
-            const desc = $desc.find('.inline-desc').val().trim();
-            const mulRaw = $mul.find('.inline-mul').val().trim();
-            $desc.find('.validation-msg').hide().text('');
-            $mul.find('.validation-msg').hide().text('');
-            let hasError = false;
-            if(desc === '') { 
-                $desc.find('.validation-msg').text('Description is required').show(); 
-                hasError = true; 
-            }
-            const mul = parseNumber(mulRaw);
-            if(isNaN(mul) || mul <= 0) { 
-                $mul.find('.validation-msg').text('Multiplier must be greater than 0').show(); 
-                hasError = true; 
-            }
-            if(hasError) return false;
-
-            $desc.text(desc);
-            $mul.text(mul.toFixed(2));
-            const base = subtotalValue();
-            $row.find('td').eq(2).text(currency(base * mul));
-
-            $row.find('.save-inline-margin, .cancel-inline-margin').remove();
-            $row.find('.edit-margin').show();
-            $row.find('.remove-row').show();
-            recalcAll();
-            $row.data('editing', false);
-            
-            showToast('success', 'Margin updated successfully!');
-            return true;
-        }
-
-        function cancelEditMargin($row){
-            const orig = $row.data('orig') || {};
-            $row.find('td').eq(0).text(orig.desc || '');
-            $row.find('td').eq(1).text(orig.mul || '');
-            const mul = parseNumber(orig.mul || 0);
-            $row.find('td').eq(2).text(currency(subtotalValue() * (isNaN(mul)?0:mul)));
-            $row.find('.save-inline-margin, .cancel-inline-margin').remove();
-            $row.find('.edit-margin').show();
-            $row.find('.remove-row').show();
-            recalcAll();
-            $row.data('editing', false);
-        }
-
-        // delegated event handlers
-        $(document).on('click', '.edit-box', function(e){ 
-            e.preventDefault(); 
-            enterEditManufacturer($(this).closest('tr')); 
-        });
-        
-        $(document).on('click', '.save-inline', function(e){ 
-            e.preventDefault(); 
-            saveEditManufacturer($(this).closest('tr')); 
-        });
-        
-        $(document).on('click', '.cancel-inline', function(e){ 
-            e.preventDefault(); 
-            cancelEditManufacturer($(this).closest('tr')); 
-        });
-
-        $(document).on('click', '.edit-margin', function(e){ 
-            e.preventDefault(); 
-            enterEditMargin($(this).closest('tr')); 
-        });
-        
-        $(document).on('click', '.save-inline-margin', function(e){ 
-            e.preventDefault(); 
-            saveEditMargin($(this).closest('tr')); 
-        });
-        
-        $(document).on('click', '.cancel-inline-margin', function(e){ 
-            e.preventDefault(); 
-            cancelEditMargin($(this).closest('tr')); 
-        });
-
-        // remove row with better confirmation
-        $(document).on('click', '.remove-row', function(e){ 
-            e.preventDefault(); 
-            const $row = $(this).closest('tr'); 
-            const itemName = $row.find('td').first().text().trim() || 'this item';
-            
-            if(!confirm(`Are you sure you want to delete "${itemName}"?\n\nThis action cannot be undone.`)) return; 
-            
-            $row.fadeOut(300, function(){
-                $(this).remove(); 
-                recalcAll();
-                showToast('info', 'Item deleted successfully.');
-            });
-        });
-
-        // inline save on Enter, cancel on Esc
-        $(document).on('keydown', '.inline-name, .inline-unit, .inline-desc, .inline-mul', function(e){
-            if(e.key === 'Enter'){
-                e.preventDefault();
-                const $row = $(this).closest('tr');
-                if($row.find('.save-inline').length) {
-                    $row.find('.save-inline').trigger('click');
-                } else if($row.find('.save-inline-margin').length) {
-                    $row.find('.save-inline-margin').trigger('click');
-                }
-            } else if(e.key === 'Escape'){
-                e.preventDefault();
-                const $row = $(this).closest('tr');
-                if($row.find('.cancel-inline').length) {
-                    $row.find('.cancel-inline').trigger('click');
-                }
-                if($row.find('.cancel-inline-margin').length) {
-                    $row.find('.cancel-inline-margin').trigger('click');
-                }
-            }
-        });
-
-        // accordion toggle
-        $(document).on('click', '.quote-accordion__header', function(){ 
-            const body = $(this).next('.quote-accordion__body'); 
-            $('.quote-accordion__body').not(body).slideUp(); 
-            $('.quote-accordion__header').not(this).removeClass('active'); 
-            $(this).toggleClass('active'); 
-            body.stop(true,true).slideToggle(); 
-        });
-
-        // final recalc on step change
-        $(document).on('click', '.step-footer .btn.theme', function(){ 
-            if(currentStep+1 === totalSteps){ 
-                recalcAll(); 
-            } 
-        });
-
-        // ensure initial calculation
-        recalcAll();
-
-        // --- Populate Review Step ---
-        function populateReviewStep() {
-            // Project info
-            $('#review-project-name').text(selectedProjectData.name || '-');
-            $('#review-customer-name').text(selectedProjectData.customer || '-');
-            
-            // Quote items from step 2
-            let itemsHtml = '';
-            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){
-                const $row = $(this);
-                if($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
-                
-                const itemName = $row.find('td').eq(0).text().trim();
-                const qty = $row.find('.quantity-input').val() || 0;
-                const unitPrice = $row.find('td').eq(3).text().trim();
-                const total = $row.find('td').eq(4).text().trim();
-                
-                if(parseInt(qty) > 0) {
-                    itemsHtml += `<div class="summary-item">
-                        <div class="item-description">${escapeHtml(itemName)} × ${qty}</div>
-                        <div class="item-price">${total}</div>
-                    </div>`;
-                }
-            });
-            $('#review-items-list').html(itemsHtml || '<p style="color: #999;">No items added</p>');
-            
-            // Box manufacturers
-            let manufacturersHtml = '';
-            $('#box-manufacturer-table tbody tr').each(function(){
-                const $row = $(this);
-                if($row.find('.add-box-btn').length) return;
-                
-                const name = $row.find('.manufacturer-name-td').text().trim();
-                const qty = $row.find('.quantity-input').val() || 0;
-                const unitPrice = $row.find('.unit-price-td').text().trim();
-                const total = $row.find('.line-total').text().trim();
-                
-                if(name) {
-                    manufacturersHtml += `<div class="summary-item">
-                        <div class="item-description">${escapeHtml(name)} × ${qty} @ $${unitPrice}</div>
-                        <div class="item-price">${total}</div>
-                    </div>`;
-                }
-            });
-            $('#review-manufacturers-list').html(manufacturersHtml || '<p style="color: #999;">No manufacturers added</p>');
-            
-            // Margins
-            let marginsHtml = '';
-            $('#margin-markup-table tbody tr').each(function(){
-                const $row = $(this);
-                if($row.find('.add-margin-btn').length) return;
-                
-                const desc = $row.find('.margin-desc-td').text().trim();
-                const multiplier = $row.find('.margin-mul-td').text().trim();
-                const result = $row.find('.margin-result').text().trim();
-                
-                if(desc) {
-                    marginsHtml += `<div class="summary-item">
-                        <div class="item-description">${escapeHtml(desc)} (${multiplier}x)</div>
-                        <div class="item-price">${result}</div>
-                    </div>`;
-                }
-            });
-            $('#review-margins-list').html(marginsHtml || '<p style="color: #999;">No margins added</p>');
-            
-            // Totals
-            const subtotal = $('#subtotal').text();
-            const tax = $('#tax').text();
-            const grandTotal = $('#grand-total').text();
-            
-            $('#review-subtotal').text(subtotal);
-            $('#review-tax').text(tax);
-            $('#review-total').text(grandTotal);
-            $('#review-grand-total').text(grandTotal);
-        }
-
-        // --- Submit Quote Form via AJAX ---
-        function submitQuoteForm() {
-            // Collect all form data
-            const formData = {
-                _token: '{{ csrf_token() }}',
-                project_id: selectedProjectId,
-                customer_name: selectedProjectData.customer,
-                project_name: selectedProjectData.name,
-                subtotal: parseNumber($('#subtotal').text()),
-                tax: parseNumber($('#tax').text()),
-                total: parseNumber($('#grand-total').text()),
-                discount: 0,
-                items: [],
-                manufacturers: [],
-                margins: []
-            };
-            
-            // Collect quote items
-            $('.quote-stepview__left .custom-table .table tbody tr').each(function(){
-                const $row = $(this);
-                if($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
-                
-                const itemName = $row.find('td').eq(0).text().trim();
-                const qty = parseNumber($row.find('.quantity-input').val());
-                const unitPrice = parseNumber($row.find('td').eq(3).text());
-                const total = parseNumber($row.find('td').eq(4).text());
-                const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
-                
-                if(qty > 0) {
-                    formData.items.push({
-                        name: itemName,
-                        qty: qty,
-                        unit_price: unitPrice,
-                        line_total: total,
-                        is_taxable: isTaxable
-                    });
-                }
-            });
-            
-            // Collect manufacturers
-            $('#box-manufacturer-table tbody tr').each(function(){
-                const $row = $(this);
-                if($row.find('.add-box-btn').length) return;
-                
-                const name = $row.find('.manufacturer-name-td').text().trim();
-                const qty = parseNumber($row.find('.quantity-input').val());
-                const unitPrice = parseNumber($row.find('.unit-price-td').text());
-                const total = parseNumber($row.find('.line-total').text());
-                const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
-                
-                if(name) {
-                    formData.manufacturers.push({
-                        name: name,
-                        qty: qty,
-                        unit_price: unitPrice,
-                        line_total: total,
-                        is_taxable: isTaxable
-                    });
-                }
-            });
-            
-            // Collect margins
-            $('#margin-markup-table tbody tr').each(function(){
-                const $row = $(this);
-                if($row.find('.add-margin-btn').length) return;
-                
-                const desc = $row.find('.margin-desc-td').text().trim();
-                const multiplier = parseNumber($row.find('.margin-mul-td').text());
-                const result = parseNumber($row.find('.margin-result').text());
-                const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
-                
-                if(desc) {
-                    formData.margins.push({
-                        description: desc,
-                        multiplier: multiplier,
-                        result: result,
-                        is_taxable: isTaxable
-                    });
-                }
-            });
-            
-            // Show loading state
-            const $submitBtn = $('.step-footer .btn.theme');
-            const originalText = $submitBtn.html();
-            $submitBtn.prop('disabled', true).html('<span style="display: inline-block; width: 20px; height: 20px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Creating Quote...');
-            
-            // Submit via AJAX
-            $.ajax({
-                url: '{{ route("admin.quotes.store") }}',
-                method: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if(response.success) {
-                        // Show success step
-                        $('#success-quote-number').text(response.quote_number || '-');
-                        $('.quote-stepview').hide();
-                        $('.success-step').show();
-                        $('.step-footer').hide();
-                        $('.progress-container, .progress-labels, .breadcrumb').hide();
-                        
-                        showToast('success', 'Quote created successfully!');
-                    } else {
-                        showToast('error', response.message || 'Failed to create quote');
-                        $submitBtn.prop('disabled', false).html(originalText);
+            // inline save on Enter, cancel on Esc
+            $(document).on('keydown', '.inline-name, .inline-unit, .inline-desc, .inline-mul', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const $row = $(this).closest('tr');
+                    if ($row.find('.save-inline').length) {
+                        $row.find('.save-inline').trigger('click');
+                    } else if ($row.find('.save-inline-margin').length) {
+                        $row.find('.save-inline-margin').trigger('click');
                     }
-                },
-                error: function(xhr) {
-                    let errorMsg = 'An error occurred while creating the quote.';
-                    
-                    if(xhr.status === 422) {
-                        // Validation errors
-                        const errors = xhr.responseJSON?.errors || {};
-                        const errorMessages = [];
-                        $.each(errors, function(field, messages) {
-                            errorMessages.push(messages.join(' '));
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    const $row = $(this).closest('tr');
+                    if ($row.find('.cancel-inline').length) {
+                        $row.find('.cancel-inline').trigger('click');
+                    }
+                    if ($row.find('.cancel-inline-margin').length) {
+                        $row.find('.cancel-inline-margin').trigger('click');
+                    }
+                }
+            });
+
+            // accordion toggle
+            $(document).on('click', '.quote-accordion__header', function () {
+                const body = $(this).next('.quote-accordion__body');
+                $('.quote-accordion__body').not(body).slideUp();
+                $('.quote-accordion__header').not(this).removeClass('active');
+                $(this).toggleClass('active');
+                body.stop(true, true).slideToggle();
+            });
+
+            // final recalc on step change
+            $(document).on('click', '.step-footer .btn.theme', function () {
+                if (currentStep + 1 === totalSteps) {
+                    recalcAll();
+                }
+            });
+
+            // ensure initial calculation
+            recalcAll();
+
+            // --- Populate Review Step ---
+            function populateReviewStep() {
+                // Project info
+                $('#review-project-name').text(selectedProjectData.name || '-');
+                $('#review-customer-name').text(selectedProjectData.customer || '-');
+
+                // Quote items from step 2
+                let itemsHtml = '';
+                $('.quote-stepview__left .custom-table .table tbody tr').each(function () {
+                    const $row = $(this);
+                    if ($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+
+                    const itemName = $row.find('td').eq(0).text().trim();
+                    const qty = $row.find('.quantity-input').val() || 0;
+                    const unitPrice = $row.find('td').eq(3).text().trim();
+                    const total = $row.find('td').eq(4).text().trim();
+
+                    if (parseInt(qty) > 0) {
+                        itemsHtml += `<div class="summary-item">
+                            <div class="item-description">${escapeHtml(itemName)} × ${qty}</div>
+                            <div class="item-price">${total}</div>
+                        </div>`;
+                    }
+                });
+                $('#review-items-list').html(itemsHtml || '<p style="color: #999;">No items added</p>');
+
+                // Box manufacturers
+                let manufacturersHtml = '';
+                $('#box-manufacturer-table tbody tr').each(function () {
+                    const $row = $(this);
+                    if ($row.find('.add-box-btn').length) return;
+
+                    const name = $row.find('.manufacturer-name-td').text().trim();
+                    const qty = $row.find('.quantity-input').val() || 0;
+                    const unitPrice = $row.find('.unit-price-td').text().trim();
+                    const total = $row.find('.line-total').text().trim();
+
+                    if (name) {
+                        manufacturersHtml += `<div class="summary-item">
+                            <div class="item-description">${escapeHtml(name)} × ${qty} @ $${unitPrice}</div>
+                            <div class="item-price">${total}</div>
+                        </div>`;
+                    }
+                });
+                $('#review-manufacturers-list').html(manufacturersHtml || '<p style="color: #999;">No manufacturers added</p>');
+
+                // Margins
+                let marginsHtml = '';
+                $('#margin-markup-table tbody tr').each(function () {
+                    const $row = $(this);
+                    if ($row.find('.add-margin-btn').length) return;
+
+                    const desc = $row.find('.margin-desc-td').text().trim();
+                    const multiplier = $row.find('.margin-mul-td').text().trim();
+                    const result = $row.find('.margin-result').text().trim();
+
+                    if (desc) {
+                        marginsHtml += `<div class="summary-item">
+                            <div class="item-description">${escapeHtml(desc)} (${multiplier}x)</div>
+                            <div class="item-price">${result}</div>
+                        </div>`;
+                    }
+                });
+                $('#review-margins-list').html(marginsHtml || '<p style="color: #999;">No margins added</p>');
+
+                // Totals
+                const subtotal = $('#subtotal').text();
+                const tax = $('#tax').text();
+                const grandTotal = $('#grand-total').text();
+
+                $('#review-subtotal').text(subtotal);
+                $('#review-tax').text(tax);
+                $('#review-total').text(grandTotal);
+                $('#review-grand-total').text(grandTotal);
+            }
+
+            // --- Submit Quote Form via AJAX ---
+            function submitQuoteForm() {
+                // Collect all form data
+                const formData = {
+                    _token: '{{ csrf_token() }}',
+                    project_id: selectedProjectId,
+                    customer_name: selectedProjectData.customer,
+                    project_name: selectedProjectData.name,
+                    subtotal: parseNumber($('#subtotal').text()),
+                    tax: parseNumber($('#tax').text()),
+                    total: parseNumber($('#grand-total').text()),
+                    discount: 0,
+                    items: [],
+                    manufacturers: [],
+                    margins: []
+                };
+
+                // Collect quote items
+                $('.quote-stepview__left .custom-table .table tbody tr').each(function () {
+                    const $row = $(this);
+                    if ($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+
+                    const itemName = $row.find('td').eq(0).text().trim();
+                    const qty = parseNumber($row.find('.quantity-input').val());
+                    const unitPrice = parseNumber($row.find('td').eq(3).text());
+                    const total = parseNumber($row.find('td').eq(4).text());
+                    const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
+
+                    if (qty > 0) {
+                        formData.items.push({
+                            name: itemName,
+                            qty: qty,
+                            unit_price: unitPrice,
+                            line_total: total,
+                            is_taxable: isTaxable
                         });
-                        errorMsg = errorMessages.join('<br>') || errorMsg;
-                    } else if(xhr.responseJSON?.message) {
-                        errorMsg = xhr.responseJSON.message;
                     }
-                    
-                    showToast('error', errorMsg);
-                    $submitBtn.prop('disabled', false).html(originalText);
-                    
-                    console.error('Quote submission error:', xhr);
-                }
-            });
-        }
+                });
+
+                // Collect manufacturers
+                $('#box-manufacturer-table tbody tr').each(function () {
+                    const $row = $(this);
+                    if ($row.find('.add-box-btn').length) return;
+
+                    const name = $row.find('.manufacturer-name-td').text().trim();
+                    const qty = parseNumber($row.find('.quantity-input').val());
+                    const unitPrice = parseNumber($row.find('.unit-price-td').text());
+                    const total = parseNumber($row.find('.line-total').text());
+                    const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
+
+                    if (name) {
+                        formData.manufacturers.push({
+                            name: name,
+                            qty: qty,
+                            unit_price: unitPrice,
+                            line_total: total,
+                            is_taxable: isTaxable
+                        });
+                    }
+                });
+
+                // Collect margins
+                $('#margin-markup-table tbody tr').each(function () {
+                    const $row = $(this);
+                    if ($row.find('.add-margin-btn').length) return;
+
+                    const desc = $row.find('.margin-desc-td').text().trim();
+                    const multiplier = parseNumber($row.find('.margin-mul-td').text());
+                    const result = parseNumber($row.find('.margin-result').text());
+                    const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
+
+                    if (desc) {
+                        formData.margins.push({
+                            description: desc,
+                            multiplier: multiplier,
+                            result: result,
+                            is_taxable: isTaxable
+                        });
+                    }
+                });
+
+                // Show loading state
+                const $submitBtn = $('.step-footer .btn.theme');
+                const originalText = $submitBtn.html();
+                $submitBtn.prop('disabled', true).html('<span style="display: inline-block; width: 20px; height: 20px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite;"></span> Creating Quote...');
+
+                // Submit via AJAX
+                $.ajax({
+                    url: '{{ route("admin.quotes.store") }}',
+                    method: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            // Show success step
+                            $('#success-quote-number').text(response.quote_number || '-');
+                            $('.quote-stepview').hide();
+                            $('.success-step').show();
+                            $('.step-footer').hide();
+                            $('.progress-container, .breadcrumb').hide();
+
+                            showToast('success', 'Quote created successfully!');
+                        } else {
+                            showToast('error', response.message || 'Failed to create quote');
+                            $submitBtn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errorMsg = 'An error occurred while creating the quote.';
+
+                        if (xhr.status === 422) {
+                            // Validation errors
+                            const errors = xhr.responseJSON?.errors || {};
+                            const errorMessages = [];
+                            $.each(errors, function (field, messages) {
+                                errorMessages.push(messages.join(' '));
+                            });
+                            errorMsg = errorMessages.join('<br>') || errorMsg;
+                        } else if (xhr.responseJSON?.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+
+                        showToast('error', errorMsg);
+                        $submitBtn.prop('disabled', false).html(originalText);
+
+                        console.error('Quote submission error:', xhr);
+                    }
+                });
+            }
 
         }); // end jQuery ready
     </script>
-    
+
     <style>
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
+
         .summary-section {
             margin-bottom: 20px;
         }
+
         .summary-section h4 {
             margin-bottom: 10px;
             color: #333;
             font-size: 16px;
             font-weight: 600;
         }
+
         .summary-section p {
             margin: 5px 0;
             color: #666;
         }
+
         .summary-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #f0f0f0;
         }
+
         .summary-item.total-row {
             font-weight: bold;
             border-top: 2px solid #333;
             border-bottom: 2px solid #333;
             padding: 12px 0;
         }
+
         .item-description {
             flex: 1;
             color: #333;
         }
+
         .item-price {
             font-weight: 600;
             color: #333;
         }
+
         .summary-divider {
             height: 1px;
             background: #e0e0e0;
