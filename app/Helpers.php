@@ -112,11 +112,19 @@ if (!function_exists('get_kitchen_type_list')) {
     function get_kitchen_type_list($id = '')
     {
         $data = [
+            // Kitchen Types
             ['id' => 'KITCHEN_TOP', 'text' => 'Kitchen Top'],
             ['id' => 'KITCHEN_MANUFACTURER', 'text' => 'Cabinet Manufacturer'],
             ['id' => 'KITCHEN_MARGIN_MARKUP', 'text' => 'Margin / Markup'],
             ['id' => 'KITCHEN_DELIVERY', 'text' => 'Delivery Charges'],
             ['id' => 'KITCHEN_BUFFER', 'text' => 'BUFFER & Totals'],
+            
+            // Vanity Types
+            ['id' => 'VANITY_TOP', 'text' => 'Vanity Top'],
+            ['id' => 'VANITY_MANUFACTURER', 'text' => 'Vanity Manufacturer'],
+            ['id' => 'VANITY_MARGIN_MARKUP', 'text' => 'Margin / Markup'],
+            ['id' => 'VANITY_DELIVERY', 'text' => 'Delivery Charges'],
+            ['id' => 'VANITY_BUFFER', 'text' => 'BUFFER & Totals'],
         ];
 
         if ($id !== '') {

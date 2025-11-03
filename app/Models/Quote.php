@@ -14,6 +14,7 @@ class Quote extends Model
         'user_id',
         'project_id',
         'quote_number',
+        'quote_type',
         'subtotal',
         'tax',
         'discount',
@@ -86,12 +87,28 @@ class Quote extends Model
 
     public function isKitchen(): bool
     {
-        return (bool) $this->is_kitchen;
+        return $this->quote_type === 'kitchen' || (bool) $this->is_kitchen;
     }
 
     public function isVanity(): bool
     {
-        return (bool) $this->is_vanity;
+        return $this->quote_type === 'vanity' || (bool) $this->is_vanity;
+    }
+
+    /**
+     * Scope for kitchen quotes
+     */
+    public function scopeKitchen($query)
+    {
+        return $query->where('quote_type', 'kitchen');
+    }
+
+    /**
+     * Scope for vanity quotes
+     */
+    public function scopeVanity($query)
+    {
+        return $query->where('quote_type', 'vanity');
     }
     
     /**

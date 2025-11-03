@@ -62,27 +62,39 @@ class QuoteController extends Controller
 
     /**
      * Show creation form.
+     * Dynamically loads data based on quote type (kitchen or vanity)
      */
-    public function create()
+    public function create(Request $request)
     {
-        // Fetch kitchen quote data from database with full objects (including is_taxable)
-        $KITCHEN_TOP = KitchenQuote::where('type', 'KITCHEN_TOP')
+        // Determine quote type from request (default to 'kitchen')
+        $quoteType = $request->input('type', 'kitchen');
+        
+        // Validate quote type
+        if (!in_array($quoteType, ['kitchen', 'vanity'])) {
+            $quoteType = 'kitchen';
+        }
+        
+        // Convert to uppercase prefix for database queries
+        $typePrefix = strtoupper($quoteType);
+        
+        // Fetch quote data dynamically based on type
+        $KITCHEN_TOP = KitchenQuote::where('type', $typePrefix . '_TOP')
             ->get()
             ->keyBy('project');
             
-        $KITCHEN_MANUFACTURER = KitchenQuote::where('type', 'KITCHEN_MANUFACTURER')
+        $KITCHEN_MANUFACTURER = KitchenQuote::where('type', $typePrefix . '_MANUFACTURER')
             ->get()
             ->keyBy('project');
             
-        $KITCHEN_MARGIN_MARKUP = KitchenQuote::where('type', 'KITCHEN_MARGIN_MARKUP')
+        $KITCHEN_MARGIN_MARKUP = KitchenQuote::where('type', $typePrefix . '_MARGIN_MARKUP')
             ->get()
             ->keyBy('project');
             
-        $KITCHEN_DELIVERY = KitchenQuote::where('type', 'KITCHEN_DELIVERY')
+        $KITCHEN_DELIVERY = KitchenQuote::where('type', $typePrefix . '_DELIVERY')
             ->get()
             ->keyBy('project');
             
-        $KITCHEN_BUFFER = KitchenQuote::where('type', 'KITCHEN_BUFFER')
+        $KITCHEN_BUFFER = KitchenQuote::where('type', $typePrefix . '_BUFFER')
             ->get()
             ->keyBy('project');
 
@@ -101,18 +113,21 @@ class QuoteController extends Controller
             'KITCHEN_MARGIN_MARKUP', 
             'KITCHEN_DELIVERY', 
             'KITCHEN_BUFFER', 
-            'projects'
+            'projects',
+            'quoteType'
         ));
     }
 
    /**
      * Store a new quote (handles full multi-step form payload)
+     * Supports both kitchen and vanity types
      */
     public function store(Request $request)
     {
         // Basic server-side validation
         $request->validate([
             'project_id'       => 'required|exists:projects,id',
+            'quote_type'       => 'nullable|in:kitchen,vanity',
             'customer_name'    => 'nullable|string',
             'project_name'     => 'nullable|string',
             'items'            => 'nullable|array',
@@ -125,6 +140,10 @@ class QuoteController extends Controller
         ]);
 
         $user = Auth::user();
+
+        // Get quote type (default to kitchen)
+        $quoteType = $request->input('quote_type', 'kitchen');
+        $typePrefix = strtoupper($quoteType);
 
         // helpers to ensure consistent DB storage formatting
         $toUnitPrice = fn($v) => number_format((float)$v, 4, '.', '');
@@ -145,11 +164,12 @@ class QuoteController extends Controller
                 ? Carbon::parse($request->input('expires_at'))
                 : Carbon::now()->addDays($expiryDays);
 
-            // Create quote master
+            // Create quote master with dynamic type
             $quote = Quote::create([
                 'user_id'      => $user->id,
                 'project_id'   => $request->input('project_id'),
                 'quote_number' => $quoteNumber,
+                'quote_type'   => $quoteType,
                 'customer_name'=> $request->input('customer_name') ?? $project->customer->name ?? '',
                 'project_name' => $request->input('project_name') ?? $project->name ?? '',
                 'status'       => 'Draft',
@@ -158,8 +178,8 @@ class QuoteController extends Controller
                 'discount'     => $request->input('discount', 0),
                 'total'        => $request->input('total', 0),
                 'pdf_path'     => null,
-                'is_kitchen'   => true,
-                'is_vanity'    => false,
+                'is_kitchen'   => $quoteType === 'kitchen',
+                'is_vanity'    => $quoteType === 'vanity',
                 'expires_at'   => $expiresAt,
             ]);
 
@@ -170,15 +190,20 @@ class QuoteController extends Controller
                 
                 $isTaxable = $item['is_taxable'] ?? false;
                 $lineTotal = $toLine($item['line_total'] ?? 0);
+                $qty = $toQty($item['qty'] ?? 0);
+                
+                // Skip items with zero quantity or zero line total
+                if ($qty <= 0 || $lineTotal <= 0) continue;
+                
                 $taxRate = setting('tax_rate', 0.08);
                 $taxCost = $isTaxable ? ($lineTotal * $taxRate) : 0;
                 
                 $quote->items()->create([
                     'name'       => $item['name'],
-                    'type'       => 'KITCHEN_TOP',
+                    'type'       => $typePrefix . '_TOP',
                     'scope_material' => $item['scope_material'] ?? null,
                     'unit_price' => $toUnitPrice($item['unit_price'] ?? 0),
-                    'qty'        => $toQty($item['qty'] ?? 0),
+                    'qty'        => $qty,
                     'line_total' => $lineTotal,
                     'tax_cost'   => $taxCost,
                     'is_taxable' => $isTaxable,
@@ -192,14 +217,19 @@ class QuoteController extends Controller
                 
                 $isTaxable = $manufacturer['is_taxable'] ?? false;
                 $lineTotal = $toLine($manufacturer['line_total'] ?? 0);
+                $qty = $toQty($manufacturer['qty'] ?? 0);
+                
+                // Skip manufacturers with zero quantity or zero line total
+                if ($qty <= 0 || $lineTotal <= 0) continue;
+                
                 $taxRate = setting('tax_rate', 0.08);
                 $taxCost = $isTaxable ? ($lineTotal * $taxRate) : 0;
                 
                 $quote->items()->create([
                     'name'       => $manufacturer['name'],
-                    'type'       => 'KITCHEN_MANUFACTURER',
+                    'type'       => $typePrefix . '_MANUFACTURER',
                     'unit_price' => $toUnitPrice($manufacturer['unit_price'] ?? 0),
-                    'qty'        => $toQty($manufacturer['qty'] ?? 0),
+                    'qty'        => $qty,
                     'line_total' => $lineTotal,
                     'tax_cost'   => $taxCost,
                     'is_taxable' => $isTaxable,
@@ -215,13 +245,17 @@ class QuoteController extends Controller
                 
                 $isTaxable = $margin['is_taxable'] ?? false;
                 $lineTotal = $toLine($margin['result'] ?? 0);
+                
+                // Skip margins with zero line total (result)
+                if ($lineTotal <= 0) continue;
+                
                 $taxRate = setting('tax_rate', 0.08);
                 $taxCost = $isTaxable ? ($lineTotal * $taxRate) : 0;
                 
                 // Save as quote item without prefix (type column identifies it)
                 $quote->items()->create([
                     'name'       => $margin['description'],
-                    'type'       => 'KITCHEN_MARGIN_MARKUP',
+                    'type'       => $typePrefix . '_MARGIN_MARKUP',
                     'unit_price' => $toUnitPrice($margin['multiplier'] ?? 0),
                     'qty'        => $toQty(1),
                     'line_total' => $lineTotal,

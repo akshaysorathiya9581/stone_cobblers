@@ -353,6 +353,38 @@ select {
     /* Unicode lock open emoji */
 }
 
+/* Quotes Management Icons */
+.icon-quotes-management::before {
+    content: "📄";
+    /* Document icon for quote documents */
+}
+
+.icon-kitchen-quote::before {
+    content: "🏠";
+    /* Kitchen/Home icon */
+}
+
+.icon-vanity-quote::before {
+    content: "🚿";
+    /* Bathroom/Vanity icon */
+}
+
+/* Price Management Icons */
+.icon-price-management::before {
+    content: "💲";
+    /* Dollar sign for pricing */
+}
+
+.icon-price-tag::before {
+    content: "🏷️";
+    /* Price tag icon */
+}
+
+.icon-calculator::before {
+    content: "🧮";
+    /* Calculator for pricing calculations */
+}
+
 /* Main Content */
 .main-content {
     flex: 1;

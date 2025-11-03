@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kitchen Quotes — Prices')
+@section('title', ucfirst($type ?? 'Kitchen') . ' Quotes — Prices')
 
 @push('css')
 @endpush
@@ -30,9 +30,9 @@
     <div class="content bg-content">
       <div class="quote-details quote-details__listing">
         <div class="content-header">
-          <h2 class="title">Kitchen Top — Unit Price Update</h2>
+          <h2 class="title">{{ ucfirst($type ?? 'Kitchen') }} Top — Unit Price Update</h2>
           <a href="javascript:;" class="btn primary open-modal" data-target="#addQuoteModal">
-            <i>➕</i> Add New Quote
+            <i>➕</i> Add New {{ ucfirst($type ?? 'Kitchen') }} Quote
           </a>
         </div>
 
@@ -151,8 +151,13 @@
           <select name="type" id="add_category" class="form-input custom-select" data-placeholder="Select Quote Category"
             required>
             <option></option>
-            @foreach (get_kitchen_type_list() as $type)
-              <option value="{{ $type['id'] }}">{{ $type['text'] }}</option>
+            @php
+              $currentType = strtoupper($type ?? 'KITCHEN');
+            @endphp
+            @foreach (get_kitchen_type_list() as $quoteType)
+              @if(str_starts_with($quoteType['id'], $currentType))
+                <option value="{{ $quoteType['id'] }}">{{ $quoteType['text'] }}</option>
+              @endif
             @endforeach
           </select>
           <div class="invalid-feedback" data-field="category"></div>
@@ -210,8 +215,13 @@
           <select name="type" id="edit_type" class="form-input custom-select" data-placeholder="Select Quote Category"
             required>
             <option></option>
-            @foreach (get_kitchen_type_list() as $type)
-              <option value="{{ $type['id'] }}">{{ $type['text'] }}</option>
+            @php
+              $currentType = strtoupper($type ?? 'KITCHEN');
+            @endphp
+            @foreach (get_kitchen_type_list() as $quoteType)
+              @if(str_starts_with($quoteType['id'], $currentType))
+                <option value="{{ $quoteType['id'] }}">{{ $quoteType['text'] }}</option>
+              @endif
             @endforeach
           </select>
           <div class="invalid-feedback" data-field="type" style="display:none;"></div>

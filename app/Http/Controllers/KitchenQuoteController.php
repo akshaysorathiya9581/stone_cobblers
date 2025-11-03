@@ -10,12 +10,39 @@ use App\Models\KitchenQuote;
 
 class KitchenQuoteController extends Controller
 {
-    public function index()
+    /**
+     * Display kitchen or vanity price configuration
+     * This handles both Kitchen and Vanity quote pricing
+     */
+    public function index(Request $request)
     {
-        $kitchen_tops = KitchenQuote::orderBy('created_at')->get();
-        // $manufacturers = KitchenQuote::where('type', 'KITCHEN_CABINET')->orderBy('created_at')->get();
+        // Determine type from URL path or query parameter
+        $path = $request->path();
+        $type = 'kitchen'; // default
+        
+        // Check if URL contains 'vanity'
+        if (str_contains($path, 'vanity')) {
+            $type = 'vanity';
+        }
+        
+        // Allow query parameter to override
+        if ($request->has('type')) {
+            $type = $request->query('type');
+        }
+        
+        // Ensure valid type
+        if (!in_array($type, ['kitchen', 'vanity'])) {
+            $type = 'kitchen';
+        }
 
-        return view('admin.kitchen_quote.index', compact('kitchen_tops'));
+        $typePrefix = strtoupper($type);
+        
+        // Filter by type prefix
+        $kitchen_tops = KitchenQuote::where('type', 'LIKE', $typePrefix . '%')
+            ->orderBy('created_at')
+            ->get();
+
+        return view('admin.kitchen_quote.index', compact('kitchen_tops', 'type'));
     }
 
    /**

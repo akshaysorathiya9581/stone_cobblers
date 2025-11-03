@@ -6,61 +6,116 @@
     <title>Quote {{ $quote->quote_number ?? '' }}</title>
 
     <style>
-        /* --- Page margins (top margin must allow header height) --- */
+        /* --- Page margins --- */
         @page {
-            margin: 40mm 1mm 15mm 1mm;
+            margin: 42mm 15mm 15mm 15mm;
             /* top, right, bottom, left */
         }
 
         /* Basic typography */
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
-            color: #222;
+            font-size: 11px;
+            color: #000;
             line-height: 1.4;
             margin: 0;
             padding: 0;
         }
 
-        /* --- Fixed header (appears on every page) --- */
+        /* --- Fixed header for all pages --- */
         .pdf-header {
             position: fixed;
-            top: -25mm;
-            /* header sits in the top margin area */
+            top: -38mm;
             left: 0;
             right: 0;
-            height: 40mm;
-            /* header height - keep in sync with @page top margin */
-            display: flex;
-            align-items: center;
-            padding: 6px 15mm;
+            height: 38mm;
+            padding: 8mm 15mm 5mm 15mm;
             box-sizing: border-box;
+            border-bottom: 2px solid #000;
+            background: #fff;
         }
 
-        .pdf-header .left {
-            width: 35%;
-            display: flex;
-            align-items: center;
-            float: left
+        .header-wrapper {
+            width: 100%;
+            height: 100%;
         }
 
-        .pdf-header .left img.logo {
-            width: auto;
-            height: auto;
-            max-height: 60px;
-            max-width: 190px;
-            display: block;
+        .header-wrapper::after {
+            content: "";
+            display: table;
+            clear: both;
         }
 
-        .pdf-header .right {
-            width: 35%;
-            text-align: right;
-            font-size: 11px;
-            color: #222;
-            line-height: 1.35;
-            white-space: pre-line;
+        .header-left {
+            float: left;
+            width: 40%;
+            padding-right: 15px;
+        }
+
+        .header-left .logo-box {
+            border: 2px solid #000;
+            padding: 6px 8px;
+            display: inline-block;
+            max-width: 200px;
+        }
+
+        .header-left .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #000;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .header-left .company-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #000;
+            line-height: 1.3;
+            text-transform: uppercase;
+        }
+
+        .header-right {
             float: right;
-            margin-top: -20px
+            width: 55%;
+            text-align: right;
+            padding-left: 15px;
+        }
+
+        .header-right .company-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header-right .address-block {
+            font-size: 10px;
+            color: #000;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+
+        .header-right .address-block strong {
+            font-weight: 600;
+        }
+
+        .header-right .contact-block {
+            font-size: 10px;
+            color: #000;
+            line-height: 1.6;
+        }
+
+        .header-right .contact-block strong {
+            font-weight: 600;
+        }
+
+        .header-right .link {
+            color: #0066cc;
+            text-decoration: none;
         }
 
         /* --- Fixed footer with page numbers --- */
@@ -72,12 +127,18 @@
             right: 0;
             height: 12mm;
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             color: #666;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
         }
 
-        .pdf-footer .pagenum:before {
-            content: "Page " counter(page);
+        /* Page numbers are handled by inline PHP script at bottom */
+        
+        .pdf-footer .footer-text {
+            font-size: 9px;
+            color: #999;
+            margin-top: 3px;
         }
 
         /* --- Content area (starts below header) --- */
@@ -180,36 +241,60 @@
 
 <body>
 
-    {{-- HEADER (fixed) --}}
+    {{-- HEADER (appears on all pages) --}}
     <div class="pdf-header" aria-hidden="true">
-        <div class="left">
-            @if (!empty($companyLogo))
-                <img src="{{ $companyLogo }}" alt="{{ $companyName }}" class="logo">
-            @else
-                {{-- fallback: simple text logo --}}
-                <div style="font-weight:700;font-size:18px;">{{ $companyName }}</div>
-            @endif
-        </div>
+        <div class="header-wrapper">
+            {{-- Left: Logo --}}
+            <div class="header-left">
+                @if (!empty($companyLogo))
+                    <img src="{{ $companyLogo }}" alt="{{ $companyName }}" style="max-width: 180px; max-height: 70px; display: block;">
+                @else
+                    {{-- Logo box matching the image design --}}
+                    <div class="logo-box">
+                        <div class="logo-text">TSC</div>
+                        <div class="company-name">THE<br>STONE<br>COBBLERS</div>
+                    </div>
+                @endif
+            </div>
 
-        <div class="right">
-            {{ $companyAddress }}, {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }}<br>
-            Phone: {{ $companyPhone }}<br>
-            @if($companyEmail)
-                Email: {{ $companyEmail }}<br>
-            @endif
-            @if($companyWebsite)
-                Web: {{ $companyWebsite }}
-            @endif
+            {{-- Right: Company Information --}}
+            <div class="header-right">
+                <div class="company-title">{{ strtoupper($companyName) }}</div>
+                
+                <div class="address-block">
+                    <strong>{{ $companyAddress }}</strong><br>
+                    {{ $companyAddress }}, {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }}<br>
+                    {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }}
+                </div>
+                
+                <div class="contact-block">
+                    <div><strong>Phone:</strong> {{ $companyPhone }}</div>
+                    @if($companyEmail)
+                        <div><strong>Email:</strong> <span class="link">{{ $companyEmail }}</span></div>
+                    @endif
+                    @if($companyWebsite)
+                        <div><strong>Web:</strong> <span class="link">{{ $companyWebsite }}</span></div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
-    {{-- FOOTER (fixed page numbers) --}}
+    {{-- FOOTER (page numbers added via PHP script at bottom) --}}
     <div class="pdf-footer">
-        <span class="pagenum"></span>
+        <div class="footer-text" style="margin-top: 15px;">
+            {{ $companyName }} | {{ $companyPhone }} | {{ $companyEmail ?? '' }}
+        </div>
     </div>
 
     {{-- MAIN CONTENT --}}
     <div class="content">
+        {{-- Date line with underline matching image design --}}
+        <div style="margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #000;">
+            <strong style="font-size: 12px;">Date:</strong> 
+            <span style="margin-left: 5px;">{{ optional($quote->created_at)->format('m/d/Y') ?? '_______________' }}</span>
+        </div>
+
         <table class="quote-meta">
             <tr>
                 <td style="width:50%;">
@@ -218,7 +303,6 @@
                     {{ $quote->customer_name ?? (optional(optional($quote->project)->customer)->name ?? 'N/A') }}
                 </td>
                 <td style="width:50%; text-align:right;">
-                    <strong>Quote Date:</strong> {{ optional($quote->created_at)->format('m/d/Y') ?? '—' }}<br>
                     <strong>Expires:</strong> {{ optional($quote->expires_at)->format('m/d/Y') ?? '—' }}
                 </td>
             </tr>
@@ -250,9 +334,11 @@
 
             <tbody>
                 @php
-                    // Filter items by type KITCHEN_TOP
+                    // Filter items by type *_TOP (Kitchen or Vanity) with qty > 0 AND line_total > 0
                     $quoteItems = collect($items)->filter(function($item) {
-                        return $item->type === 'KITCHEN_TOP' && (float)$item->qty > 0;
+                        return (str_ends_with($item->type, '_TOP') || $item->type === 'KITCHEN_TOP' || $item->type === 'VANITY_TOP')
+                            && (float)$item->qty > 0 
+                            && (float)$item->line_total > 0;
                     });
                 @endphp
                 
@@ -287,9 +373,11 @@
             </thead>
             <tbody>
                 @php
-                    // Filter items by type KITCHEN_MANUFACTURER
+                    // Filter items by type *_MANUFACTURER (Kitchen or Vanity) with qty > 0 AND line_total > 0
                     $manufacturers = collect($items)->filter(function($item) {
-                        return $item->type === 'KITCHEN_MANUFACTURER';
+                        return (str_ends_with($item->type, '_MANUFACTURER') || $item->type === 'KITCHEN_MANUFACTURER' || $item->type === 'VANITY_MANUFACTURER')
+                            && (float)$item->qty > 0 
+                            && (float)$item->line_total > 0;
                     });
                 @endphp
                 
@@ -328,9 +416,10 @@
             </thead>
             <tbody>
                 @php
-                    // Filter items by type KITCHEN_MARGIN_MARKUP
+                    // Filter items by type *_MARGIN_MARKUP (Kitchen or Vanity) and line_total > 0
                     $margins = collect($items)->filter(function($item) {
-                        return $item->type === 'KITCHEN_MARGIN_MARKUP';
+                        return (str_ends_with($item->type, '_MARGIN_MARKUP') || $item->type === 'KITCHEN_MARGIN_MARKUP' || $item->type === 'VANITY_MARGIN_MARKUP')
+                            && (float)$item->line_total > 0;
                     });
                 @endphp
                 
@@ -415,6 +504,24 @@
         </div>
 
     </div> {{-- end .content --}}
+
+    <script type="text/php">
+        if (isset($pdf)) {
+            $text = "Page {PAGE_NUM} of {PAGE_COUNT}";
+            $font = $fontMetrics->get_font("DejaVu Sans", "normal");
+            $size = 10;
+            $pageWidth = $pdf->get_width();
+            $pageHeight = $pdf->get_height();
+            $textWidth = $fontMetrics->get_text_width($text, $font, $size);
+            
+            // Calculate center position for page number
+            $x = ($pageWidth - $textWidth) / 2;
+            $y = $pageHeight - 25; // Position from bottom
+            
+            // Draw the page number
+            $pdf->page_text($x, $y, $text, $font, $size, array(0.4, 0.4, 0.4));
+        }
+    </script>
 
 </body>
 

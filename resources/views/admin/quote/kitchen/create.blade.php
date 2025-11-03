@@ -1,52 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', ucfirst($quoteType ?? 'Kitchen') . ' Quotes — Prices')
+@section('title', 'Kitchen Quotes — Prices')
 
 @push('css')
-<style>
-    /* Completed state for progress steps */
-    .progress-step.completed {
-        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
-        border-color: #16a34a !important;
-        transform: scale(1.1);
-        transition: all 0.3s ease;
-    }
-    
-    .progress-step.completed svg {
-        display: block;
-    }
-    
-    /* Success step animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes scaleIn {
-        from {
-            transform: scale(0.8);
-            opacity: 0;
-        }
-        to {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
-    
-    .success-step {
-        animation: fadeInUp 0.6s ease-out;
-    }
-    
-    .success-step__icon {
-        animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-</style>
 @endpush
 
 @section('content')
@@ -71,7 +27,7 @@
                     <span class="breadcrumb-item">Quote Generation – Step 1 of 4</span>
                 </div>
                 <div class="content-header d-block">
-                    <h2 class="title">Stone by Stone: Your Perfect {{ ucfirst($quoteType ?? 'Kitchen') }} Quote</h2>
+                    <h2 class="title">Stone by Stone: Your Perfect Kitchen Quote</h2>
                     <h3 class="subtitle">Step 1 of 4 – Select Project</h3>
                     <div class="quote-steps">
                         <div class="progress-container">
@@ -97,9 +53,12 @@
                     <div class="quote-stepview__full" style="max-width: 600px;">
                         <div class="stepview-title text-align-left">
                             <h3 class="title mb-8">Select a Project</h3>
-                            <p>Choose the project for which you want to create a quote</p>
+                            <p>Choose the project for which you want to create a kitchen quote</p>
                         </div>
                         <div class="form-fields">
+                            <!-- Hidden field for quote type -->
+                            <input type="hidden" id="quote_type" name="quote_type" value="kitchen">
+                            
                             <div class="form-field">
                                 <label class="form-label required">Project</label>
                                 <select class="form-input custom-select" name="project_id" id="project_id"
@@ -148,7 +107,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($KITCHEN_TOP ?? [] as $projectName => $item)
+                                    @forelse($QUOTE_TOP ?? [] as $projectName => $item)
                                         <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
                                             <td class="label item-name-td">
                                                 {{ $item->project }}
@@ -361,7 +320,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse($KITCHEN_MANUFACTURER ?? [] as $manufacturerName => $item)
+                                                @forelse($QUOTE_MANUFACTURER ?? [] as $manufacturerName => $item)
                                                     <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
                                                         <td class="label manufacturer-name-td">
                                                             {{ $item->project }}
@@ -489,7 +448,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse($KITCHEN_MARGIN_MARKUP ?? [] as $marginDesc => $item)
+                                                @forelse($QUOTE_MARGIN_MARKUP ?? [] as $marginDesc => $item)
                                                     <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
                                                         <td class="label margin-desc-td">
                                                             {{ $item->project }}
@@ -644,52 +603,16 @@
 
                 <!-- Success Step -->
                 <div class="quote-stepview success-step" style="display: none;">
-                    <div class="quote-stepview__full" style="max-width: 700px; margin: 50px auto; text-align: center;">
-                        <div class="success-step__icon" style="width: 120px; height: 120px; margin: 0 auto 30px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);">
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
+                    <div class="quote-stepview__full">
+                        <div class="success-step__icon">✓</div>
+                        <h2 class="success-step__title">Quote Created Successfully!</h2>
+                        <p class="success-step__description">Your quote has been created and PDF has been generated.</p>
+                        <div class="mb-20">
+                            <p><strong>Quote Number:</strong> <span id="success-quote-number">-</span></p>
                         </div>
-                        
-                        <h2 class="success-step__title" style="font-size: 32px; font-weight: 700; color: #16a34a; margin-bottom: 15px; letter-spacing: -0.5px;">
-                            Quote Created Successfully!
-                        </h2>
-                        
-                        <p class="success-step__description" style="font-size: 16px; color: #64748b; margin-bottom: 30px; line-height: 1.6;">
-                            Your quote has been created and the PDF has been generated successfully.
-                        </p>
-                        
-                        <div class="quote-success-card" style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 35px;">
-                            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10 9 9 9 8 9"></polyline>
-                                </svg>
-                                <h3 style="font-size: 18px; font-weight: 600; color: #1e293b; margin: 0;">Quote Number</h3>
-                            </div>
-                            <p style="font-size: 28px; font-weight: 700; color: #16a34a; margin: 0; letter-spacing: 1px;">
-                                <span id="success-quote-number">-</span>
-                            </p>
-                        </div>
-                        
-                        <div class="success-step__flex" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                            <a href="#" id="view-all-quotes-btn" class="btn theme" style="padding: 14px 30px; font-size: 15px; font-weight: 600; border-radius: 8px; min-width: 180px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                </svg>
-                                View All Quotes
-                            </a>
-                            <a href="#" id="create-another-quote-btn" class="btn secondary" style="padding: 14px 30px; font-size: 15px; font-weight: 600; border-radius: 8px; min-width: 180px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                                Create Another Quote
-                            </a>
+                        <div class="success-step__flex">
+                            <a href="{{ route('admin.kitchen.quotes.index') }}" class="btn theme">View All Quotes</a>
+                            <a href="{{ route('admin.kitchen.quotes.create') }}" class="btn secondary">Create Another Quote</a>
                         </div>
                     </div>
                 </div>
@@ -1804,8 +1727,8 @@
                 // Collect all form data
                 const formData = {
                     _token: '{{ csrf_token() }}',
-                    quote_type: '{{ $quoteType ?? "kitchen" }}', // Dynamic quote type
                     project_id: selectedProjectId,
+                    quote_type: $('#quote_type').val() || 'kitchen', // Include quote type
                     customer_name: selectedProjectData.customer,
                     project_name: selectedProjectData.name,
                     subtotal: parseNumber($('#subtotal').text()),
@@ -1907,16 +1830,6 @@
                             $('.breadcrumb').hide();
                             $('.content-header .title').hide();
                             $('.content-header .subtitle').hide();
-                            
-                            // Set button URLs based on quote type
-                            const quoteType = '{{ $quoteType ?? "kitchen" }}';
-                            if (quoteType === 'kitchen') {
-                                $('#view-all-quotes-btn').attr('href', '{{ route("admin.kitchen.quotes.index") }}');
-                                $('#create-another-quote-btn').attr('href', '{{ route("admin.kitchen.quotes.create") }}');
-                            } else if (quoteType === 'vanity') {
-                                $('#view-all-quotes-btn').attr('href', '{{ route("admin.vanity.quotes.index") }}');
-                                $('#create-another-quote-btn').attr('href', '{{ route("admin.vanity.quotes.create") }}');
-                            }
 
                             showToast('success', 'Quote created successfully!');
                         } else {

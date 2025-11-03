@@ -16,20 +16,65 @@
                         // Check if current route matches the item's route
                         $isActive = false;
                         if (isset($item['route'])) {
-                            // Check exact match first
-                            $isActive = request()->routeIs($item['route']);
+                            $currentRouteName = request()->route() ? request()->route()->getName() : '';
+                            $currentPath = '/' . ltrim(request()->path(), '/');
                             
-                            // If not exact match, check with wildcard
+                            // PRIORITY 1: If item has match_path, use it for EXACT segment matching
+                            if (isset($item['match_path']) && !empty($item['match_path'])) {
+                                // Extract path segments for exact matching
+                                $pathSegments = array_filter(explode('/', $currentPath));
+                                $matchSegments = array_filter(explode('/', $item['match_path']));
+                                
+                                // Check if the match_path segments exist in the current path in exact order
+                                $matchFound = false;
+                                foreach ($pathSegments as $index => $segment) {
+                                    // Check if this segment exactly matches the match_path
+                                    if ($segment === $item['match_path']) {
+                                        $matchFound = true;
+                                        break;
+                                    }
+                                }
+                                
+                                $isActive = $matchFound;
+                            }
+                            
+                            // PRIORITY 2: Check exact route match
                             if (!$isActive) {
+                                $isActive = request()->routeIs($item['route']);
+                            }
+                            
+                            // PRIORITY 3: Check with wildcard (only if no match_path defined)
+                            if (!$isActive && !isset($item['match_path'])) {
                                 $isActive = request()->routeIs($item['route'] . '.*');
                             }
                             
-                            // Also check if URL path starts with the route path
-                            if (!$isActive && $item['route']) {
+                            // PRIORITY 4: Check if current route name starts with menu route name (only if no match_path)
+                            if (!$isActive && $currentRouteName && !isset($item['match_path'])) {
+                                $isActive = str_starts_with($currentRouteName, str_replace('.index', '', $item['route']));
+                            }
+                            
+                            // PRIORITY 5: URL path comparison (only if no match_path)
+                            if (!$isActive && $item['route'] && !isset($item['match_path'])) {
                                 try {
                                     $routePath = parse_url(route($item['route']), PHP_URL_PATH);
-                                    $currentPath = request()->path();
-                                    $isActive = str_starts_with('/' . $currentPath, $routePath);
+                                    // Normalize paths for comparison
+                                    $routePath = '/' . ltrim($routePath, '/');
+                                    $currentPath = '/' . ltrim($currentPath, '/');
+                                    
+                                    // Check if current path starts with route path
+                                    $isActive = str_starts_with($currentPath, $routePath);
+                                    
+                                    // Additional check: extract base segment and compare
+                                    if (!$isActive) {
+                                        $routeSegments = array_filter(explode('/', $routePath));
+                                        $currentSegments = array_filter(explode('/', $currentPath));
+                                        
+                                        // Compare first 2-3 segments
+                                        if (count($routeSegments) >= 2 && count($currentSegments) >= 2) {
+                                            $isActive = $routeSegments[0] === $currentSegments[0] && 
+                                                       $routeSegments[1] === $currentSegments[1];
+                                        }
+                                    }
                                 } catch (\Exception $e) {
                                     // Route doesn't exist, skip
                                 }

@@ -32,19 +32,19 @@ class AppServiceProvider extends ServiceProvider
                 ['section'=>'Main','title'=>'Dashboard','icon'=>'icon-dashboard','route'=>'admin.dashboard','module'=>'dashboard'],
                 ['section'=>'Main','title'=>'Customers','icon'=>'icon-customers','route'=>'admin.customers.index','module'=>'customers'],
                 ['section'=>'Main','title'=>'Projects','icon'=>'icon-projects','route'=>'admin.projects.index','module'=>'projects'],
-                ['section'=>'Main','title'=>'Quotes','icon'=>'icon-quotes','route'=>'admin.quotes.index','module'=>'quotes'],
+
+                // Quotes Management (Separate for Kitchen and Vanity)
+                ['section'=>'Quotes Management','title'=>'Kitchen Quotes','icon'=>'icon-kitchen-quote','route'=>'admin.kitchen.quotes.index','module'=>'quotes','match_path'=>'kitchen-quotes-management'],
+                ['section'=>'Quotes Management','title'=>'Vanity Quotes','icon'=>'icon-vanity-quote','route'=>'admin.vanity.quotes.index','module'=>'quotes','match_path'=>'vanity-quotes-management'],
+
+                // Price Management (Configuration)
+                ['section'=>'Price Management','title'=>'Kitchen Quotes','icon'=>'icon-price-tag','route'=>'admin.kitchen-quotes.index','module'=>'kitchen_quotes','match_path'=>'kitchen-quotes'],
+                ['section'=>'Price Management','title'=>'Vanity Quotes','icon'=>'icon-calculator','route'=>'admin.vanity-quotes.index','module'=>'kitchen_quotes','match_path'=>'vanity-price-quotes'],
 
                 // Management
                 // ['section'=>'Management','title'=>'Reports','icon'=>'icon-reports','route'=>null,'module'=>'reports'],
                 ['section'=>'Management','title'=>'Settings','icon'=>'icon-settings','route'=>'admin.settings.index','module'=>'settings'],
                 ['section'=>'Management','title'=>'Files','icon'=>'icon-files','route'=>'admin.files.index','module'=>'files'],
-
-                // Quick Access
-                // ['section'=>'Quick Access','title'=>'Starred','icon'=>'icon-starred','route'=>null,'module'=>null],
-                // ['section'=>'Quick Access','title'=>'Pinned','icon'=>'icon-pinned','route'=>null,'module'=>null],
-
-                // Quotes Management
-                ['section'=>'Price Management','title'=>'Kitchen Quotes','icon'=>'icon-quotes','route'=>'admin.kitchen-quotes.index','module'=>'kitchen_quotes'],
 
                 // Account (rendered separately too, but kept here for consistency)
                 ['section'=>'Account','title'=>'Logout','icon'=>'icon-logout','route'=>'logout','module'=>null,'is_logout'=>true],
