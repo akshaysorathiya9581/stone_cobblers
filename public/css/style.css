@@ -7,6 +7,7 @@
 :root {
     --primary-color: #16a34a;
     --primary-color-rgb: 22, 163, 74;
+    --primary-color-light: #f0f9f0;
     --secondary-color: #f1f3f4;
     --text-color: #333;
     --text-dark: #171a1f;
@@ -442,7 +443,7 @@ select {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background-color: #f0f9f0;
+    background-color: var(--primary-color-light);
 }
 
 .content.bg-white {
@@ -1241,6 +1242,11 @@ select {
 
 .action-btn.download:hover {
     background-color: #cce5ff;
+}
+
+.action-btn.save-inline-item,
+.action-btn.cancel-inline-item {
+    margin-top: 8px;
 }
 
 /* Stats Cards */
@@ -2209,7 +2215,7 @@ select {
 
 /*  */
 .profile-main {
-    background-color: #f0f9f0;
+    background-color: var(--primary-color-light);
 }
 
 .profile-main .profile-content {
@@ -2667,7 +2673,7 @@ select {
 }
 
 .quote-stepview .custom-table .form-input {
-    padding: 11px 16px;
+    padding: 10px 16px;
     max-width: 167px;
 }
 
@@ -2746,44 +2752,45 @@ select {
     margin: 0;
 }
 
-.summary-card {
+.quote-stepview__right .summary-card {
     background-color: #f8f9fa;
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.summary-item {
+.quote-stepview__right .summary-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
 }
 
-.summary-label {
+.quote-stepview__right .summary-label {
     font-size: 16px;
     font-weight: 400;
     color: var(--text-color);
 }
 
-.summary-amount {
+.quote-stepview__right .summary-amount {
     font-size: 16px;
     font-weight: 500;
     color: var(--text-color);
 }
 
-.grand-total {
+.quote-stepview__right .grand-total {
     padding-top: 15px;
-    border-top: 1px solid #dee1e6
+    border-top: 1px solid #dee1e6;
+    margin-bottom: 0;
 }
 
-.grand-total .summary-label {
+.quote-stepview__right .grand-total .summary-label {
     font-size: 18px;
     font-weight: 700;
     color: var(--text-color);
 }
 
-.grand-total .summary-amount {
+.quote-stepview__right .grand-total .summary-amount {
     font-size: 22px;
     font-weight: 700;
     color: var(--primary-color);
@@ -2867,7 +2874,7 @@ select {
     color: #565E6C;
 }
 
-.quote-accordion__body .add-btn {
+.quote-stepview .add-btn {
     display: inline-flex;
     background-color: #EAFFE8;
     border: 1px solid #00000000;
@@ -2879,15 +2886,16 @@ select {
 }
 
 .quote-stepview__summary .summary-card {
-    background-color: #f8f9fa;
+    background-color: var(--primary-color-light);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 20px 25px 30px;
+    padding: 30px;
 }
 
 .quote-stepview__summary .summary-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     margin-bottom: 20px;
 }
 
@@ -2896,6 +2904,7 @@ select {
     font-weight: 700;
     line-height: 22px;
     color: #171a1f;
+    margin-bottom: 20px;
 }
 
 .quote-stepview__summary .final-total-section {
@@ -2921,14 +2930,14 @@ select {
     width: 100%;
     height: 1px;
     background-color: #bcc1ca;
-    margin: 22px 0;
+    margin: 25px 0;
 }
 
 .quote-stepview__summary .summary-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
 .quote-stepview__summary .summary-item:last-child {
@@ -2952,4 +2961,51 @@ select {
 .quote-stepview__summary .total-row .item-description,
 .quote-stepview__summary .total-row .item-price {
     font-weight: 700;
+}
+
+.quote-stepview__summary .summary-section > p:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.validation-msg {
+    font-size: 12px;
+    margin-top: 3px;
+    color: var(--error-color);
+}
+
+.quote-stepview.success-step .quote-stepview__full {
+    text-align: center;
+    padding: 40px;
+    max-width: 550px;
+    margin: auto;
+    background-color: var(--primary-color-light);
+    border-radius: 20px;
+}
+
+.success-step .success-step__icon {
+    font-size: 60px; 
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.success-step .success-step__icon {
+    font-size: 60px; 
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.success-step .success-step__title {
+    color: var(--primary-color); 
+    margin-bottom: 15px;
+}
+
+.success-step .success-step__description {
+    font-size: 16px; 
+    color: var(--text-color); 
+    margin-bottom: 30px;
+}
+.success-step .success-step__flex {
+    display: flex;
+    gap: 15px; 
+    justify-content: center;
 }
