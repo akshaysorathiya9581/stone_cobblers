@@ -278,7 +278,7 @@
                             <div class="summary-amount" id="subtotal">$7,730.00</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-label">Tax (8%)</div>
+                            <div class="summary-label">{{ setting('tax_label', 'Tax') }} ({{ setting('tax_rate', 0.08) * 100 }}%)</div>
                             <div class="summary-amount" id="tax">$618.40</div>
                         </div>
                         <div class="summary-item grand-total">
@@ -580,7 +580,7 @@
                                 </div>
 
                                 <div class="summary-item">
-                                    <div class="item-description">Tax (8%)</div>
+                                    <div class="item-description">{{ setting('tax_label', 'Tax') }} ({{ setting('tax_rate', 0.08) * 100 }}%)</div>
                                     <div class="item-price" id="review-tax">$0.00</div>
                                 </div>
 
@@ -631,8 +631,10 @@
     <script>
         jQuery(function ($) {
             // --- CONFIG & HELPERS ---
-            const TAX_RATE = 0.08; // 8% tax
-            const currency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(n || 0));
+            const TAX_RATE = {{ setting('tax_rate', 0.08) }}; // Dynamic tax rate from settings
+            const CURRENCY_SYMBOL = '{{ setting('currency_symbol', '$') }}';
+            const CURRENCY_CODE = '{{ setting('currency_code', 'USD') }}';
+            const currency = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: CURRENCY_CODE }).format(Number(n || 0));
             const parseNumber = (v) => {
                 if (v === null || v === undefined) return NaN;
                 if (typeof v === 'number') return v;

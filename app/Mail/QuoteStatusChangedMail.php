@@ -22,8 +22,19 @@ class QuoteStatusChangedMail extends Mailable
 
     public function build()
     {
+        $companyName = setting('company_name', 'Stone Cobblers Inc.');
+        $fromEmail = setting('email_from_address', 'noreply@stonecobblers.com');
+        $fromName = setting('email_from_name', $companyName);
+        
         $subject = "Quote #{$this->quote->quote_number} - {$this->status}";
-        return $this->subject($subject)
-                    ->markdown('emails.quotes.status_changed');
+        
+        return $this->from($fromEmail, $fromName)
+                    ->subject($subject)
+                    ->markdown('emails.quotes.status_changed')
+                    ->with([
+                        'companyName' => $companyName,
+                        'companyPhone' => setting('company_phone', '(555) 123-4567'),
+                        'companyEmail' => setting('company_email', 'info@stonecobblers.com'),
+                    ]);
     }
 }

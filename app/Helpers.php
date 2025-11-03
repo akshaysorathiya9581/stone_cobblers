@@ -201,3 +201,76 @@ function fmtAuto($v)
     }
     return number_format($v, 2, '.', '');
 }
+
+if (!function_exists('format_currency')) {
+    /**
+     * Format a number as currency using settings
+     *
+     * @param float|int $amount
+     * @param bool $showSymbol
+     * @return string
+     */
+    function format_currency($amount, $showSymbol = true)
+    {
+        $symbol = setting('currency_symbol', '$');
+        $decimals = 2;
+        
+        $formatted = number_format((float)$amount, $decimals, '.', ',');
+        
+        return $showSymbol ? $symbol . $formatted : $formatted;
+    }
+}
+
+if (!function_exists('get_tax_rate')) {
+    /**
+     * Get the tax rate from settings
+     *
+     * @return float
+     */
+    function get_tax_rate()
+    {
+        return (float) setting('tax_rate', 0.08);
+    }
+}
+
+if (!function_exists('calculate_tax')) {
+    /**
+     * Calculate tax amount for a given amount
+     *
+     * @param float|int $amount
+     * @return float
+     */
+    function calculate_tax($amount)
+    {
+        $taxRate = get_tax_rate();
+        return (float)$amount * $taxRate;
+    }
+}
+
+if (!function_exists('company_info')) {
+    /**
+     * Get company information from settings
+     *
+     * @param string|null $key
+     * @return string|array
+     */
+    function company_info($key = null)
+    {
+        $companyData = [
+            'name' => setting('company_name', 'Stone Cobblers Inc.'),
+            'email' => setting('company_email', 'info@stonecobblers.com'),
+            'phone' => setting('company_phone', '(555) 123-4567'),
+            'address' => setting('company_address', '123 Stone Street'),
+            'city' => setting('company_city', 'New York'),
+            'state' => setting('company_state', 'NY'),
+            'zipcode' => setting('company_zipcode', '10001'),
+            'website' => setting('company_website', 'https://stonecobblers.com'),
+        ];
+        
+        if ($key === null) {
+            return $companyData;
+        }
+        
+        return $companyData[$key] ?? '';
+    }
+}

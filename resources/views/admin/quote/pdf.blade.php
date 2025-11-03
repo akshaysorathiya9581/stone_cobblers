@@ -192,7 +192,14 @@
         </div>
 
         <div class="right">
-            {!! nl2br(e($companyAddress)) !!}
+            {{ $companyAddress }}, {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }}<br>
+            Phone: {{ $companyPhone }}<br>
+            @if($companyEmail)
+                Email: {{ $companyEmail }}<br>
+            @endif
+            @if($companyWebsite)
+                Web: {{ $companyWebsite }}
+            @endif
         </div>
     </div>
 
@@ -365,7 +372,7 @@
                 </tr>
 
                 <tr class="totals">
-                    <td colspan="3" style="text-align: right; font-size: 14px;">Tax (8%)</td>
+                    <td colspan="3" style="text-align: right; font-size: 14px;">{{ $taxRate ? 'Tax (' . ($taxRate * 100) . '%)' : 'Tax' }}</td>
                     <td class="col-right" style="font-size: 14px;">${{ number_format($quote->tax ?? 0, 2) }}</td>
                 </tr>
 
@@ -395,14 +402,16 @@
 
         <br>
         <br>
-        <div class="highlight">THIS QUOTE IS VALID FOR 30 DAYS</div>
+        <div class="highlight">THIS QUOTE IS VALID FOR {{ setting('quote_expiry_days', 30) }} DAYS</div>
 
         <div class="note" style="margin-top:12px;">
-            <strong>Sales Rep:</strong> {{ optional($quote->creator)->email ?? 'info@thestonecobblers.com' }}<br>
-            <strong>Payment Schedule:</strong> 50% deposit required, balance due upon completion.<br>
-            <strong>Terms:</strong> Countertops include field templates, materials, fabrication, and installation.
-            Additional services may incur extra charges.<br>
-            <em>Please review carefully before signing.</em>
+            @if($quoteTerms)
+                <strong>Terms & Conditions:</strong> {!! nl2br(e($quoteTerms)) !!}<br>
+            @endif
+            <strong>Sales Rep:</strong> {{ optional($quote->creator)->email ?? setting('company_email', 'info@thestonecobblers.com') }}<br>
+            @if($quoteFooter)
+                <br><em>{{ $quoteFooter }}</em>
+            @endif
         </div>
 
     </div> {{-- end .content --}}

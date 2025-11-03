@@ -66,6 +66,34 @@
                 </div>
             </div>
 
+            <!-- Company Settings Quick View -->
+            <div style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e5e7eb;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">Company Settings</h3>
+                    <a href="{{ route('admin.settings.index') }}" style="color: #0ea5e9; text-decoration: none; font-size: 14px;">Edit Settings →</a>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; font-size: 14px; color: #6b7280;">
+                    <div>
+                        <strong style="color: #374151;">Company:</strong> {{ setting('company_name', 'Stone Cobblers Inc.') }}
+                    </div>
+                    <div>
+                        <strong style="color: #374151;">Tax Rate:</strong> {{ setting('tax_rate', 0.08) * 100 }}%
+                    </div>
+                    <div>
+                        <strong style="color: #374151;">Quote Prefix:</strong> {{ setting('quote_prefix', 'QT') }}
+                    </div>
+                    <div>
+                        <strong style="color: #374151;">Quote Expiry:</strong> {{ setting('quote_expiry_days', 30) }} days
+                    </div>
+                    <div>
+                        <strong style="color: #374151;">Currency:</strong> {{ setting('currency_symbol', '$') }} ({{ setting('currency_code', 'USD') }})
+                    </div>
+                    <div>
+                        <strong style="color: #374151;">Email:</strong> {{ setting('company_email', 'info@stonecobblers.com') }}
+                    </div>
+                </div>
+            </div>
+
             <!-- Tabs -->
             <div class="tabs">
                 <button class="tab active" data-status="all">All Customers</button>

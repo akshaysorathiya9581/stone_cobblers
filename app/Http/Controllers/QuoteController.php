@@ -140,9 +140,10 @@ class QuoteController extends Controller
             // generate quote number
             $quoteNumber = $this->generateQuoteNumber();
 
+            $expiryDays = setting('quote_expiry_days', 30);
             $expiresAt = $request->filled('expires_at')
                 ? Carbon::parse($request->input('expires_at'))
-                : Carbon::now()->addDays(30);
+                : Carbon::now()->addDays($expiryDays);
 
             // Create quote master
             $quote = Quote::create([
@@ -169,7 +170,8 @@ class QuoteController extends Controller
                 
                 $isTaxable = $item['is_taxable'] ?? false;
                 $lineTotal = $toLine($item['line_total'] ?? 0);
-                $taxCost = $isTaxable ? ($lineTotal * 0.08) : 0;
+                $taxRate = setting('tax_rate', 0.08);
+                $taxCost = $isTaxable ? ($lineTotal * $taxRate) : 0;
                 
                 $quote->items()->create([
                     'name'       => $item['name'],
@@ -190,7 +192,8 @@ class QuoteController extends Controller
                 
                 $isTaxable = $manufacturer['is_taxable'] ?? false;
                 $lineTotal = $toLine($manufacturer['line_total'] ?? 0);
-                $taxCost = $isTaxable ? ($lineTotal * 0.08) : 0;
+                $taxRate = setting('tax_rate', 0.08);
+                $taxCost = $isTaxable ? ($lineTotal * $taxRate) : 0;
                 
                 $quote->items()->create([
                     'name'       => $manufacturer['name'],
@@ -212,7 +215,8 @@ class QuoteController extends Controller
                 
                 $isTaxable = $margin['is_taxable'] ?? false;
                 $lineTotal = $toLine($margin['result'] ?? 0);
-                $taxCost = $isTaxable ? ($lineTotal * 0.08) : 0;
+                $taxRate = setting('tax_rate', 0.08);
+                $taxCost = $isTaxable ? ($lineTotal * $taxRate) : 0;
                 
                 // Save as quote item without prefix (type column identifies it)
                 $quote->items()->create([
@@ -280,13 +284,24 @@ class QuoteController extends Controller
             $viewData = [
                 'quote' => $quote,
                 'items' => $items,
-                'companyName' => config('app.name'),
-                'companyAddress' => "317 West Boylston St, West Boylston, MA 01583 774-261-4445",
+                'companyName' => setting('company_name', config('app.name')),
+                'companyAddress' => setting('company_address', '317 West Boylston St'),
+                'companyCity' => setting('company_city', 'West Boylston'),
+                'companyState' => setting('company_state', 'MA'),
+                'companyZipcode' => setting('company_zipcode', '01583'),
+                'companyPhone' => setting('company_phone', '774-261-4445'),
+                'companyEmail' => setting('company_email', ''),
+                'companyWebsite' => setting('company_website', ''),
                 'companyLogo' => $companyLogo,
+                'taxRate' => setting('tax_rate', 0.08),
+                'quoteTerms' => setting('quote_terms', 'Payment due within 30 days.'),
+                'quoteFooter' => setting('quote_footer', 'Thank you for your business!'),
             ];
 
-            // generate pdf
-            $pdf = Pdf::loadView('admin.quote.pdf', $viewData)->setPaper('a4', 'portrait');
+            // generate pdf with dynamic settings
+            $pdfPageSize = setting('pdf_page_size', 'letter');
+            $pdfOrientation = setting('pdf_orientation', 'portrait');
+            $pdf = Pdf::loadView('admin.quote.pdf', $viewData)->setPaper($pdfPageSize, $pdfOrientation);
             $bytes = $pdf->output();
 
             // ensure dir exists
@@ -389,10 +404,11 @@ class QuoteController extends Controller
     protected function generateQuoteNumber(): string
     {
         $year = date('Y');
-        $prefix = "QT-{$year}-";
-        $count = DB::table('quotes')->where('quote_number', 'like', $prefix . '%')->count();
+        $prefix = setting('quote_prefix', 'QT');
+        $formattedPrefix = "{$prefix}-{$year}-";
+        $count = DB::table('quotes')->where('quote_number', 'like', $formattedPrefix . '%')->count();
         $seq = $count + 1;
-        return $prefix . str_pad($seq, 3, '0', STR_PAD_LEFT);
+        return $formattedPrefix . str_pad($seq, 3, '0', STR_PAD_LEFT);
     }
 
     // Send quote to customer (mark Sent and email)

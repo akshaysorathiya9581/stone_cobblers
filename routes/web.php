@@ -11,6 +11,7 @@ use App\Http\Controllers\KitchenQuoteController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingController;
 
 
 use Illuminate\Support\Facades\Artisan;
@@ -86,5 +87,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('kitchen-quotes/{quote}', [KitchenQuoteController::class, 'show'])->name('admin.kitchen-quotes.show');
     Route::match(['put','patch'],'kitchen-quotes/{quote}', [KitchenQuoteController::class, 'update'])->name('admin.kitchen-quotes.update');
     Route::delete('kitchen-quotes/{quote}', [KitchenQuoteController::class, 'destroy'])->name('admin.kitchen-quotes.destroy');
+
+    // Settings
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index')->middleware('module:settings');
+    Route::post('settings', [SettingController::class, 'update'])->name('settings.update')->middleware('module:settings');
+    Route::get('settings/{key}', [SettingController::class, 'show'])->name('settings.show')->middleware('module:settings');
+    Route::post('settings/create', [SettingController::class, 'store'])->name('settings.store')->middleware('module:settings');
+    Route::delete('settings/{key}', [SettingController::class, 'destroy'])->name('settings.destroy')->middleware('module:settings');
 });
 

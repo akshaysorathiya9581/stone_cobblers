@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
 
                 // Management
                 // ['section'=>'Management','title'=>'Reports','icon'=>'icon-reports','route'=>null,'module'=>'reports'],
-                ['section'=>'Management','title'=>'Settings','icon'=>'icon-settings','route'=>null,'module'=>'settings'],
+                ['section'=>'Management','title'=>'Settings','icon'=>'icon-settings','route'=>'admin.settings.index','module'=>'settings'],
                 ['section'=>'Management','title'=>'Files','icon'=>'icon-files','route'=>'admin.files.index','module'=>'files'],
 
                 // Quick Access
