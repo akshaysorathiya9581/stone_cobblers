@@ -174,6 +174,7 @@ class QuoteController extends Controller
                 $quote->items()->create([
                     'name'       => $item['name'],
                     'type'       => 'KITCHEN_TOP',
+                    'scope_material' => $item['scope_material'] ?? null,
                     'unit_price' => $toUnitPrice($item['unit_price'] ?? 0),
                     'qty'        => $toQty($item['qty'] ?? 0),
                     'line_total' => $lineTotal,

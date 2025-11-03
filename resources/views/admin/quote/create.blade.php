@@ -96,22 +96,23 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 15%;">Project/Item Name</th>
-                                        <th>Scope/Material</th>
-                                        <th>QTY</th>
-                                        <th>Unit Cost</th>
-                                        <th>Total</th>
+                                        <th style="width: 20%;">Scope/Material</th>
+                                        <th style="width: 15%;">QTY</th>
+                                        <th style="width: 15%;">Unit Cost</th>
+                                        <th style="width: 15%;">Total</th>
+                                        <th style="width: 10%;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($KITCHEN_TOP ?? [] as $projectName => $item)
                                         <tr data-taxable="{{ $item->is_taxable ? '1' : '0' }}">
-                                            <td class="label">
+                                            <td class="label item-name-td">
                                                 {{ $item->project }}
                                                 @if($item->is_taxable)
                                                     <span class="t_tag">T</span>
                                                 @endif
                                             </td>
-                                            <td class="label">-</td>
+                                            <td class="label scope-material-td">{{ $item->scope_material ?? '-' }}</td>
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
@@ -121,11 +122,19 @@
                                             </td>
                                             <td class="label">${{ number_format($item->cost, 2) }}</td>
                                             <td class="label">${{ number_format($item->cost, 2) }}</td>
+                                            <td class="label actions-td">
+                                                <button class="action-btn edit edit-item">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button class="action-btn delete remove-row">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr data-taxable="1">
-                                            <td class="label">Kitchen - Sq Ft <span class="t_tag">T</span> </td>
-                                            <td class="label">Granite</td>
+                                            <td class="label item-name-td">Kitchen - Sq Ft <span class="t_tag">T</span> </td>
+                                            <td class="label scope-material-td">Granite</td>
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
@@ -135,10 +144,18 @@
                                             </td>
                                             <td class="label">$75.00</td>
                                             <td class="label">$3,750.00</td>
+                                            <td class="label actions-td">
+                                                <button class="action-btn edit edit-item">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button class="action-btn delete remove-row">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                         <tr data-taxable="1">
-                                            <td class="label">Labor Charge <span class="t_tag">T</span> </td>
-                                            <td class="label">Service</td>
+                                            <td class="label item-name-td">Labor Charge <span class="t_tag">T</span> </td>
+                                            <td class="label scope-material-td">Service</td>
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
@@ -148,10 +165,18 @@
                                             </td>
                                             <td class="label">$120.00</td>
                                             <td class="label">$1,440.00</td>
+                                            <td class="label actions-td">
+                                                <button class="action-btn edit edit-item">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button class="action-btn delete remove-row">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                         <tr data-taxable="0">
-                                            <td class="label">Edge - Lin Ft</td>
-                                            <td class="label">Stone</td>
+                                            <td class="label item-name-td">Edge - Lin Ft</td>
+                                            <td class="label scope-material-td">Stone</td>
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
@@ -161,10 +186,18 @@
                                             </td>
                                             <td class="label">$85.00</td>
                                             <td class="label">$1,360.00</td>
+                                            <td class="label actions-td">
+                                                <button class="action-btn edit edit-item">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button class="action-btn delete remove-row">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                         <tr data-taxable="1">
-                                            <td class="label">Arc Charges <span class="t_tag">T</span> </td>
-                                            <td class="label">-</td>
+                                            <td class="label item-name-td">Arc Charges <span class="t_tag">T</span> </td>
+                                            <td class="label scope-material-td">-</td>
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
@@ -174,10 +207,18 @@
                                             </td>
                                             <td class="label">$250.00</td>
                                             <td class="label">$250.00</td>
+                                            <td class="label actions-td">
+                                                <button class="action-btn edit edit-item">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button class="action-btn delete remove-row">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                         <tr data-taxable="0">
-                                            <td class="label">Bump-Outs</td>
-                                            <td class="label">-</td>
+                                            <td class="label item-name-td">Bump-Outs</td>
+                                            <td class="label scope-material-td">-</td>
                                             <td class="label">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn minus">−</button>
@@ -187,8 +228,43 @@
                                             </td>
                                             <td class="label">$15.00</td>
                                             <td class="label">$930.00</td>
+                                            <td class="label actions-td">
+                                                <button class="action-btn edit edit-item">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                <button class="action-btn delete remove-row">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
                                         </tr>
                                     @endforelse
+                                    <!-- Add new item row -->
+                                    <tr class="add-row-item">
+                                        <td class="label">
+                                            <input type="text" class="form-input add-item-name" placeholder="Item Name" />
+                                            <div class="validation-msg small text-danger" style="display:none;"></div>
+                                        </td>
+                                        <td class="label">
+                                            <input type="text" class="form-input add-item-scope" placeholder="Scope/Material" />
+                                            <div class="validation-msg small text-danger" style="display:none;"></div>
+                                        </td>
+                                        <td class="label">
+                                            <div class="quantity-controls">
+                                                <button class="quantity-btn minus">−</button>
+                                                <input type="number" class="quantity-input add-item-qty" value="1" min="0" />
+                                                <button class="quantity-btn plus">+</button>
+                                            </div>
+                                            <div class="validation-msg small text-danger" style="display:none;"></div>
+                                        </td>
+                                        <td class="label">
+                                            <input type="number" class="form-input text-align-center add-item-unit" placeholder="Unit Price" step="0.01" min="0" />
+                                            <div class="validation-msg small text-danger" style="display:none;"></div>
+                                        </td>
+                                        <td class="label add-item-line-total-display">$0.00</td>
+                                        <td class="label">
+                                            <button type="button" class="btn add-btn add-item-btn">+ Add</button>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -900,6 +976,89 @@
 
             // --- ADD ROWS ---
 
+            // Live calculation for add-row line total (Quote Items)
+            $(document).on('input change', '.add-item-unit, .add-item-qty', function () {
+                const $addRow = $(this).closest('.add-row-item');
+                const unitVal = parseNumber($addRow.find('.add-item-unit').val());
+                const qtyVal = parseNumber($addRow.find('.add-item-qty').val());
+                const lineTotal = (isNaN(unitVal) ? 0 : unitVal) * (isNaN(qtyVal) ? 0 : qtyVal);
+                $addRow.find('.add-item-line-total-display').text(currency(lineTotal));
+            });
+
+            // Add new item button handler
+            $(document).on('click', '.add-item-btn', function (e) {
+                e.preventDefault();
+                const $triggerRow = $(this).closest('tr');
+
+                // read values from inputs
+                const name = $.trim($triggerRow.find('.add-item-name').val() || '');
+                const scope = $.trim($triggerRow.find('.add-item-scope').val() || '');
+                const unitRaw = $triggerRow.find('.add-item-unit').val() || '';
+                const qtyRaw = $triggerRow.find('.add-item-qty').val() || '1';
+
+                // clear previous validation messages
+                $triggerRow.find('.validation-msg').hide().text('');
+
+                // validation
+                if (name === '') {
+                    $triggerRow.find('.validation-msg').eq(0).text('Please enter item name.').show();
+                    return;
+                }
+                const unit = parseNumber(unitRaw);
+                if (isNaN(unit) || unit <= 0) {
+                    $triggerRow.find('.validation-msg').eq(3).text('Please enter a valid unit price (greater than 0).').show();
+                    return;
+                }
+                let qty = parseInt(qtyRaw, 10);
+                if (isNaN(qty) || qty < 0) {
+                    $triggerRow.find('.validation-msg').eq(2).text('Please enter a valid quantity (0 or greater).').show();
+                    return;
+                }
+
+                // build new row (default to non-taxable for manually added items)
+                const lineTotal = unit * qty;
+                const newRow = $(`
+                <tr data-taxable="0">
+                    <td class="label item-name-td">${escapeHtml(name)}</td>
+                    <td class="label scope-material-td">${escapeHtml(scope || '-')}</td>
+                    <td class="label">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus">−</button>
+                            <input type="number" class="quantity-input" value="${qty}" min="0" />
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                    </td>
+                    <td class="label">${currency(unit)}</td>
+                    <td class="label">${currency(lineTotal)}</td>
+                    <td class="label actions-td">
+                        <button class="action-btn edit edit-item">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="action-btn delete remove-row">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                `);
+
+                // insert BEFORE the trigger row (so add row remains at bottom)
+                $triggerRow.before(newRow);
+
+                // clear the add-row inputs for next entry
+                $triggerRow.find('.add-item-name').val('');
+                $triggerRow.find('.add-item-scope').val('');
+                $triggerRow.find('.add-item-unit').val('');
+                $triggerRow.find('.add-item-qty').val('1');
+                $triggerRow.find('.add-item-line-total-display').text('$0.00');
+
+                // bind quantity handlers
+                bindQuantityControls(newRow);
+                recalcAll();
+
+                // Show success message
+                showToast('success', 'Item added successfully!');
+            });
+
             // Live calculation for add-row line total (Box Manufacturer)
             $(document).on('input change', '.add-box-unit, .add-box-qty', function () {
                 const $addRow = $(this).closest('.add-row-box');
@@ -1042,6 +1201,132 @@
             });
 
             // --- EDIT FUNCTIONALITY ---
+
+            // Enter edit mode for item row
+            function enterEditItem($row) {
+                if ($row.data('editing')) return;
+                $row.data('editing', true);
+
+                const $nameCell = $row.find('td').eq(0);
+                const $scopeCell = $row.find('td').eq(1);
+                const $qtyCell = $row.find('td').eq(2);
+                const $unitCell = $row.find('td').eq(3);
+                
+                const orig = {
+                    name: $nameCell.text().trim(),
+                    scope: $scopeCell.text().trim(),
+                    qty: $qtyCell.find('.quantity-input').val() || '0',
+                    unit: $unitCell.text().trim()
+                };
+                $row.data('orig', orig);
+
+                $nameCell.html(`<input type="text" class="form-input inline-name" value="${escapeHtml(orig.name)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+                $scopeCell.html(`<input type="text" class="form-input inline-scope" value="${escapeHtml(orig.scope === '-' ? '' : orig.scope)}"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+                $unitCell.html(`<input type="number" class="form-input inline-unit" value="${escapeHtml(orig.unit.replace('$', '').replace(',', ''))}" step="0.01" min="0"><div class="validation-msg small text-danger" style="display:none;"></div>`);
+
+                // qty input already exists — add inline validation area if missing
+                if ($qtyCell.find('.validation-msg').length === 0) {
+                    $qtyCell.append('<div class="validation-msg small text-danger" style="display:none;"></div>');
+                }
+
+                // actions: hide edit/delete and show save/cancel
+                const $actions = $row.find('.actions-td');
+                $actions.find('.edit-item').hide();
+                $actions.find('.remove-row').hide();
+                $actions.prepend('<button class="btn save-inline-item">Save</button><button class="btn cancel-inline-item">Cancel</button>');
+
+                // live update and validation
+                $row.find('.inline-unit').on('input', function () {
+                    const val = $(this).val();
+                    const num = parseNumber(val);
+                    if (isNaN(num) || num <= 0) {
+                        $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show();
+                    } else {
+                        $unitCell.find('.validation-msg').hide().text('');
+                    }
+                    recalcRow($row);
+                    recalcAll();
+                });
+
+                $row.find('.quantity-input').on('input', function () {
+                    const val = $(this).val();
+                    const num = parseNumber(val);
+                    if (val === '' || isNaN(num) || num < 0) {
+                        $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show();
+                    } else {
+                        $qtyCell.find('.validation-msg').hide().text('');
+                    }
+                    recalcRow($row);
+                    recalcAll();
+                });
+            }
+
+            function saveEditItem($row) {
+                const $nameCell = $row.find('td').eq(0);
+                const $scopeCell = $row.find('td').eq(1);
+                const $qtyCell = $row.find('td').eq(2);
+                const $unitCell = $row.find('td').eq(3);
+
+                const name = $nameCell.find('.inline-name').val().trim();
+                const scope = $scopeCell.find('.inline-scope').val().trim();
+                const unitRaw = $unitCell.find('.inline-unit').val().trim();
+                const qtyRaw = $qtyCell.find('.quantity-input').val().trim();
+
+                $nameCell.find('.validation-msg').hide().text('');
+                $scopeCell.find('.validation-msg').hide().text('');
+                $unitCell.find('.validation-msg').hide().text('');
+                $qtyCell.find('.validation-msg').hide().text('');
+
+                let hasError = false;
+                if (name === '') {
+                    $nameCell.find('.validation-msg').text('Item name is required').show();
+                    hasError = true;
+                }
+                const unit = parseNumber(unitRaw);
+                if (isNaN(unit) || unit <= 0) {
+                    $unitCell.find('.validation-msg').text('Unit price must be greater than 0').show();
+                    hasError = true;
+                }
+                const qty = parseNumber(qtyRaw);
+                if (qtyRaw === '' || isNaN(qty) || qty < 0) {
+                    $qtyCell.find('.validation-msg').text('Quantity must be 0 or greater').show();
+                    hasError = true;
+                }
+
+                if (hasError) return false;
+
+                // persist values
+                $nameCell.text(name);
+                $scopeCell.text(scope || '-');
+                $unitCell.text(currency(unit));
+                $qtyCell.html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${parseInt(qtyRaw, 10)}" min="0"/><button class="quantity-btn plus">+</button></div>`);
+
+                // restore actions
+                $row.find('.save-inline-item, .cancel-inline-item').remove();
+                $row.find('.edit-item').show();
+                $row.find('.remove-row').show();
+
+                bindQuantityControls($row);
+                recalcAll();
+                $row.data('editing', false);
+
+                showToast('success', 'Item updated successfully!');
+                return true;
+            }
+
+            function cancelEditItem($row) {
+                const orig = $row.data('orig') || {};
+                $row.find('td').eq(0).text(orig.name || '');
+                $row.find('td').eq(1).text(orig.scope || '-');
+                $row.find('td').eq(2).html(`<div class="quantity-controls"><button class="quantity-btn minus">−</button><input type="number" class="quantity-input" value="${orig.qty || 0}" min="0"/><button class="quantity-btn plus">+</button></div>`);
+                $row.find('td').eq(3).text(orig.unit || '');
+                $row.find('.save-inline-item, .cancel-inline-item').remove();
+                $row.find('.edit-item').show();
+                $row.find('.remove-row').show();
+                bindQuantityControls($row);
+                recalcAll();
+                $row.data('editing', false);
+            }
 
             // Enter edit mode for manufacturer row
             function enterEditManufacturer($row) {
@@ -1235,6 +1520,21 @@
             }
 
             // delegated event handlers
+            $(document).on('click', '.edit-item', function (e) {
+                e.preventDefault();
+                enterEditItem($(this).closest('tr'));
+            });
+
+            $(document).on('click', '.save-inline-item', function (e) {
+                e.preventDefault();
+                saveEditItem($(this).closest('tr'));
+            });
+
+            $(document).on('click', '.cancel-inline-item', function (e) {
+                e.preventDefault();
+                cancelEditItem($(this).closest('tr'));
+            });
+
             $(document).on('click', '.edit-box', function (e) {
                 e.preventDefault();
                 enterEditManufacturer($(this).closest('tr'));
@@ -1281,11 +1581,13 @@
             });
 
             // inline save on Enter, cancel on Esc
-            $(document).on('keydown', '.inline-name, .inline-unit, .inline-desc, .inline-mul', function (e) {
+            $(document).on('keydown', '.inline-name, .inline-scope, .inline-unit, .inline-desc, .inline-mul', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const $row = $(this).closest('tr');
-                    if ($row.find('.save-inline').length) {
+                    if ($row.find('.save-inline-item').length) {
+                        $row.find('.save-inline-item').trigger('click');
+                    } else if ($row.find('.save-inline').length) {
                         $row.find('.save-inline').trigger('click');
                     } else if ($row.find('.save-inline-margin').length) {
                         $row.find('.save-inline-margin').trigger('click');
@@ -1293,6 +1595,9 @@
                 } else if (e.key === 'Escape') {
                     e.preventDefault();
                     const $row = $(this).closest('tr');
+                    if ($row.find('.cancel-inline-item').length) {
+                        $row.find('.cancel-inline-item').trigger('click');
+                    }
                     if ($row.find('.cancel-inline').length) {
                         $row.find('.cancel-inline').trigger('click');
                     }
@@ -1331,16 +1636,18 @@
                 let itemsHtml = '';
                 $('.quote-stepview__left .custom-table .table tbody tr').each(function () {
                     const $row = $(this);
-                    if ($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                    if ($row.find('.add-btn, .add-box-btn, .add-margin-btn, .add-item-btn').length) return;
 
                     const itemName = $row.find('td').eq(0).text().trim();
+                    const scopeMaterial = $row.find('td').eq(1).text().trim();
                     const qty = $row.find('.quantity-input').val() || 0;
                     const unitPrice = $row.find('td').eq(3).text().trim();
-                    const total = $row.find('td').eq(4).text().trim();
+                    const total = $row.find('td').eq(5).text().trim();
 
                     if (parseInt(qty) > 0) {
+                        const scopeText = scopeMaterial && scopeMaterial !== '-' ? ` (${escapeHtml(scopeMaterial)})` : '';
                         itemsHtml += `<div class="summary-item">
-                            <div class="item-description">${escapeHtml(itemName)} × ${qty}</div>
+                            <div class="item-description">${escapeHtml(itemName)}${scopeText} × ${qty}</div>
                             <div class="item-price">${total}</div>
                         </div>`;
                     }
@@ -1417,17 +1724,19 @@
                 // Collect quote items
                 $('.quote-stepview__left .custom-table .table tbody tr').each(function () {
                     const $row = $(this);
-                    if ($row.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                    if ($row.find('.add-btn, .add-box-btn, .add-margin-btn, .add-item-btn').length) return;
 
                     const itemName = $row.find('td').eq(0).text().trim();
+                    const scopeMaterial = $row.find('td').eq(1).text().trim();
                     const qty = parseNumber($row.find('.quantity-input').val());
                     const unitPrice = parseNumber($row.find('td').eq(3).text());
-                    const total = parseNumber($row.find('td').eq(4).text());
+                    const total = parseNumber($row.find('td').eq(5).text());
                     const isTaxable = $row.attr('data-taxable') === '1' ? 1 : 0;
 
                     if (qty > 0) {
                         formData.items.push({
                             name: itemName,
+                            scope_material: scopeMaterial && scopeMaterial !== '-' ? scopeMaterial : null,
                             qty: qty,
                             unit_price: unitPrice,
                             line_total: total,

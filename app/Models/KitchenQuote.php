@@ -12,6 +12,7 @@ class KitchenQuote extends Model
     // allow only these fields to be mass assigned
     protected $fillable = [
         'project',
+        'scope_material',
         'type',
         'cost',
         'is_taxable',

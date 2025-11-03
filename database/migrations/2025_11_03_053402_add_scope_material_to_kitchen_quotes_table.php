@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('kitchen_quotes', function (Blueprint $table) {
-            $table->boolean('is_taxable')->default(false)->after('cost');
+            $table->string('scope_material')->nullable()->after('project');
         });
     }
 
@@ -22,9 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('kitchen_quotes', function (Blueprint $table) {
-            $table->dropColumn('is_taxable');
+            $table->dropColumn('scope_material');
         });
     }
 };
-
-

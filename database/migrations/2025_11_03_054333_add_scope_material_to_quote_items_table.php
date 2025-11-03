@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quote_items', function (Blueprint $table) {
-            $table->string('type', 50)->nullable()->after('name');
-            $table->decimal('tax_cost', 15, 4)->default(0)->after('line_total');
-            $table->boolean('is_taxable')->default(false)->after('tax_cost');
+            $table->string('scope_material')->nullable()->after('type');
         });
     }
 
@@ -24,9 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('quote_items', function (Blueprint $table) {
-            $table->dropColumn(['type', 'tax_cost', 'is_taxable']);
+            $table->dropColumn('scope_material');
         });
     }
 };
-
-

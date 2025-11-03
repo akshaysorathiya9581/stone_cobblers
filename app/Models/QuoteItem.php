@@ -13,6 +13,7 @@ class QuoteItem extends Model
         'quote_id',
         'name',
         'type',
+        'scope_material',
         'unit_price',
         'qty',
         'line_total',

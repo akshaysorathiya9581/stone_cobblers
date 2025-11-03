@@ -40,10 +40,11 @@
         <table class="table">
           <thead>
             <tr>
-              <th style="width: 35%;">Item</th>
-              <th style="width: 15%;">Unit Price</th>
-              <th style="width: 20%;">Type</th>
-              <th style="width: 10%;">Taxable</th>
+              <th style="width: 25%;">Item</th>
+              <th style="width: 20%;">Scope/Material</th>
+              <th style="width: 12%;">Unit Price</th>
+              <th style="width: 15%;">Type</th>
+              <th style="width: 8%;">Taxable</th>
               <th style="width: 10%;">Actions</th>
             </tr>
           </thead>
@@ -56,6 +57,7 @@
               @endphp
               <tr data-id="{{ $quote->id }}" data-taxable="{{ $quote->is_taxable ? '1' : '0' }}">
                 <td class="item-label">{{ $quote->project }}</td>
+                <td class="scope-material-label">{{ $quote->scope_material ?? '-' }}</td>
                 <td>{{ $formatted }}</td>
                 <td>{{ get_kitchen_type_list($quote->type) }}</td>
                 <td class="text-center">
@@ -132,6 +134,12 @@
         </div>
 
         <div class="form-group">
+          <label for="add_scope_material" class="form-label">Scope/Material</label>
+          <input type="text" name="scope_material" id="add_scope_material" class="form-input" placeholder="Enter Scope/Material">
+          <div class="invalid-feedback" data-field="scope_material"></div>
+        </div>
+
+        <div class="form-group">
           <label for="add_unit_price" class="form-label">Unit Price</label>
           <input type="number" step="0.0001" name="cost" id="add_unit_price" class="form-input"
             placeholder="Enter Unit Price" required>
@@ -183,6 +191,12 @@
           <label for="edit_project" class="form-label">Item</label>
           <input type="text" name="project" id="edit_project" class="form-input" required>
           <div class="invalid-feedback" data-field="project" style="display:none;"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit_scope_material" class="form-label">Scope/Material</label>
+          <input type="text" name="scope_material" id="edit_scope_material" class="form-input">
+          <div class="invalid-feedback" data-field="scope_material" style="display:none;"></div>
         </div>
 
         <div class="form-group">
@@ -284,7 +298,7 @@
         'KITCHEN_CABINET': 'Cabinet Manufacturer' // if you use this alias
       };
 
-      // buildRowHtml now returns 5 columns: item | price | category | taxable | actions
+      // buildRowHtml now returns 6 columns: item | scope/material | price | category | taxable | actions
       function buildRowHtml(quote) {
         const unitPriceFormatted = (Number(quote.cost) || 0).toFixed((Math.abs(Number(quote.cost)) < 1 && Number(quote.cost) !== 0) ? 4 : 2);
 
@@ -299,6 +313,7 @@
         return `
                               <tr data-id="${quote.id}" data-taxable="${quote.is_taxable ? '1' : '0'}">
                                 <td class="item-label">${escapeHtml(quote.project)}</td>
+                                <td class="scope-material-label">${escapeHtml(quote.scope_material || '-')}</td>
                                 <td>${unitPriceFormatted}</td>
                                 <td class="type-label">${escapeHtml(typeLabel)}</td>
                                 <td class="text-center">${taxableBadge}</td>
@@ -330,6 +345,7 @@
 
         const data = {
           project: $form.find('[name="project"]').val(),
+          scope_material: $form.find('[name="scope_material"]').val(),
           cost: $form.find('[name="cost"]').val(),
           type: $form.find('[name="type"]').val(),
           is_taxable: $form.find('[name="is_taxable"]').is(':checked') ? 1 : 0,
@@ -392,6 +408,7 @@
             // populate edit form
             $('#edit_id').val(q.id);
             $('#edit_project').val(q.project);
+            $('#edit_scope_material').val(q.scope_material || '');
             $('#edit_cost').val(q.cost);
             $('#edit_type').val(q.type).trigger('change.select2');
             $('#edit_is_taxable').prop('checked', q.is_taxable ? true : false);
@@ -415,6 +432,7 @@
 
         const data = {
           project: $('#edit_project').val(),
+          scope_material: $('#edit_scope_material').val(),
           cost: $('#edit_cost').val(),
           type: $('#edit_type').val(),
           is_taxable: $('#edit_is_taxable').is(':checked') ? 1 : 0,
@@ -439,23 +457,26 @@
               // update data attribute
               $tr.attr('data-taxable', q.is_taxable ? '1' : '0');
               
-              // update the item label cell
+              // update the item label cell (1st column)
               $tr.find('.item-label').first().text(q.project);
 
-              // update price (2nd column)
+              // update scope/material (2nd column)
+              $tr.find('.scope-material-label').first().text(q.scope_material || '-');
+
+              // update price (3rd column)
               const dec = (Math.abs(Number(q.cost)) < 1 && Number(q.cost) !== 0) ? 4 : 2;
               const formatted = Number(q.cost).toFixed(dec);
-              $tr.find('td').eq(1).text(formatted);
+              $tr.find('td').eq(2).text(formatted);
 
-              // update category (3rd column) - prefer server-provided label or map
+              // update category (4th column) - prefer server-provided label or map
               const typeLabel = q.type_label || typeMap[q.type] || q.type || '';
-              $tr.find('td').eq(2).text(typeLabel);
+              $tr.find('td').eq(3).text(typeLabel);
               
-              // update taxable badge (4th column)
+              // update taxable badge (5th column)
               const taxableBadge = q.is_taxable 
                 ? '<span class="badge badge-success" style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>'
                 : '<span class="badge badge-secondary" style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>';
-              $tr.find('td').eq(3).html(taxableBadge);
+              $tr.find('td').eq(4).html(taxableBadge);
             } else {
               // if row missing, append to table bottom
               appendQuoteToTable(q);

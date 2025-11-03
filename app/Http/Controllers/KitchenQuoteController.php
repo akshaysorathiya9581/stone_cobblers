@@ -23,9 +23,10 @@ class KitchenQuoteController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate. We expect single quote create from modal: item, unit_price, category, is_taxable
+        // Validate. We expect single quote create from modal: item, scope_material, unit_price, category, is_taxable
         $rules = [
             'project' => 'required|string|max:255',
+            'scope_material' => 'nullable|string|max:255',
             'cost' => 'required|numeric|min:0',
             'type' => 'required|string',
             'is_taxable' => 'nullable|boolean',
@@ -39,12 +40,13 @@ class KitchenQuoteController extends Controller
                 'ok' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
-                'old' => $request->only(['project','cost','type','is_taxable'])
+                'old' => $request->only(['project','scope_material','cost','type','is_taxable'])
             ], 422);
         }
 
         $quote = KitchenQuote::create([
             'project' => $request->post('project'),
+            'scope_material' => $request->post('scope_material'),
             'cost' => $request->post('cost'),
             'type' => $request->post('type'),
             'is_taxable' => $request->post('is_taxable', false),
@@ -78,6 +80,7 @@ class KitchenQuoteController extends Controller
     {
         $rules = [
             'project' => 'required|string|max:255',
+            'scope_material' => 'nullable|string|max:255',
             'cost' => 'required|numeric|min:0',
             'type' => 'required|string',
             'is_taxable' => 'nullable|boolean',
@@ -90,11 +93,12 @@ class KitchenQuoteController extends Controller
                 'ok' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
-                'old' => $request->only(['project','cost','type','is_taxable'])
+                'old' => $request->only(['project','scope_material','cost','type','is_taxable'])
             ], 422);
         }
 
         $quote->project = $request->post('project');
+        $quote->scope_material = $request->post('scope_material');
         $quote->cost = $request->post('cost');
         $quote->type = $request->post('type');
         $quote->is_taxable = $request->post('is_taxable', false);
