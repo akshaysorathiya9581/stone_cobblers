@@ -780,7 +780,7 @@
             function recalcRow($row) {
                 if (!$row || !$row.length) return 0;
                 // skip add-rows
-                if ($row.find('.add-box-btn, .add-margin-btn').length) return 0;
+                if ($row.find('.add-box-btn, .add-margin-btn, .add-item-btn').length) return 0;
 
                 // If this row is a manufacturer row (has unit-price-td class)
                 if ($row.find('.unit-price-td').length || $row.find('.manufacturer-name-td').length) {
@@ -803,7 +803,8 @@
                     return lineTotal;
                 }
 
-                // Main left items: unit in col 3, total in col 4
+                // Main left items with new structure: item | scope | qty | unit | total | actions
+                // unit is in col 3 (index 3), total is in col 4 (index 4)
                 const $unitCell = $row.find('td').eq(3);
                 let unit = 0;
                 if ($unitCell.find('input').length) {
@@ -840,18 +841,22 @@
             function subtotalValue() {
                 let subtotal = 0;
 
-                // Left tables (main items)
+                // Left tables (main items) - new structure has 6 columns: item | scope | qty | unit | total | actions
+                // Total is at index 4
                 $('.quote-stepview__left .custom-table .table').each(function () {
                     $(this).find('tbody tr').each(function () {
                         const $r = $(this);
                         // skip add rows
-                        if ($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                        if ($r.find('.add-btn, .add-box-btn, .add-margin-btn, .add-item-btn').length) return;
                         const $cells = $r.find('td');
                         if ($cells.length === 0) return;
-                        // prefer input value in last cell, then text
-                        const $last = $cells.last();
-                        const text = $last.find('input').length ? $last.find('input').val() : $last.text();
-                        subtotal += parseNumber(text) || 0;
+                        
+                        // For main items table, total is at column index 4 (5th column)
+                        if ($cells.length >= 5) {
+                            const $totalCell = $cells.eq(4);
+                            const text = $totalCell.find('input').length ? $totalCell.find('input').val() : $totalCell.text();
+                            subtotal += parseNumber(text) || 0;
+                        }
                     });
                 });
 
@@ -922,10 +927,11 @@
                 let taxableSubtotal = 0;
 
                 // Left tables (main items) - only taxable ones
+                // New structure: item | scope | qty | unit | total | actions
                 $('.quote-stepview__left .custom-table .table tbody tr').each(function () {
                     const $r = $(this);
                     // skip add rows
-                    if ($r.find('.add-btn, .add-box-btn, .add-margin-btn').length) return;
+                    if ($r.find('.add-btn, .add-box-btn, .add-margin-btn, .add-item-btn').length) return;
 
                     // check if row is taxable
                     const isTaxable = $r.attr('data-taxable') === '1';
@@ -933,9 +939,13 @@
 
                     const $cells = $r.find('td');
                     if ($cells.length === 0) return;
-                    const $last = $cells.last();
-                    const text = $last.find('input').length ? $last.find('input').val() : $last.text();
-                    taxableSubtotal += parseNumber(text) || 0;
+                    
+                    // Total is at column index 4 (5th column)
+                    if ($cells.length >= 5) {
+                        const $totalCell = $cells.eq(4);
+                        const text = $totalCell.find('input').length ? $totalCell.find('input').val() : $totalCell.text();
+                        taxableSubtotal += parseNumber(text) || 0;
+                    }
                 });
 
                 // Accordion tables (manufacturers) - only taxable ones
