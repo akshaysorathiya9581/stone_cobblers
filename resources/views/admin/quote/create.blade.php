@@ -74,12 +74,12 @@
                             </div>
 
                             <!-- <div class="project-info"
-                                style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                                <h4 style="margin-bottom: 10px; color: #333;">Project Details</h4>
-                                <p><strong>Customer:</strong> <span id="selected-customer">-</span></p>
-                                <p><strong>Project:</strong> <span id="selected-project">-</span></p>
-                                <p><strong>Status:</strong> <span id="selected-status">-</span></p>
-                            </div> -->
+                                    style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                    <h4 class="section-title">Project Details</h4>
+                                    <p><strong>Customer:</strong> <span id="selected-customer">-</span></p>
+                                    <p><strong>Project:</strong> <span id="selected-project">-</span></p>
+                                    <p><strong>Status:</strong> <span id="selected-status">-</span></p>
+                                </div> -->
                         </div>
                     </div>
                 </div>
@@ -245,19 +245,22 @@
                                             <div class="validation-msg small text-danger" style="display:none;"></div>
                                         </td>
                                         <td class="label">
-                                            <input type="text" class="form-input add-item-scope" placeholder="Scope/Material" />
+                                            <input type="text" class="form-input add-item-scope"
+                                                placeholder="Scope/Material" />
                                             <div class="validation-msg small text-danger" style="display:none;"></div>
                                         </td>
                                         <td class="label">
                                             <div class="quantity-controls">
                                                 <button class="quantity-btn minus">−</button>
-                                                <input type="number" class="quantity-input add-item-qty" value="1" min="0" />
+                                                <input type="number" class="quantity-input add-item-qty" value="1"
+                                                    min="0" />
                                                 <button class="quantity-btn plus">+</button>
                                             </div>
                                             <div class="validation-msg small text-danger" style="display:none;"></div>
                                         </td>
                                         <td class="label">
-                                            <input type="number" class="form-input text-align-center add-item-unit" placeholder="Unit Price" step="0.01" min="0" />
+                                            <input type="number" class="form-input text-align-center add-item-unit"
+                                                placeholder="Unit Price" step="0.01" min="0" />
                                             <div class="validation-msg small text-danger" style="display:none;"></div>
                                         </td>
                                         <td class="label add-item-line-total-display">$0.00</td>
@@ -278,7 +281,8 @@
                             <div class="summary-amount" id="subtotal">$7,730.00</div>
                         </div>
                         <div class="summary-item">
-                            <div class="summary-label">{{ setting('tax_label', 'Tax') }} ({{ setting('tax_rate', 0.08) * 100 }}%)</div>
+                            <div class="summary-label">{{ setting('tax_label', 'Tax') }}
+                                ({{ setting('tax_rate', 0.08) * 100 }}%)</div>
                             <div class="summary-amount" id="tax">$618.40</div>
                         </div>
                         <div class="summary-item grand-total">
@@ -336,7 +340,7 @@
                                                             </button>
                                                             <button class="action-btn delete remove-row">
                                                                 <i class="fa-solid fa-trash"></i>
-                                                            </button1>
+                                                                </button1>
                                                         </td>
                                                     </tr>
                                                 @empty
@@ -540,7 +544,7 @@
                                 <div class="summary-divider"></div>
 
                                 <div class="summary-section">
-                                    <h4 style="margin-bottom: 10px; color: #333;">Project Information</h4>
+                                    <h4 class="summary-title">Project Information</h4>
                                     <p><strong>Project:</strong> <span id="review-project-name">-</span></p>
                                     <p><strong>Customer:</strong> <span id="review-customer-name">-</span></p>
                                 </div>
@@ -548,7 +552,7 @@
                                 <div class="summary-divider"></div>
 
                                 <div class="summary-section">
-                                    <h4 style="margin-bottom: 10px; color: #333;">Quote Items</h4>
+                                    <h4 class="summary-title">Quote Items</h4>
                                     <div id="review-items-list">
                                         <!-- Items will be populated by JavaScript -->
                                     </div>
@@ -557,7 +561,7 @@
                                 <div class="summary-divider"></div>
 
                                 <div class="summary-section">
-                                    <h4 style="margin-bottom: 10px; color: #333;">Box Manufacturers</h4>
+                                    <h4 class="summary-title">Box Manufacturers</h4>
                                     <div id="review-manufacturers-list">
                                         <!-- Manufacturers will be populated by JavaScript -->
                                     </div>
@@ -566,7 +570,7 @@
                                 <div class="summary-divider"></div>
 
                                 <div class="summary-section">
-                                    <h4 style="margin-bottom: 10px; color: #333;">Margin Markups</h4>
+                                    <h4 class="summary-title">Margin Markups</h4>
                                     <div id="review-margins-list">
                                         <!-- Margins will be populated by JavaScript -->
                                     </div>
@@ -575,18 +579,19 @@
                                 <div class="summary-divider"></div>
 
                                 <div class="summary-item total-row">
-                                    <div class="item-description">Subtotal</div>
-                                    <div class="item-price" id="review-subtotal">$0.00</div>
+                                    <div class="summary-title mb-0">Subtotal</div>
+                                    <div class="final-total-amount" id="review-subtotal">$0.00</div>
                                 </div>
 
                                 <div class="summary-item">
-                                    <div class="item-description">{{ setting('tax_label', 'Tax') }} ({{ setting('tax_rate', 0.08) * 100 }}%)</div>
+                                    <div class="item-description">{{ setting('tax_label', 'Tax') }}
+                                        ({{ setting('tax_rate', 0.08) * 100 }}%)</div>
                                     <div class="item-price" id="review-tax">$0.00</div>
                                 </div>
 
-                                <div class="summary-item total-row" style="font-size: 20px; font-weight: bold;">
-                                    <div class="item-description">Grand Total</div>
-                                    <div class="item-price" id="review-total">$0.00</div>
+                                <div class="summary-item total-row">
+                                    <div class="summary-title mb-0">Grand Total</div>
+                                    <div class="final-total-amount" id="review-total">$0.00</div>
                                 </div>
                             </div>
                         </div>
@@ -595,16 +600,14 @@
 
                 <!-- Success Step -->
                 <div class="quote-stepview success-step" style="display: none;">
-                    <div class="quote-stepview__full" style="text-align: center; padding: 50px;">
-                        <div style="font-size: 60px; color: #22c55e; margin-bottom: 20px;">✓</div>
-                        <h2 style="color: #22c55e; margin-bottom: 15px;">Quote Created Successfully!</h2>
-                        <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
-                            Your quote has been created and PDF has been generated.
-                        </p>
-                        <div style="margin-bottom: 20px;">
+                    <div class="quote-stepview__full">
+                        <div class="success-step__icon">✓</div>
+                        <h2 class="success-step__title">Quote Created Successfully!</h2>
+                        <p class="success-step__description">Your quote has been created and PDF has been generated.</p>
+                        <div class="mb-20">
                             <p><strong>Quote Number:</strong> <span id="success-quote-number">-</span></p>
                         </div>
-                        <div style="display: flex; gap: 15px; justify-content: center;">
+                        <div class="success-step__flex">
                             <a href="{{ route('admin.quotes.index') }}" class="btn theme">View All Quotes</a>
                             <a href="{{ route('admin.quotes.create') }}" class="btn secondary">Create Another Quote</a>
                         </div>
@@ -852,7 +855,7 @@
                         if ($r.find('.add-btn, .add-box-btn, .add-margin-btn, .add-item-btn').length) return;
                         const $cells = $r.find('td');
                         if ($cells.length === 0) return;
-                        
+
                         // For main items table, total is at column index 4 (5th column)
                         if ($cells.length >= 5) {
                             const $totalCell = $cells.eq(4);
@@ -941,7 +944,7 @@
 
                     const $cells = $r.find('td');
                     if ($cells.length === 0) return;
-                    
+
                     // Total is at column index 4 (5th column)
                     if ($cells.length >= 5) {
                         const $totalCell = $cells.eq(4);
@@ -1030,28 +1033,28 @@
                 // build new row (default to non-taxable for manually added items)
                 const lineTotal = unit * qty;
                 const newRow = $(`
-                <tr data-taxable="0">
-                    <td class="label item-name-td">${escapeHtml(name)}</td>
-                    <td class="label scope-material-td">${escapeHtml(scope || '-')}</td>
-                    <td class="label">
-                        <div class="quantity-controls">
-                            <button class="quantity-btn minus">−</button>
-                            <input type="number" class="quantity-input" value="${qty}" min="0" />
-                            <button class="quantity-btn plus">+</button>
-                        </div>
-                    </td>
-                    <td class="label">${currency(unit)}</td>
-                    <td class="label">${currency(lineTotal)}</td>
-                    <td class="label actions-td">
-                        <button class="action-btn edit edit-item">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="action-btn delete remove-row">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                `);
+                    <tr data-taxable="0">
+                        <td class="label item-name-td">${escapeHtml(name)}</td>
+                        <td class="label scope-material-td">${escapeHtml(scope || '-')}</td>
+                        <td class="label">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus">−</button>
+                                <input type="number" class="quantity-input" value="${qty}" min="0" />
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                        </td>
+                        <td class="label">${currency(unit)}</td>
+                        <td class="label">${currency(lineTotal)}</td>
+                        <td class="label actions-td">
+                            <button class="action-btn edit edit-item">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="action-btn delete remove-row">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    `);
 
                 // insert BEFORE the trigger row (so add row remains at bottom)
                 $triggerRow.before(newRow);
@@ -1111,27 +1114,27 @@
                 // build new row (default to non-taxable for manually added items)
                 const lineTotal = unit * qty;
                 const newRow = $(`
-                <tr data-taxable="0">
-                    <td class="label manufacturer-name-td">${escapeHtml(name)}</td>
-                    <td class="label unit-price-td">${unit.toFixed(2)}</td>
-                    <td class="label">
-                        <div class="quantity-controls">
-                            <button class="quantity-btn minus">−</button>
-                            <input type="number" class="quantity-input" value="${qty}" min="0" />
-                            <button class="quantity-btn plus">+</button>
-                        </div>
-                    </td>
-                    <td class="label line-total">${currency(lineTotal)}</td>
-                    <td class="label actions-td">
-                        <button class="action-btn edit edit-box">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="action-btn delete remove-row">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                `);
+                    <tr data-taxable="0">
+                        <td class="label manufacturer-name-td">${escapeHtml(name)}</td>
+                        <td class="label unit-price-td">${unit.toFixed(2)}</td>
+                        <td class="label">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus">−</button>
+                                <input type="number" class="quantity-input" value="${qty}" min="0" />
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                        </td>
+                        <td class="label line-total">${currency(lineTotal)}</td>
+                        <td class="label actions-td">
+                            <button class="action-btn edit edit-box">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="action-btn delete remove-row">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    `);
 
                 // insert BEFORE the trigger row (so add row remains at bottom)
                 $triggerRow.before(newRow);
@@ -1183,20 +1186,20 @@
                 const resultValue = base * mul;
 
                 const newRow = $(`
-                <tr data-taxable="0">
-                    <td class="label margin-desc-td">${escapeHtml(desc)}</td>
-                    <td class="label margin-mul-td">${mul.toFixed(2)}</td>
-                    <td class="label margin-result">${currency(resultValue)}</td>
-                    <td class="label actions-td">
-                        <button class="action-btn edit edit-margin">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="action-btn delete remove-row">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-                `);
+                    <tr data-taxable="0">
+                        <td class="label margin-desc-td">${escapeHtml(desc)}</td>
+                        <td class="label margin-mul-td">${mul.toFixed(2)}</td>
+                        <td class="label margin-result">${currency(resultValue)}</td>
+                        <td class="label actions-td">
+                            <button class="action-btn edit edit-margin">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="action-btn delete remove-row">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    `);
 
                 // insert before add-row
                 $triggerRow.before(newRow);
@@ -1223,7 +1226,7 @@
                 const $scopeCell = $row.find('td').eq(1);
                 const $qtyCell = $row.find('td').eq(2);
                 const $unitCell = $row.find('td').eq(3);
-                
+
                 const orig = {
                     name: $nameCell.text().trim(),
                     scope: $scopeCell.text().trim(),
@@ -1245,7 +1248,7 @@
                 const $actions = $row.find('.actions-td');
                 $actions.find('.edit-item').hide();
                 $actions.find('.remove-row').hide();
-                $actions.prepend('<button class="btn save-inline-item">Save</button><button class="btn cancel-inline-item">Cancel</button>');
+                $actions.prepend('<button class="action-btn edit save-inline-item"><i class="fa fa-save"></i></button><button class="action-btn delete cancel-inline-item"><i class="fa fa-window-close"></i></button>');
 
                 // live update and validation
                 $row.find('.inline-unit').on('input', function () {
@@ -1367,7 +1370,7 @@
                 const $actions = $row.find('.actions-td');
                 $actions.find('.edit-box').hide();
                 $actions.find('.remove-row').hide();
-                $actions.prepend('<button class="btn save-inline">Save</button><button class="btn cancel-inline">Cancel</button>');
+                $actions.prepend('<button class="action-btn edit save-inline"><i class="fa fa-save"></i></button><button class="action-btn delete cancel-inline"><i class="fa fa-window-close"></i></button>');
 
                 // live update and validation
                 $row.find('.inline-unit').on('input', function () {
@@ -1470,7 +1473,7 @@
                 const $actions = $row.find('.actions-td');
                 $actions.find('.edit-margin').hide();
                 $actions.find('.remove-row').hide();
-                $actions.prepend('<button class="btn save-inline-margin">Save</button><button class="btn cancel-inline-margin">Cancel</button>');
+                $actions.prepend('<button class="action-btn edit save-inline-margin"><i class="fa fa-save"></i></button><button class="action-btn delete cancel-inline-margin"><i class="fa fa-window-close"></i></button>');
 
                 $row.find('.inline-mul').on('input', function () {
                     const mul = parseNumber($(this).val());
@@ -1659,9 +1662,9 @@
                     if (parseInt(qty) > 0) {
                         const scopeText = scopeMaterial && scopeMaterial !== '-' ? ` (${escapeHtml(scopeMaterial)})` : '';
                         itemsHtml += `<div class="summary-item">
-                            <div class="item-description">${escapeHtml(itemName)}${scopeText} × ${qty}</div>
-                            <div class="item-price">${total}</div>
-                        </div>`;
+                                <div class="item-description">${escapeHtml(itemName)}${scopeText} × ${qty}</div>
+                                <div class="item-price">${total}</div>
+                            </div>`;
                     }
                 });
                 $('#review-items-list').html(itemsHtml || '<p style="color: #999;">No items added</p>');
@@ -1679,9 +1682,9 @@
 
                     if (name) {
                         manufacturersHtml += `<div class="summary-item">
-                            <div class="item-description">${escapeHtml(name)} × ${qty} @ $${unitPrice}</div>
-                            <div class="item-price">${total}</div>
-                        </div>`;
+                                <div class="item-description">${escapeHtml(name)} × ${qty} @ $${unitPrice}</div>
+                                <div class="item-price">${total}</div>
+                            </div>`;
                     }
                 });
                 $('#review-manufacturers-list').html(manufacturersHtml || '<p style="color: #999;">No manufacturers added</p>');
@@ -1698,9 +1701,9 @@
 
                     if (desc) {
                         marginsHtml += `<div class="summary-item">
-                            <div class="item-description">${escapeHtml(desc)} (${multiplier}x)</div>
-                            <div class="item-price">${result}</div>
-                        </div>`;
+                                <div class="item-description">${escapeHtml(desc)} (${multiplier}x)</div>
+                                <div class="item-price">${result}</div>
+                            </div>`;
                     }
                 });
                 $('#review-margins-list').html(marginsHtml || '<p style="color: #999;">No margins added</p>');
@@ -1851,57 +1854,57 @@
         }); // end jQuery ready
     </script>
 
-    <style>
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
+    <!-- <style>
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
             }
-        }
 
-        .summary-section {
-            margin-bottom: 20px;
-        }
+            .summary-section {
+                margin-bottom: 20px;
+            }
 
-        .summary-section h4 {
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 16px;
-            font-weight: 600;
-        }
+            .summary-section h4 {
+                margin-bottom: 10px;
+                color: #333;
+                font-size: 16px;
+                font-weight: 600;
+            }
 
-        .summary-section p {
-            margin: 5px 0;
-            color: #666;
-        }
+            .summary-section p {
+                margin: 5px 0;
+                color: #666;
+            }
 
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
+            .summary-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
 
-        .summary-item.total-row {
-            font-weight: bold;
-            border-top: 2px solid #333;
-            border-bottom: 2px solid #333;
-            padding: 12px 0;
-        }
+            .summary-item.total-row {
+                font-weight: bold;
+                border-top: 2px solid #333;
+                border-bottom: 2px solid #333;
+                padding: 12px 0;
+            }
 
-        .item-description {
-            flex: 1;
-            color: #333;
-        }
+            .item-description {
+                flex: 1;
+                color: #333;
+            }
 
-        .item-price {
-            font-weight: 600;
-            color: #333;
-        }
+            .item-price {
+                font-weight: 600;
+                color: #333;
+            }
 
-        .summary-divider {
-            height: 1px;
-            background: #e0e0e0;
-            margin: 20px 0;
-        }
-    </style>
+            .summary-divider {
+                height: 1px;
+                background: #e0e0e0;
+                margin: 20px 0;
+            }
+        </style> -->
 @endpush
