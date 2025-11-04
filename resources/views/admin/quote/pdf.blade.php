@@ -8,8 +8,11 @@
     <style>
         /* --- Page margins --- */
         @page {
-            margin: 42mm 15mm 15mm 15mm;
-            /* top, right, bottom, left */
+            margin-top: 45mm;
+            margin-right: 15mm;
+            margin-bottom: 20mm;
+            margin-left: 15mm;
+            /* Header sits in top margin (30mm height), footer in bottom margin (12mm height) */
         }
 
         /* Basic typography */
@@ -25,19 +28,23 @@
         /* --- Fixed header for all pages --- */
         .pdf-header {
             position: fixed;
-            top: -38mm;
+            top: -40mm;
             left: 0;
             right: 0;
-            height: 38mm;
-            padding: 8mm 15mm 5mm 15mm;
+            height: 35mm;
+            padding: 0;
+            margin: 0;
             box-sizing: border-box;
-            border-bottom: 2px solid #000;
+            border-bottom: 1px solid #000;
             background: #fff;
+            z-index: 1000;
         }
 
         .header-wrapper {
             width: 100%;
             height: 100%;
+            padding: 5mm 0;
+            box-sizing: border-box;
         }
 
         .header-wrapper::after {
@@ -50,6 +57,7 @@
             float: left;
             width: 40%;
             padding-right: 15px;
+            box-sizing: border-box;
         }
 
         .header-left .logo-box {
@@ -81,13 +89,15 @@
             width: 55%;
             text-align: right;
             padding-left: 15px;
+            margin-top: -10px;
+            box-sizing: border-box;
         }
 
         .header-right .company-title {
             font-size: 14px;
             font-weight: 700;
             color: #000;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
@@ -95,8 +105,8 @@
         .header-right .address-block {
             font-size: 10px;
             color: #000;
-            line-height: 1.5;
-            margin-bottom: 6px;
+            line-height: 1.4;
+            margin-bottom: 4px;
         }
 
         .header-right .address-block strong {
@@ -106,7 +116,7 @@
         .header-right .contact-block {
             font-size: 10px;
             color: #000;
-            line-height: 1.6;
+            line-height: 1.4;
         }
 
         .header-right .contact-block strong {
@@ -118,11 +128,9 @@
             text-decoration: none;
         }
 
-        /* --- Fixed footer with page numbers --- */
         .pdf-footer {
             position: fixed;
-            bottom: -12mm;
-            /* sits in bottom margin */
+            bottom: -15mm;
             left: 0;
             right: 0;
             height: 12mm;
@@ -131,9 +139,9 @@
             color: #666;
             padding-top: 8px;
             border-top: 1px solid #ddd;
+            background: #fff;
+            z-index: 1000;
         }
-
-        /* Page numbers are handled by inline PHP script at bottom */
         
         .pdf-footer .footer-text {
             font-size: 9px;
@@ -141,14 +149,18 @@
             margin-top: 3px;
         }
 
-        /* --- Content area (starts below header) --- */
         .content {
-            padding: 0 15mm;
+            position: relative;
+            margin: 0;
+            padding-top: 2mm;
+            padding-bottom: 2mm;
+            padding-left: 0;
+            padding-right: 0;
             box-sizing: border-box;
         }
 
         .quote-meta {
-            margin: 6px 0 12px 0;
+            margin: 0 0 6px 0;
             padding: 0;
             font-size: 12px;
             width: 100%;
@@ -183,7 +195,7 @@
             background: #333;
             color: #fff;
             font-weight: bold;
-            padding: 6px;
+            padding: 4px;
             margin-top: 14px;
             font-size: 13px;
         }
@@ -226,7 +238,6 @@
             font-weight: 600;
         }
 
-        /* Prevent page breaks inside table rows for important rows */
         tr {
             page-break-inside: avoid;
         }
@@ -236,20 +247,41 @@
             color: #999;
             font-style: italic;
         }
+
+        .section-title {
+            page-break-after: avoid;
+        }
+
+        table.items {
+            page-break-inside: auto;
+        }
+
+        table.items thead {
+            display: table-header-group;
+        }
+
+        table.items tfoot {
+            display: table-footer-group;
+        }
+
+        .signature {
+            page-break-inside: avoid;
+        }
+
+        .highlight {
+            page-break-inside: avoid;
+        }
     </style>
 </head>
 
 <body>
 
-    {{-- HEADER (appears on all pages) --}}
     <div class="pdf-header" aria-hidden="true">
         <div class="header-wrapper">
-            {{-- Left: Logo --}}
             <div class="header-left">
                 @if (!empty($companyLogo))
                     <img src="{{ $companyLogo }}" alt="{{ $companyName }}" style="max-width: 180px; max-height: 70px; display: block;">
                 @else
-                    {{-- Logo box matching the image design --}}
                     <div class="logo-box">
                         <div class="logo-text">TSC</div>
                         <div class="company-name">THE<br>STONE<br>COBBLERS</div>
@@ -257,18 +289,17 @@
                 @endif
             </div>
 
-            {{-- Right: Company Information --}}
             <div class="header-right">
                 <div class="company-title">{{ strtoupper($companyName) }}</div>
-                
                 <div class="address-block">
-                    <strong>{{ $companyAddress }}</strong><br>
-                    {{ $companyAddress }}, {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }}<br>
-                    {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }}
-                </div>
-                
+                    <!-- <strong>{{ $companyAddress }}</strong><br> -->
+                    {{ $companyAddress }}, {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }}
+                    <!-- {{ $companyCity }}, {{ $companyState }} {{ $companyZipcode }} -->
+                </div>         
                 <div class="contact-block">
-                    <div><strong>Phone:</strong> {{ $companyPhone }}</div>
+                    <div>
+                        <strong>Phone:</strong> {{ $companyPhone }}
+                    </div>
                     @if($companyEmail)
                         <div><strong>Email:</strong> <span class="link">{{ $companyEmail }}</span></div>
                     @endif
@@ -290,7 +321,7 @@
     {{-- MAIN CONTENT --}}
     <div class="content">
         {{-- Date line with underline matching image design --}}
-        <div style="margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #000;">
+        <div>
             <strong style="font-size: 12px;">Date:</strong> 
             <span style="margin-left: 5px;">{{ optional($quote->created_at)->format('m/d/Y') ?? '_______________' }}</span>
         </div>
@@ -313,9 +344,10 @@
                     {{ optional(optional($quote->project)->customer)->address ?? 'N/A' }}
                 </td>
             </tr>
+
         </table>
 
-        <p><strong>Project Type:</strong>
+        <p style="font-size: 12px;"><strong>Project Type:</strong>
             {{ trim(($quote->is_kitchen ? 'KITCHEN' : '') . ($quote->is_kitchen && $quote->is_vanity ? ' + ' : '') . ($quote->is_vanity ? 'VANITY' : '')) ?: 'KITCHEN' }}
         </p>
 
@@ -488,8 +520,6 @@
             <p style="margin-bottom:0;">Date:</p>
             <div></div>
         </div>
-
-        <br>
         <br>
         <div class="highlight">THIS QUOTE IS VALID FOR {{ setting('quote_expiry_days', 30) }} DAYS</div>
 
