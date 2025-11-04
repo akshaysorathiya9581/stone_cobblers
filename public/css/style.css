@@ -181,6 +181,7 @@ select {
 
 /* Sidebar */
 .sidebar {
+    min-width: 250px;
     width: 250px;
     background-color: #f1f3f4;
     border-right: 1px solid var(--border-color);
@@ -1170,6 +1171,10 @@ select {
 .actions {
     display: flex;
     gap: 8px;
+}
+
+.actions span.muted {
+    display: none;
 }
 
 .action-btn {
@@ -2658,11 +2663,10 @@ select {
 }
 
 .quote-stepview .quote-stepview__left {
-    width: 100%;
+    width: calc(100% - 330px);
     padding: 20px;
     border: 1px solid var(--border-color);
     border-radius: 10px;
-
 }
 
 .quote-stepview .quote-stepview__right {
@@ -2707,6 +2711,13 @@ select {
 .quote-stepview .custom-table .form-input {
     padding: 10px 16px;
     max-width: 167px;
+}
+
+@media (max-width: 1480px) {
+    .quote-stepview .custom-table .form-input {
+        padding: 9px 14px;
+        max-width: 140px;
+    }
 }
 
 .quote-stepview .custom-table .form-input::placeholder {
@@ -2911,6 +2922,7 @@ select {
     background-color: #EAFFE8;
     border: 1px solid #00000000;
     color: var(--primary-color);
+    white-space: nowrap;
 }
 
 .quote-stepview__summary {
