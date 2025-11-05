@@ -18,13 +18,24 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 
 // Frontend / Auth
-// Root: show login to guests, redirect logged-in users to admin dashboard
+// Root: show marketing page to guests, redirect logged-in users to admin dashboard
 Route::get('/', function () {
     if (Auth::check()) {
-        return redirect()->route('admin.dashboard'); // redirects to /admin/dashboard
+        return redirect()->route('admin.dashboard');
     }
-    return app(AuthController::class)->index();
-})->name('login');
+
+    return view('frontend.home');
+})->name('home');
+
+Route::get('/home', function () {
+    return Auth::check()
+        ? redirect()->route('admin.dashboard')
+        : redirect()->route('home');
+});
+
+Route::get('/login', [AuthController::class, 'index'])
+    ->middleware('guest')
+    ->name('login');
 
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
