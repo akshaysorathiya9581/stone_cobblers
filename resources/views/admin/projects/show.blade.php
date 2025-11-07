@@ -43,7 +43,7 @@
                             Back
                         </a>
                         @if($user && $user->role === 'admin')
-                            <a href="{{ route('admin.projects.edit', $proj->id) }}" class="btn" role="button">Edit</a>
+                            <a href="{{ route('admin.projects.edit', $proj->id) }}" class="btn secondary" role="button">Edit</a>
                         @endif
                     </div>
                 </div>

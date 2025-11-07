@@ -25,7 +25,7 @@
                     <h1 class="content-title">Customer Management View</h1>
                     <div class="action-buttons">
                         <a href="{{ route('admin.customers.index') }}" class="btn primary" role="button">Back</a>
-                        <a href="{{ route('admin.customers.edit', ['customer' => $customer->id]) }}" class="btn" role="button">Edit</a>
+                        <a href="{{ route('admin.customers.edit', ['customer' => $customer->id]) }}" class="btn secondary" role="button">Edit</a>
                     </div>
                 </div>
 

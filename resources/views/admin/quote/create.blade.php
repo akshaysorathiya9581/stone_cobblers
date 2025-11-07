@@ -54,6 +54,9 @@
     <div class="main-content">
         <!-- Header -->
         <div class="header">
+            <button class="sidebar-toggle">
+                <i class="fas fa-bars toggle-icon"></i>
+            </button>
             <div class="search-bar">
                 <i>🔍</i>
                 <input type="text" placeholder="Search quotes, customers...">
@@ -140,7 +143,7 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 15%;">Project/Item Name</th>
-                                        <th style="width: 20%;">Scope/Material</th>
+                                        <th style="width: 15%;">Scope/Material</th>
                                         <th style="width: 15%;">QTY</th>
                                         <th style="width: 15%;">Unit Cost</th>
                                         <th style="width: 15%;">Total</th>
