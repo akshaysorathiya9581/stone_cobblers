@@ -1,4 +1,7 @@
 <div class="header">
+    <button class="sidebar-toggle">
+        <i class="fas fa-bars toggle-icon"></i>
+    </button>
     <div class="search-bar">
         <i>🔍</i>
         <input type="text" placeholder="Search..." />
@@ -13,6 +16,7 @@
             <i>➕</i> {{ $createLabel ?? 'New' }}
         </a>
 
-        <a href="{{ route('admin.profile.edit') }}" class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U',0,2)) : 'U' }}</a>
+        <a href="{{ route('admin.profile.edit') }}"
+            class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U', 0, 2)) : 'U' }}</a>
     </div>
 </div>

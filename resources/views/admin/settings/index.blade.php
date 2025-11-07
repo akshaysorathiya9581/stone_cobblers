@@ -2,139 +2,13 @@
 
 @section('title', 'Settings')
 
-@push('css')
-<style>
-    .settings-tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 30px;
-        border-bottom: 2px solid #e5e7eb;
-    }
-
-    .settings-tab {
-        padding: 12px 24px;
-        background: transparent;
-        border: none;
-        border-bottom: 2px solid transparent;
-        color: #6b7280;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-bottom: -2px;
-    }
-
-    .settings-tab:hover {
-        color: #111827;
-    }
-
-    .settings-tab.active {
-        color: #0ea5e9;
-        border-bottom-color: #0ea5e9;
-    }
-
-    .settings-tab-content {
-        display: none;
-    }
-
-    .settings-tab-content.active {
-        display: block;
-    }
-
-    .settings-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 20px;
-    }
-
-    .settings-field {
-        margin-bottom: 20px;
-    }
-
-    .settings-field label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-        color: #374151;
-    }
-
-    .settings-field .field-description {
-        font-size: 12px;
-        color: #6b7280;
-        margin-top: 4px;
-    }
-
-    .settings-field input[type="text"],
-    .settings-field input[type="email"],
-    .settings-field input[type="number"],
-    .settings-field select,
-    .settings-field textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 14px;
-    }
-
-    .settings-field textarea {
-        min-height: 100px;
-        resize: vertical;
-    }
-
-    .settings-field input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-    }
-
-    .checkbox-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .save-settings-btn {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        padding: 14px 28px;
-        background: #0ea5e9;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s;
-        z-index: 100;
-    }
-
-    .save-settings-btn:hover {
-        background: #0284c7;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .save-settings-btn:disabled {
-        background: #9ca3af;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .settings-section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #111827;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #e5e7eb;
-    }
-</style>
-@endpush
-
 @section('content')
 <div class="main-content">
     <!-- Header -->
     <div class="header">
+        <button class="sidebar-toggle">
+                <i class="fas fa-bars toggle-icon"></i>
+            </button>
         <div class="search-bar">
             <i>🔍</i>
             <input type="text" placeholder="Search settings...">
@@ -146,30 +20,52 @@
         </div>
     </div>
 
-    <div class="content bg-content">
-        <div class="quote-details">
-            <div class="content-header">
-                <h2 class="title">Settings</h2>
-                <p style="color: #6b7280; margin-top: 5px;">Manage your application settings</p>
+    <div class="content settings-main">
+        <div class="content-header">
+            <div class="settings-header-content">
+                <div>
+                    <h1 class="content-title">Settings</h1>
+                    <p class="settings-subtitle">Manage your application settings and preferences</p>
+                </div>
             </div>
+        </div>
 
+        <div class="settings-container">
             <form id="settingsForm">
                 @csrf
 
                 <!-- Tabs -->
-                <div class="settings-tabs">
-                    <button type="button" class="settings-tab active" data-tab="general">General</button>
-                    <button type="button" class="settings-tab" data-tab="company">Company</button>
-                    <button type="button" class="settings-tab" data-tab="tax">Tax & Pricing</button>
-                    <button type="button" class="settings-tab" data-tab="quote">Quote</button>
-                    <button type="button" class="settings-tab" data-tab="email">Email</button>
-                    <button type="button" class="settings-tab" data-tab="pdf">PDF</button>
+                <div class="tabs settings-tabs">
+                    <button type="button" class="tab active" data-tab="general">
+                        <i class="fas fa-sliders-h"></i> General
+                    </button>
+                    <button type="button" class="tab" data-tab="company">
+                        <i class="fas fa-building"></i> Company
+                    </button>
+                    <button type="button" class="tab" data-tab="tax">
+                        <i class="fas fa-percentage"></i> Tax & Pricing
+                    </button>
+                    <button type="button" class="tab" data-tab="quote">
+                        <i class="fas fa-file-invoice-dollar"></i> Quote
+                    </button>
+                    <button type="button" class="tab" data-tab="email">
+                        <i class="fas fa-envelope"></i> Email
+                    </button>
+                    <button type="button" class="tab" data-tab="pdf">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
                 </div>
 
                 <!-- General Settings -->
                 <div class="settings-tab-content active" data-content="general">
-                    <h3 class="settings-section-title">General Settings</h3>
-                    <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3 class="settings-section-title">
+                                <i class="fas fa-sliders-h"></i> General Settings
+                            </h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-grid">
                         @foreach($settings['general'] ?? [] as $setting)
                         <div class="settings-field">
                             <label for="setting_{{ $setting->key }}">
@@ -190,13 +86,21 @@
                             @endif
                         </div>
                         @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Company Settings -->
                 <div class="settings-tab-content" data-content="company">
-                    <h3 class="settings-section-title">Company Information</h3>
-                    <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3 class="settings-section-title">
+                                <i class="fas fa-building"></i> Company Information
+                            </h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-grid">
                         @foreach($settings['company'] ?? [] as $setting)
                         <div class="settings-field">
                             <label for="setting_{{ $setting->key }}">
@@ -209,13 +113,21 @@
                             @endif
                         </div>
                         @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Tax & Pricing Settings -->
                 <div class="settings-tab-content" data-content="tax">
-                    <h3 class="settings-section-title">Tax & Pricing Settings</h3>
-                    <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3 class="settings-section-title">
+                                <i class="fas fa-percentage"></i> Tax & Pricing Settings
+                            </h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-grid">
                         @foreach($settings['tax'] ?? [] as $setting)
                         <div class="settings-field">
                             <label for="setting_{{ $setting->key }}">
@@ -233,13 +145,21 @@
                             @endif
                         </div>
                         @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Quote Settings -->
                 <div class="settings-tab-content" data-content="quote">
-                    <h3 class="settings-section-title">Quote Settings</h3>
-                    <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3 class="settings-section-title">
+                                <i class="fas fa-file-invoice-dollar"></i> Quote Settings
+                            </h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-grid">
                         @foreach($settings['quote'] ?? [] as $setting)
                         <div class="settings-field">
                             <label for="setting_{{ $setting->key }}">
@@ -260,13 +180,21 @@
                             @endif
                         </div>
                         @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Email Settings -->
                 <div class="settings-tab-content" data-content="email">
-                    <h3 class="settings-section-title">Email Settings</h3>
-                    <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3 class="settings-section-title">
+                                <i class="fas fa-envelope"></i> Email Settings
+                            </h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-grid">
                         @foreach($settings['email'] ?? [] as $setting)
                         <div class="settings-field">
                             <label for="setting_{{ $setting->key }}">
@@ -287,13 +215,21 @@
                             @endif
                         </div>
                         @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- PDF Settings -->
                 <div class="settings-tab-content" data-content="pdf">
-                    <h3 class="settings-section-title">PDF Settings</h3>
-                    <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3 class="settings-section-title">
+                                <i class="fas fa-file-pdf"></i> PDF Settings
+                            </h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-grid">
                         @foreach($settings['pdf'] ?? [] as $setting)
                         <div class="settings-field">
                             <label for="setting_{{ $setting->key }}">
@@ -319,12 +255,16 @@
                             @endif
                         </div>
                         @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" class="save-settings-btn" id="saveBtn">
-                    <i class="fa-solid fa-save"></i> Save Settings
-                </button>
+                <div class="settings-form-actions">
+                    <button type="submit" class="btn theme" id="saveBtn">
+                        Save Settings
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -335,10 +275,10 @@
 <script>
 $(document).ready(function() {
     // Tab switching
-    $('.settings-tab').on('click', function() {
+    $('.settings-tabs .tab').on('click', function() {
         const tab = $(this).data('tab');
         
-        $('.settings-tab').removeClass('active');
+        $('.settings-tabs .tab').removeClass('active');
         $(this).addClass('active');
         
         $('.settings-tab-content').removeClass('active');

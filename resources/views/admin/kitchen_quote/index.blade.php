@@ -10,6 +10,9 @@
   <div class="main-content">
     <!-- Header -->
     <div class="header">
+      <button class="sidebar-toggle">
+        <i class="fas fa-bars toggle-icon"></i>
+      </button>
       <div class="search-bar">
         <i>🔍</i>
         <input type="text" placeholder="Search quotes, customers...">
@@ -36,49 +39,53 @@
           </a>
         </div>
 
-        {{-- Kitchen Top table --}}
-        <table class="table">
-          <thead>
-            <tr>
-              <th style="width: 25%;">Item</th>
-              <th style="width: 20%;">Scope/Material</th>
-              <th style="width: 12%;">Unit Price</th>
-              <th style="width: 15%;">Type</th>
-              <th style="width: 8%;">Taxable</th>
-              <th style="width: 10%;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach ($kitchen_tops as $quote)
-              @php
-                $n = (float) $quote->cost;
-                $dec = $n !== 0.0 && abs($n) < 1.0 ? 4 : 2;
-                $formatted = number_format($n, $dec, '.', '');
-              @endphp
-              <tr data-id="{{ $quote->id }}" data-taxable="{{ $quote->is_taxable ? '1' : '0' }}">
-                <td class="item-label">{{ $quote->project }}</td>
-                <td class="scope-material-label">{{ $quote->scope_material ?? '-' }}</td>
-                <td>{{ $formatted }}</td>
-                <td>{{ get_kitchen_type_list($quote->type) }}</td>
-                <td class="text-center">
-                  @if($quote->is_taxable)
-                    <span class="badge badge-success" style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>
-                  @else
-                    <span class="badge badge-secondary" style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>
-                  @endif
-                </td>
-                <td>
-                  <div class="actions">
-                    <a href="javascript:;" class="action-btn open-modal edit" data-id="{{ $quote->id }}"
-                      data-target="#editQuoteModal"><i class="fa-solid fa-pen-to-square"></i></a>
-                    <a href="javascript:;" class="action-btn delete" data-id="{{ $quote->id }}"><i
-                        class="fa-solid fa-trash"></i></a>
-                  </div>
-                </td>
+        <div class="responsive-table">
+          {{-- Kitchen Top table --}}
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 25%;">Item</th>
+                <th style="width: 20%;">Scope/Material</th>
+                <th style="width: 12%;">Unit Price</th>
+                <th style="width: 15%;">Type</th>
+                <th style="width: 8%;">Taxable</th>
+                <th style="width: 10%;">Actions</th>
               </tr>
-            @endforeach
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @foreach ($kitchen_tops as $quote)
+                @php
+                  $n = (float) $quote->cost;
+                  $dec = $n !== 0.0 && abs($n) < 1.0 ? 4 : 2;
+                  $formatted = number_format($n, $dec, '.', '');
+                @endphp
+                <tr data-id="{{ $quote->id }}" data-taxable="{{ $quote->is_taxable ? '1' : '0' }}">
+                  <td class="item-label">{{ $quote->project }}</td>
+                  <td class="scope-material-label">{{ $quote->scope_material ?? '-' }}</td>
+                  <td>{{ $formatted }}</td>
+                  <td>{{ get_kitchen_type_list($quote->type) }}</td>
+                  <td class="text-center">
+                    @if($quote->is_taxable)
+                      <span class="badge badge-success"
+                        style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>
+                    @else
+                      <span class="badge badge-secondary"
+                        style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>
+                    @endif
+                  </td>
+                  <td>
+                    <div class="actions">
+                      <a href="javascript:;" class="action-btn open-modal edit" data-id="{{ $quote->id }}"
+                        data-target="#editQuoteModal"><i class="fa-solid fa-pen-to-square"></i></a>
+                      <a href="javascript:;" class="action-btn delete" data-id="{{ $quote->id }}"><i
+                          class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
 
         {{-- Cabinet Manufacturer table --}}
         {{-- <div class="quote-details__inside">
@@ -135,7 +142,8 @@
 
         <div class="form-group">
           <label for="add_scope_material" class="form-label">Scope/Material</label>
-          <input type="text" name="scope_material" id="add_scope_material" class="form-input" placeholder="Enter Scope/Material">
+          <input type="text" name="scope_material" id="add_scope_material" class="form-input"
+            placeholder="Enter Scope/Material">
           <div class="invalid-feedback" data-field="scope_material"></div>
         </div>
 
@@ -165,7 +173,8 @@
 
         <div class="form-group">
           <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <input type="checkbox" name="is_taxable" id="add_is_taxable" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+            <input type="checkbox" name="is_taxable" id="add_is_taxable" value="1"
+              style="width: 18px; height: 18px; cursor: pointer;">
             <span>Is Taxable?</span>
           </label>
           <div class="invalid-feedback" data-field="is_taxable"></div>
@@ -229,7 +238,8 @@
 
         <div class="form-group">
           <label class="form-label" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <input type="checkbox" name="is_taxable" id="edit_is_taxable" value="1" style="width: 18px; height: 18px; cursor: pointer;">
+            <input type="checkbox" name="is_taxable" id="edit_is_taxable" value="1"
+              style="width: 18px; height: 18px; cursor: pointer;">
             <span>Is Taxable?</span>
           </label>
           <div class="invalid-feedback" data-field="is_taxable" style="display:none;"></div>
@@ -314,27 +324,27 @@
 
         // prefer server-provided label, else use map
         const typeLabel = quote.type_label || typeMap[quote.type] || quote.type || '';
-        
+
         // taxable badge
-        const taxableBadge = quote.is_taxable 
+        const taxableBadge = quote.is_taxable
           ? '<span class="badge badge-success" style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>'
           : '<span class="badge badge-secondary" style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>';
 
         return `
-                              <tr data-id="${quote.id}" data-taxable="${quote.is_taxable ? '1' : '0'}">
-                                <td class="item-label">${escapeHtml(quote.project)}</td>
-                                <td class="scope-material-label">${escapeHtml(quote.scope_material || '-')}</td>
-                                <td>${unitPriceFormatted}</td>
-                                <td class="type-label">${escapeHtml(typeLabel)}</td>
-                                <td class="text-center">${taxableBadge}</td>
-                                <td>
-                                  <div class="actions">
-                                    <a href="javascript:;" class="action-btn open-modal edit" title="Edit" data-target="#editQuoteModal"><i class="fa-solid fa-pen-to-square"></i></a>
-                                    <a href="javascript:;" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
-                                  </div>
-                                </td>
-                              </tr>
-                            `;
+                                <tr data-id="${quote.id}" data-taxable="${quote.is_taxable ? '1' : '0'}">
+                                  <td class="item-label">${escapeHtml(quote.project)}</td>
+                                  <td class="scope-material-label">${escapeHtml(quote.scope_material || '-')}</td>
+                                  <td>${unitPriceFormatted}</td>
+                                  <td class="type-label">${escapeHtml(typeLabel)}</td>
+                                  <td class="text-center">${taxableBadge}</td>
+                                  <td>
+                                    <div class="actions">
+                                      <a href="javascript:;" class="action-btn open-modal edit" title="Edit" data-target="#editQuoteModal"><i class="fa-solid fa-pen-to-square"></i></a>
+                                      <a href="javascript:;" class="action-btn delete" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              `;
       }
 
       // append new quote row to the appropriate table
@@ -466,7 +476,7 @@
             if ($tr.length) {
               // update data attribute
               $tr.attr('data-taxable', q.is_taxable ? '1' : '0');
-              
+
               // update the item label cell (1st column)
               $tr.find('.item-label').first().text(q.project);
 
@@ -481,9 +491,9 @@
               // update category (4th column) - prefer server-provided label or map
               const typeLabel = q.type_label || typeMap[q.type] || q.type || '';
               $tr.find('td').eq(3).text(typeLabel);
-              
+
               // update taxable badge (5th column)
-              const taxableBadge = q.is_taxable 
+              const taxableBadge = q.is_taxable
                 ? '<span class="badge badge-success" style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">T</span>'
                 : '<span class="badge badge-secondary" style="background: #94a3b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px;">-</span>';
               $tr.find('td').eq(4).html(taxableBadge);
@@ -537,7 +547,7 @@
       });
 
     });
-              
+
   </script>
 
   <script>

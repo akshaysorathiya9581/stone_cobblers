@@ -11,6 +11,9 @@
     <div class="main-content">
         <!-- Header -->
         <div class="header">
+            <button class="sidebar-toggle">
+                <i class="fas fa-bars toggle-icon"></i>
+            </button>
             <div class="search-bar">
                 <i>🔍</i>
                 <input type="text" placeholder="Search projects, customers, status..." id="global-search">
