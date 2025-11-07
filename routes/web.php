@@ -23,8 +23,7 @@ Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('admin.dashboard');
     }
-
-    return view('frontend.home');
+    return view('frontend.login');
 })->name('home');
 
 Route::get('/home', function () {
