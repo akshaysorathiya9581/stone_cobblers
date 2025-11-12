@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Mail\QuoteSentMail;
 use App\Mail\QuoteStatusChangedMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class QuoteController extends Controller
 {
@@ -430,6 +431,118 @@ class QuoteController extends Controller
         Log::info('PDF downloaded', ['user_id' => Auth::id(), 'quote_id' => $quote->id]);
 
         return Storage::disk('local')->download($quote->pdf_path, $quote->quote_number . '.pdf');
+    }
+
+    /**
+     * Generate email draft (.eml file) with PDF attachment
+     * This creates an .eml file that can be opened in email clients with the PDF already attached
+     */
+    public function emailDraft(Quote $quote)
+    {
+        $user = Auth::user();
+
+        // Check authorization (same as download method)
+        if ($user && ($user->is_admin ?? false)) {
+            // Authorized - admin
+        } elseif ($user && $quote->user_id && $user->id === (int)$quote->user_id) {
+            // Authorized - quote creator
+        } else {
+            $project = $quote->project()->with('customer')->first();
+            if ($project && $project->client) {
+                $clientOwnerId = $project->client->created_by ?? null;
+                if ($clientOwnerId && $user && $user->id === (int)$clientOwnerId) {
+                    // Authorized - project owner
+                } else {
+                    $clientEmail = $project->client->email ?? null;
+                    if ($clientEmail && $user && $user->email === $clientEmail) {
+                        // Authorized - customer email match
+                    } else {
+                        abort(403, 'You are not authorized to access this email draft.');
+                    }
+                }
+            } else {
+                abort(403, 'You are not authorized to access this email draft.');
+            }
+        }
+
+        // Check if PDF exists
+        if (! $quote->pdf_path || ! Storage::disk('local')->exists($quote->pdf_path)) {
+            abort(404, 'PDF not found. Please generate the PDF first.');
+        }
+
+        // Load quote relationships
+        $quote->load('project.customer');
+        $project = $quote->project;
+        $customer = $project->client ?? $project->customer ?? null;
+        $customerName = $customer->name ?? $quote->customer_name ?? 'Customer';
+        $customerEmail = $customer->email ?? '';
+        $projectName = $quote->project_name ?? ($project->name ?? 'Project');
+
+        // Get PDF content
+        $pdfContent = Storage::disk('local')->get($quote->pdf_path);
+        $pdfBase64 = base64_encode($pdfContent);
+        $pdfFilename = $quote->quote_number . '.pdf';
+
+        // Get company details
+        $companyName = setting('company_name', config('app.name'));
+        $companyEmail = setting('company_email', Auth::user()->email ?? 'noreply@example.com');
+
+        // Create email subject and body
+        $subject = 'Quote ' . $quote->quote_number . ' - ' . $customerName;
+        $body = "Dear {$customerName},\n\n";
+        $body .= "Please find attached the quote for your project: {$projectName}\n\n";
+        $body .= "Quote Number: {$quote->quote_number}\n";
+        $body .= "Total Amount: $" . number_format($quote->total, 2) . "\n\n";
+        $body .= "Please review the attached PDF and let us know if you have any questions.\n\n";
+        $body .= "Best regards,\n";
+        $body .= $companyName;
+
+        // Generate .eml file content
+        $boundary = '----=_NextPart_' . md5(time() . rand());
+        $date = date('r');
+        
+        $emlContent = "From: {$companyName} <{$companyEmail}>\r\n";
+        if ($customerEmail) {
+            $emlContent .= "To: {$customerName} <{$customerEmail}>\r\n";
+        }
+        $emlContent .= "Subject: {$subject}\r\n";
+        $emlContent .= "Date: {$date}\r\n";
+        $emlContent .= "MIME-Version: 1.0\r\n";
+        $emlContent .= "Content-Type: multipart/mixed; boundary=\"{$boundary}\"\r\n";
+        $emlContent .= "\r\n";
+        $emlContent .= "This is a multi-part message in MIME format.\r\n";
+        $emlContent .= "\r\n";
+        
+        // Email body part
+        $emlContent .= "--{$boundary}\r\n";
+        $emlContent .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        $emlContent .= "Content-Transfer-Encoding: 7bit\r\n";
+        $emlContent .= "\r\n";
+        $emlContent .= $body . "\r\n";
+        $emlContent .= "\r\n";
+        
+        // PDF attachment part
+        $emlContent .= "--{$boundary}\r\n";
+        $emlContent .= "Content-Type: application/pdf; name=\"{$pdfFilename}\"\r\n";
+        $emlContent .= "Content-Transfer-Encoding: base64\r\n";
+        $emlContent .= "Content-Disposition: attachment; filename=\"{$pdfFilename}\"\r\n";
+        $emlContent .= "\r\n";
+        // Split base64 into 76-character lines (RFC 2045)
+        $emlContent .= chunk_split($pdfBase64, 76, "\r\n");
+        $emlContent .= "\r\n";
+        
+        // End boundary
+        $emlContent .= "--{$boundary}--\r\n";
+
+        // Return .eml file with headers to open directly in email client (like mailto)
+        // Using 'inline' disposition so browser opens it directly instead of downloading
+        $filename = 'Quote-' . $quote->quote_number . '.eml';
+        
+        return response($emlContent)
+            ->header('Content-Type', 'message/rfc822')
+            ->header('Content-Disposition', 'inline; filename="' . $filename . '"')
+            ->header('Content-Description', 'Email Draft with PDF Attachment')
+            ->header('X-Content-Type-Options', 'nosniff');
     }
 
     /**

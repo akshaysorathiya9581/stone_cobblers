@@ -77,6 +77,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('quotes', QuoteController::class)->middleware('module:quotes');
     Route::get('/quote/{type?}', [QuoteController::class, 'quote_form_show'])->name('quote.form.show');
     Route::get('/quotes/{quote}/download', [QuoteController::class, 'download'])->name('quotes.download');
+    Route::get('/quotes/{quote}/email-draft', [QuoteController::class, 'emailDraft'])->name('quotes.email-draft');
     Route::post('quotes/{quote}/send',      [QuoteController::class, 'send'])->name('quotes.send');
     Route::post('quotes/{quote}/approve',   [QuoteController::class, 'approve'])->name('quotes.approve');
     Route::post('quotes/{quote}/reject',    [QuoteController::class, 'reject'])->name('quotes.reject');

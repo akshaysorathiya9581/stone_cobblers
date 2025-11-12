@@ -193,18 +193,46 @@
                 });
         }
 
-        // Send quote
+        // Send quote - Open email draft directly in email client (like mailto) with PDF attached
         $(document).on('click', '.send', function (e) {
             e.preventDefault();
             var $btn = $(this);
             var $row = $btn.closest('tr');
-            var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop(); // support id="quote-123"
-            var url = "{{ url('admin/quotes') }}/" + quoteId + "/send"; // or use route template
-
-            ajaxAction($btn, url, function (res) {
-                // update status cell
-                $row.find('.status-tag').removeClass().addClass('status-tag status-' + res.status_label.toLowerCase()).text(res.status_label);
-            });
+            var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop();
+            
+            // Check if PDF exists
+            var $downloadBtn = $row.find('.action-btn.download');
+            if ($downloadBtn.length === 0) {
+                if (window.toastr) {
+                    toastr.error('PDF not available for this quote. Please generate the PDF first.');
+                }
+                return;
+            }
+            
+            // Get quote details for mailto fallback
+            var quoteNumber = $row.find('.quote-number').text().trim();
+            var customerName = $row.find('.customer-details h4').text().trim();
+            var projectName = $row.find('.customer-details p').text().trim();
+            var amount = $row.find('.amount').text().trim();
+            
+            // Get email draft URL (generates .eml file with PDF embedded as attachment)
+            var emailDraftUrl = "{{ url('admin/quotes') }}/" + quoteId + "/email-draft";
+            
+            // Show loading state
+            var original = $btn.html();
+            $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+            
+            // Open email draft directly in email client (like mailto: link behavior)
+            // Direct navigation to .eml file will open in default email client on Windows
+            window.location.href = emailDraftUrl;
+            
+            // Reset button after a delay
+            setTimeout(function() {
+                $btn.prop('disabled', false).html(original);
+                if (window.toastr) {
+                    toastr.success('Email draft opened in your email client with PDF attached.');
+                }
+            }, 1500);
         });
 
         // Approve quote
