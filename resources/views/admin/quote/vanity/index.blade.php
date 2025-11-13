@@ -92,6 +92,28 @@
                                 $clientName = optional($quote->project->customer)->name ?? ($quote->project->customer->name ?? '—');
                                 $projectTitle = optional($quote->project)->name ?? ($quote->project_name ?? '-');
                                 $pdfRoute = route('admin.quotes.download', $quote->id);
+                                
+                                // Prepare email data for mailto link
+                                $customer = $quote->project->customer ?? $quote->project->client ?? null;
+                                $customerEmail = $customer->email ?? '';
+                                $companyName = setting('company_name', config('app.name'));
+                                $companyEmail = setting('company_email', auth()->user()->email ?? '');
+                                
+                                // Email subject
+                                $emailSubject = 'Quote ' . $quote->quote_number . ' - ' . $clientName;
+                                
+                                // Email body - matching the email template design
+                                $emailBody = "Hello " . $clientName . ",\n\n";
+                                $emailBody .= "We have sent you Quote #" . $quote->quote_number . " with a total amount of $" . number_format($quote->total, 2) . ".\n\n";
+                                $emailBody .= "You can download the PDF using the link below:\n";
+                                $emailBody .= url($pdfRoute) . "\n\n";
+                                $emailBody .= "If you have any questions, reply to this email.\n\n";
+                                $emailBody .= "Thanks,\n" . $companyName;
+                                
+                                // Build mailto link
+                                $mailtoLink = 'mailto:' . urlencode($customerEmail);
+                                $mailtoLink .= '?subject=' . urlencode($emailSubject);
+                                $mailtoLink .= '&body=' . urlencode($emailBody);
                             @endphp
                             <tr class="table-row" id="quote-{{ $quote->id }}" data-quote-id="{{ $quote->id }}">
                                 <td class="customer-info">
@@ -114,8 +136,8 @@
                                         <span class="muted">No PDF</span>
                                     @endif
 
-                                    @if($quote->status === 'Draft')
-                                        <button class="action-btn send" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
+                                    @if($quote->status === 'Draft' && $quote->pdf_path)
+                                        <a href="{{ $mailtoLink }}" class="action-btn send" title="Send" data-quote-id="{{ $quote->id }}" onclick="handleSendQuote(event, {{ $quote->id }})"><i class="fa-solid fa-paper-plane"></i></a>
                                     @endif
 
                                     @if(in_array($quote->status, ['Sent', 'Draft']))
@@ -193,47 +215,35 @@
                 });
         }
 
-        // Send quote - Open email draft directly in email client (like mailto) with PDF attached
-        $(document).on('click', '.send', function (e) {
-            e.preventDefault();
-            var $btn = $(this);
-            var $row = $btn.closest('tr');
-            var quoteId = $row.data('quote-id') || $row.attr('id')?.split('-').pop();
+        // Handle send quote - open mailto and update status
+        function handleSendQuote(event, quoteId) {
+            // Allow mailto link to open email client
+            // The mailto link will open the email client
             
-            // Check if PDF exists
-            var $downloadBtn = $row.find('.action-btn.download');
-            if ($downloadBtn.length === 0) {
-                if (window.toastr) {
-                    toastr.error('PDF not available for this quote. Please generate the PDF first.');
-                }
-                return;
-            }
-            
-            // Get quote details for mailto fallback
-            var quoteNumber = $row.find('.quote-number').text().trim();
-            var customerName = $row.find('.customer-details h4').text().trim();
-            var projectName = $row.find('.customer-details p').text().trim();
-            var amount = $row.find('.amount').text().trim();
-            
-            // Get email draft URL (generates .eml file with PDF embedded as attachment)
-            var emailDraftUrl = "{{ url('admin/quotes') }}/" + quoteId + "/email-draft";
-            
-            // Show loading state
-            var original = $btn.html();
-            $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
-            
-            // Open email draft directly in email client (like mailto: link behavior)
-            // Direct navigation to .eml file will open in default email client on Windows
-            window.location.href = emailDraftUrl;
-            
-            // Reset button after a delay
+            // After a short delay, update quote status to "Sent" via AJAX
             setTimeout(function() {
-                $btn.prop('disabled', false).html(original);
-                if (window.toastr) {
-                    toastr.success('Email draft opened in your email client with PDF attached.');
-                }
-            }, 1500);
-        });
+                var sendUrl = "{{ url('admin/quotes') }}/" + quoteId + "/send";
+                
+                $.ajax({
+                    url: sendUrl,
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Reload the page to show updated status
+                            window.location.reload();
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Failed to update quote status:', xhr);
+                        // Still reload to show current state
+                        window.location.reload();
+                    }
+                });
+            }, 500);
+        }
 
         // Approve quote
         $(document).on('click', '.approve-btn', function (e) {

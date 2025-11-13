@@ -534,15 +534,16 @@ class QuoteController extends Controller
         // End boundary
         $emlContent .= "--{$boundary}--\r\n";
 
-        // Return .eml file with headers to open directly in email client (like mailto)
-        // Using 'inline' disposition so browser opens it directly instead of downloading
+        // Return .eml file with headers to open directly in email client
+        // Use 'inline' disposition to try to open directly instead of downloading
         $filename = 'Quote-' . $quote->quote_number . '.eml';
         
         return response($emlContent)
             ->header('Content-Type', 'message/rfc822')
             ->header('Content-Disposition', 'inline; filename="' . $filename . '"')
             ->header('Content-Description', 'Email Draft with PDF Attachment')
-            ->header('X-Content-Type-Options', 'nosniff');
+            ->header('X-Content-Type-Options', 'nosniff')
+            ->header('Content-Length', strlen($emlContent));
     }
 
     /**
