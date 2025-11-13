@@ -215,34 +215,41 @@
                 });
         }
 
-        // Handle send quote - open mailto and update status
+        // Handle send quote - show confirmation, then open draft mail and update status
         function handleSendQuote(event, quoteId) {
-            // Allow mailto link to open email client
-            // The mailto link will open the email client
+            event.preventDefault(); // Prevent default mailto link behavior
             
-            // After a short delay, update quote status to "Sent" via AJAX
-            setTimeout(function() {
-                var sendUrl = "{{ url('admin/quotes') }}/" + quoteId + "/send";
+            // Get the mailto link from the anchor tag
+            var mailtoLink = $(event.target).closest('a').attr('href');
+            
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to open the email draft? The quote status will be updated to "Sent".')) {
+                // User clicked OK - open mailto link
+                window.location.href = mailtoLink;
                 
-                $.ajax({
-                    url: sendUrl,
-                    method: 'POST',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            // Reload the page to show updated status
-                            window.location.reload();
+                // After opening email, update status to Sent
+                setTimeout(function() {
+                    var sendUrl = "{{ url('admin/quotes') }}/" + quoteId + "/send";
+                    
+                    $.ajax({
+                        url: sendUrl,
+                        method: 'POST',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                // Status updated successfully
+                                console.log('Quote status updated to Sent');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Failed to update quote status:', xhr);
                         }
-                    },
-                    error: function(xhr) {
-                        console.error('Failed to update quote status:', xhr);
-                        // Still reload to show current state
-                        window.location.reload();
-                    }
-                });
-            }, 500);
+                    });
+                }, 1000);
+            }
+            // If user clicked Cancel, do nothing (stay on page)
         }
 
         // Approve quote

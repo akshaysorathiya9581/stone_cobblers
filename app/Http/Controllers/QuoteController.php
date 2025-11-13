@@ -573,20 +573,20 @@ class QuoteController extends Controller
         $quote->save();
 
         // send mail (wrap in try/catch)
-        try {
-            $customer = optional($quote->project)->customer;
-            if ($customer && $customer->email) {
-                Mail::to($customer->email)->send(new QuoteSentMail($quote));
-            }
-        } catch (\Throwable $e) {
-            Log::error('Quote send mail failed: '.$e->getMessage());
-            // still return success but indicate email failed
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Quote marked as Sent but email failed to send.',
-                'status_label' => $quote->status,
-            ]);
-        }
+        // try {
+        //     $customer = optional($quote->project)->customer;
+        //     if ($customer && $customer->email) {
+        //         Mail::to($customer->email)->send(new QuoteSentMail($quote));
+        //     }
+        // } catch (\Throwable $e) {
+        //     Log::error('Quote send mail failed: '.$e->getMessage());
+        //     // still return success but indicate email failed
+        //     return response()->json([
+        //         'status' => 'success',
+        //         'message' => 'Quote marked as Sent but email failed to send.',
+        //         'status_label' => $quote->status,
+        //     ]);
+        // }
 
         return response()->json([
             'status' => 'success',
