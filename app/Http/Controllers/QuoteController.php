@@ -696,4 +696,150 @@ class QuoteController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Display projects that have both kitchen and vanity quotes
+     */
+    public function combinedIndex()
+    {
+        $user = Auth::user();
+
+        // Get all projects that have both kitchen and vanity quotes
+        $projects = Project::with(['customer', 'quotes' => function($query) {
+            $query->with('items');
+        }])
+        ->whereHas('quotes', function($q) {
+            $q->where('quote_type', 'kitchen');
+        })
+        ->whereHas('quotes', function($q) {
+            $q->where('quote_type', 'vanity');
+        })
+        ->orderBy('created_at', 'desc');
+
+        // Filter by user role
+        if ($user && $user->role !== 'admin') {
+            $projects->where('user_id', $user->id);
+        }
+
+        $projects = $projects->get();
+
+        // Process projects to get kitchen and vanity quotes
+        $projectsWithQuotes = $projects->map(function($project) {
+            $kitchenQuote = $project->quotes->where('quote_type', 'kitchen')->first();
+            $vanityQuote = $project->quotes->where('quote_type', 'vanity')->first();
+            
+            return [
+                'project' => $project,
+                'kitchen_quote' => $kitchenQuote,
+                'vanity_quote' => $vanityQuote,
+            ];
+        })->filter(function($item) {
+            // Only include projects that have both quotes
+            return $item['kitchen_quote'] && $item['vanity_quote'];
+        });
+
+        return view('admin.quote.combined.index', compact('projectsWithQuotes'));
+    }
+
+    /**
+     * Generate combined PDF from kitchen and vanity quotes
+     */
+    public function generateCombinedPdf($projectId)
+    {
+        $user = Auth::user();
+
+        // Get project with quotes
+        $project = Project::with(['customer', 'quotes.items'])->findOrFail($projectId);
+
+        // Check authorization
+        if ($user && $user->role !== 'admin' && $project->user_id !== $user->id) {
+            abort(403, 'You are not authorized to access this project.');
+        }
+
+        // Get kitchen and vanity quotes with their items
+        $kitchenQuote = $project->quotes->where('quote_type', 'kitchen')->first();
+        $vanityQuote = $project->quotes->where('quote_type', 'vanity')->first();
+
+        if (!$kitchenQuote || !$vanityQuote) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Project must have both kitchen and vanity quotes to generate combined PDF.',
+            ], 400);
+        }
+
+        // Load items for both quotes
+        $kitchenQuote->load('items');
+        $vanityQuote->load('items');
+        $kitchenQuote->load('creator');
+        $vanityQuote->load('creator');
+
+        try {
+            // Get items separately
+            $kitchenItems = $kitchenQuote->items;
+            $vanityItems = $vanityQuote->items;
+
+            // Calculate combined totals
+            $combinedSubtotal = ($kitchenQuote->subtotal ?? 0) + ($vanityQuote->subtotal ?? 0);
+            $combinedTax = ($kitchenQuote->tax ?? 0) + ($vanityQuote->tax ?? 0);
+            $combinedDiscount = ($kitchenQuote->discount ?? 0) + ($vanityQuote->discount ?? 0);
+            $combinedTotal = ($kitchenQuote->total ?? 0) + ($vanityQuote->total ?? 0);
+
+            // Prepare PDF data
+            $companyLogo = null;
+            $logoPath = public_path('images/logo.jpeg');
+            if (file_exists($logoPath)) {
+                $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+                $data = file_get_contents($logoPath);
+                $companyLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            }
+
+            $taxRate = setting('tax_rate', 0.08);
+
+            $viewData = [
+                'kitchenQuote' => $kitchenQuote,
+                'vanityQuote' => $vanityQuote,
+                'kitchenItems' => $kitchenItems,
+                'vanityItems' => $vanityItems,
+                'project' => $project,
+                'combinedSubtotal' => $combinedSubtotal,
+                'combinedTax' => $combinedTax,
+                'combinedDiscount' => $combinedDiscount,
+                'combinedTotal' => $combinedTotal,
+                'companyName' => setting('company_name', config('app.name')),
+                'companyAddress' => setting('company_address', '317 West Boylston St'),
+                'companyCity' => setting('company_city', 'West Boylston'),
+                'companyState' => setting('company_state', 'MA'),
+                'companyZipcode' => setting('company_zipcode', '01583'),
+                'companyPhone' => setting('company_phone', '774-261-4445'),
+                'companyEmail' => setting('company_email', ''),
+                'companyWebsite' => setting('company_website', ''),
+                'companyLogo' => $companyLogo,
+                'taxRate' => $taxRate,
+                'quoteTerms' => setting('quote_terms', 'Payment due within 30 days.'),
+                'quoteFooter' => setting('quote_footer', 'Thank you for your business!'),
+            ];
+
+            // Generate PDF using the combined quote view
+            $pdfPageSize = setting('pdf_page_size', 'letter');
+            $pdfOrientation = setting('pdf_orientation', 'portrait');
+            $pdf = Pdf::loadView('admin.quote.combined.pdf', $viewData)->setPaper($pdfPageSize, $pdfOrientation);
+
+            // Generate filename
+            $safeProjectName = preg_replace('/[^A-Za-z0-9\-_]/', '_', $project->name);
+            $filename = 'combined-quote-' . $kitchenQuote->quote_number . '-' . $vanityQuote->quote_number . '-' . date('Y-m-d') . '.pdf';
+
+            return $pdf->download($filename);
+
+        } catch (\Throwable $e) {
+            Log::error('Combined PDF generation error: ' . $e->getMessage(), [
+                'project_id' => $projectId,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate combined PDF: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

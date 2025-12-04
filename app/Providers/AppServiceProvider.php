@@ -36,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
                 // Quotes Management (Separate for Kitchen and Vanity)
                 ['section'=>'Quotes Management','title'=>'Kitchen Quotes','icon'=>'icon-kitchen-quote','route'=>'admin.kitchen.quotes.index','module'=>'quotes','match_path'=>'kitchen-quotes-management'],
                 ['section'=>'Quotes Management','title'=>'Vanity Quotes','icon'=>'icon-vanity-quote','route'=>'admin.vanity.quotes.index','module'=>'quotes','match_path'=>'vanity-quotes-management'],
+                ['section'=>'Quotes Management','title'=>'Quote','icon'=>'icon-quote','route'=>'admin.quotes.combined.index','module'=>'quotes','match_path'=>'quotes-combined'],
 
                 // Price Management (Configuration)
                 ['section'=>'Line Items','title'=>'Kitchen Rates','icon'=>'icon-price-tag','route'=>'admin.kitchen-quotes.index','module'=>'kitchen_quotes','match_path'=>'kitchen-quotes'],
