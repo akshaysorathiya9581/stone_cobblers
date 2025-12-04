@@ -58,7 +58,7 @@
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
             <div class="search-bar">
-                <i>🔍</i>
+                <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search quotes, customers...">
             </div>
 
@@ -345,11 +345,7 @@
                             <div class="quote-accordion__item">
                                 <div class="quote-accordion__header">
                                     Box Manufacturer
-                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                                        <path
-                                            d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
-                                            fill="currentColor" />
-                                    </svg>
+                                    <i class="fas fa-chevron-down quote-accordion__icon"></i>
                                 </div>
                                 <div class="quote-accordion__body">
                                     <div class="custom-table">
@@ -474,11 +470,7 @@
                             <div class="quote-accordion__item">
                                 <div class="quote-accordion__header">
                                     Margin Markup
-                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                                        <path
-                                            d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
-                                            fill="currentColor" />
-                                    </svg>
+                                    <i class="fas fa-chevron-down quote-accordion__icon"></i>
                                 </div>
                                 <div class="quote-accordion__body">
                                     <div class="custom-table">
@@ -649,9 +641,7 @@
                 <div class="quote-stepview success-step" style="display: none;">
                     <div class="quote-stepview__full" style="max-width: 700px; margin: 50px auto; text-align: center;">
                         <div class="success-step__icon" style="width: 120px; height: 120px; margin: 0 auto 30px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);">
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
+                            <i class="fas fa-check" style="font-size: 60px; color: white;"></i>
                         </div>
                         
                         <h2 class="success-step__title" style="font-size: 32px; font-weight: 700; color: #16a34a; margin-bottom: 15px; letter-spacing: -0.5px;">
@@ -664,13 +654,7 @@
                         
                         <div class="quote-success-card" style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 35px;">
                             <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                    <polyline points="10 9 9 9 8 9"></polyline>
-                                </svg>
+                                <i class="fas fa-file-invoice" style="font-size: 24px; color: #16a34a;"></i>
                                 <h3 style="font-size: 18px; font-weight: 600; color: #1e293b; margin: 0;">Quote Number</h3>
                             </div>
                             <p style="font-size: 28px; font-weight: 700; color: #16a34a; margin: 0; letter-spacing: 1px;">
@@ -680,17 +664,11 @@
                         
                         <div class="success-step__flex" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                             <a href="#" id="view-all-quotes-btn" class="btn theme" style="padding: 14px 30px; font-size: 15px; font-weight: 600; border-radius: 8px; min-width: 180px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                </svg>
+                                <i class="fas fa-home" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
                                 View All Quotes
                             </a>
                             <a href="#" id="create-another-quote-btn" class="btn secondary" style="padding: 14px 30px; font-size: 15px; font-weight: 600; border-radius: 8px; min-width: 180px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
+                                <i class="fas fa-plus" style="display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
                                 Create Another Quote
                             </a>
                         </div>

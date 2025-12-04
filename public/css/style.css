@@ -525,129 +525,173 @@ select {
 }
 
 
+/* Font Awesome icon support - using ::before for compatibility */
 .icon-dashboard::before {
-    content: "🏠";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f015"; /* fa-home */
 }
 
 .icon-customer::before {
-    content: "👤";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f007"; /* fa-user */
 }
 
 .icon-customers::before {
-    content: "👥";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0c0"; /* fa-users */
 }
 
 .icon-projects::before {
-    content: "📋";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f07c"; /* fa-folder-open */
 }
 
 .icon-quotes::before {
-    content: "💰";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0d6"; /* fa-dollar-sign */
 }
 
 .icon-files::before {
-    content: "📁";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f07b"; /* fa-folder */
 }
 
 .icon-reports::before {
-    content: "📊";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f080"; /* fa-chart-bar */
 }
 
 .icon-settings::before {
-    content: "⚙️";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f013"; /* fa-cog */
 }
 
 .icon-starred::before {
-    content: "⭐";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f005"; /* fa-star */
 }
 
 .icon-pinned::before {
-    content: "📌";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f08d"; /* fa-thumbtack */
 }
 
 .icon-person::before {
-    content: "👤";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f007"; /* fa-user */
 }
 
 .icon-envelope::before {
-    content: "📧";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0e0"; /* fa-envelope */
 }
 
 .icon-home::before {
-    content: "🏠";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f015"; /* fa-home */
 }
 
 .icon-project::before {
-    content: "📋";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f07c"; /* fa-folder-open */
 }
 
 .icon-calendar::before {
-    content: "📅";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f073"; /* fa-calendar */
 }
 
 .icon-dollar::before {
-    content: "💰";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0d6"; /* fa-dollar-sign */
 }
 
 .icon-notes::before {
-    content: "📝";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f303"; /* fa-sticky-note */
 }
 
 .icon-check::before {
-    content: "✅";
-}
-
-.icon-customer::before {
-    content: "👤";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f00c"; /* fa-check */
 }
 
 .icon-budget::before {
-    content: "💰";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0d6"; /* fa-dollar-sign */
 }
 
 .icon-timeline::before {
-    content: "📅";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f073"; /* fa-calendar */
 }
 
 .icon-team::before {
-    content: "👥";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0c0"; /* fa-users */
 }
 
 .icon-logout::before {
-    content: "🔓";
-
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f2f5"; /* fa-sign-out-alt */
 }
 
-
 .icon-quotes-management::before {
-    content: "📄";
-
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f1c1"; /* fa-file-alt */
 }
 
 .icon-kitchen-quote::before {
-    content: "🏠";
-
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f2e7"; /* fa-utensils */
 }
 
 .icon-vanity-quote::before {
-    content: "🚿";
-
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f2cd"; /* fa-bath */
 }
 
-
 .icon-price-management::before {
-    content: "💲";
-
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0d6"; /* fa-dollar-sign */
 }
 
 .icon-price-tag::before {
-    content: "🏷️";
-
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f02b"; /* fa-tags */
 }
 
 .icon-calculator::before {
-    content: "🧮";
-
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f1ec"; /* fa-calculator */
 }
 
 
@@ -3500,7 +3544,8 @@ select {
     right: 0;
     top: 42%;
     right: 20px;
-    width: 12px;
+    font-size: 12px;
+    width: auto;
     height: auto;
     transform: rotate(-90deg) translateY(-50%);
     transition: all .25s ease-in-out;

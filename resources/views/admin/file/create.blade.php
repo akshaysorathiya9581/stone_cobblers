@@ -14,13 +14,13 @@
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
             <div class="search-bar">
-                <i>🔍</i>
+                <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search projects, customers, status..." id="global-search">
             </div>
 
             <div class="header-actions">
                 <button class="header-btn secondary">
-                    <i>📤</i> Export
+                    <i class="fas fa-download"></i> Export
                 </button>
                 <a href="{{ route('admin.files.index') }}" class="header-btn primary">📂 View All Files</a>
                 <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
@@ -63,7 +63,7 @@
             <div class="upload-section" style="margin-top:12px;">
                 <div class="upload-area" id="uploadArea"
                     style="border:2px dashed #e1e1e1; padding:18px; border-radius:8px; text-align:center; cursor:pointer;">
-                    <div class="upload-icon">📁</div>
+                    <div class="upload-icon"><i class="fas fa-folder"></i></div>
                     <div class="upload-text">Drop files here or click to upload</div>
                     <div class="upload-subtext">Supports PDF, CAD, images, and documents</div>
                     <button class="upload-btn" onclick="triggerFileUpload()">Choose Files</button>

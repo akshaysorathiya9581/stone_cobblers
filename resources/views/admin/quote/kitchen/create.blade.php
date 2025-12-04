@@ -14,7 +14,7 @@
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
             <div class="search-bar">
-                <i>🔍</i>
+                <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search quotes, customers...">
             </div>
 
@@ -304,11 +304,7 @@
                             <div class="quote-accordion__item">
                                 <div class="quote-accordion__header">
                                     Box Manufacturer
-                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                                        <path
-                                            d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
-                                            fill="currentColor" />
-                                    </svg>
+                                    <i class="fas fa-chevron-down quote-accordion__icon"></i>
                                 </div>
                                 <div class="quote-accordion__body">
                                     <div class="custom-table">
@@ -433,11 +429,7 @@
                             <div class="quote-accordion__item">
                                 <div class="quote-accordion__header">
                                     Margin Markup
-                                    <svg class="quote-accordion__icon" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                                        <path
-                                            d="M8.23615 0.196241C8.49778 -0.0654138 8.92189 -0.0654138 9.18353 0.196241C9.44523 0.45789 9.44523 0.882006 9.18353 1.14366L5.16353 5.16367C4.90189 5.42531 4.47778 5.42531 4.21615 5.16367L0.196133 1.14366L0.150332 1.09263C-0.0643027 0.829465 -0.0491672 0.441535 0.196133 0.196241C0.441427 -0.0490591 0.829363 -0.0641946 1.09252 0.15044L1.14355 0.196241L4.68984 3.74254L8.23615 0.196241Z"
-                                            fill="currentColor" />
-                                    </svg>
+                                    <i class="fas fa-chevron-down quote-accordion__icon"></i>
                                 </div>
                                 <div class="quote-accordion__body">
                                     <div class="custom-table">
@@ -607,7 +599,7 @@
                 <!-- Success Step -->
                 <div class="quote-stepview success-step" style="display: none;">
                     <div class="quote-stepview__full">
-                        <div class="success-step__icon">✓</div>
+                        <div class="success-step__icon"><i class="fas fa-check"></i></div>
                         <h2 class="success-step__title">Quote Created Successfully!</h2>
                         <p class="success-step__description">Your quote has been created and PDF has been generated.</p>
                         <div class="mb-20">

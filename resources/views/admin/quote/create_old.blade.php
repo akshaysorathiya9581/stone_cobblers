@@ -16,7 +16,7 @@
         <div class="content bg-content">
             <div class="welcome-container card" id="welcome-panel">
                 <div class="quote-type">
-                    <div class="icon"></div>
+                    <div class="icon"><i class="fas fa-file-invoice-dollar" style="font-size: 48px; color: #16a34a;"></i></div>
                     <h1 class="title">Welcome to <br><span class="brand">The Stone Cobblers</span></h1>
                     <p class="description">Transform your outdoor space with our premium stone cobbling services. Let's gather some details to provide you with a personalized quote.</p>
 
@@ -47,7 +47,7 @@
                         </div>
                     </div>
 
-                    <button class="btn theme" id="begin-btn" onclick="beginQuote()">Let's Begin <span style="margin-left:8px">→</span></button>
+                    <button class="btn theme" id="begin-btn" onclick="beginQuote()">Let's Begin <i class="fas fa-arrow-right" style="margin-left:8px"></i></button>
                     <div class="time-estimate">Takes about 3 minutes to complete</div>
                     <div class="error-message" id="welcome-error" style="display:none;color:#c62828;margin-top:8px">
                         Please select at least one quote type and a project to continue.
@@ -120,7 +120,7 @@
                     <div class="nav-footer">
                         <button type="button" id="prev-tab-1" class="btn secondary" onclick="prevStep(1)" disabled><span>←</span> Previous</button>
                         <div class="steps-indicator">Step 1 of 3</div>
-                        <button type="button" id="next-tab-1" class="btn theme" data-current="1">Next <span>→</span></button>
+                        <button type="button" id="next-tab-1" class="btn theme" data-current="1">Next <i class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
 
@@ -381,7 +381,7 @@
                     <div class="nav-footer">
                         <button type="button" id="prev-tab-2" class="btn secondary" onclick="prevStep(2)"><span>←</span> Previous</button>
                         <div class="steps-indicator">Step 2 of 3</div>
-                        <button type="button" id="next-tab-2" class="btn theme" data-current="2">Next <span>→</span></button>
+                        <button type="button" id="next-tab-2" class="btn theme" data-current="2">Next <i class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
 

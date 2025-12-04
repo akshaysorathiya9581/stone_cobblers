@@ -20,11 +20,11 @@
                 <h1 class="content-title">Customer Management</h1>
                 <div class="action-buttons">
                     <a href="/reports" class="btn secondary" role="button">
-                        <i>📊</i> Reports
+                        <i class="fas fa-chart-bar"></i> Reports
                     </a>
 
                     <a href="{{ route('admin.customers.create') }}" class="btn primary" role="button">
-                        <i>➕</i> Add Customer
+                        <i class="fas fa-plus"></i> Add Customer
                     </a>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                                 <!-- Contact Info -->
                                 <td class="contact-info">
                                     <div>
-                                        📧 <a href="mailto:{{ $customer->email }}" class="email">{{ $customer->email }}</a>
+                                        <i class="fas fa-envelope"></i> <a href="mailto:{{ $customer->email }}" class="email">{{ $customer->email }}</a>
                                     </div>
                                     <div>
                                         📞 {{ $customer->phone ?? 'N/A' }}

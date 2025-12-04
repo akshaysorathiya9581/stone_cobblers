@@ -208,21 +208,21 @@
                         <div style="text-align: center;">
                             <div class="form-icon icon-project"
                                 style="background-color: rgb(22, 163, 74); color: white; border-color: rgb(22, 163, 74);">
-                                ✓
+                                <i class="fas fa-check"></i>
                             </div>
                             <h1 class="form-title" style="color: rgb(22, 163, 74); margin: 20px 0;">Project Created
                                 Successfully!</h1>
                             <p class="form-subtitle" id="success-subtitle" style="margin-bottom: 30px;">Your project has been set up and is ready to go!</p>
                             <a href="{{ route('admin.projects.index') }}" class="nav-btn next"
                                 style="text-decoration: none; display: inline-flex;">
-                                <i>📋</i> Back to Projects
+                                <i class="fas fa-folder-open"></i> Back to Projects
                             </a>
                         </div>
                     </div>
 
                     <div class="form-navigation">
                         <button type="button" class="nav-btn previous">← Previous</button>
-                        <button type="button" class="nav-btn next">Next →</button>
+                        <button type="button" class="nav-btn next">Next <i class="fas fa-arrow-right"></i></button>
                     </div>
                 </form>
             </div>
@@ -295,9 +295,9 @@
             function updateButtons() {
                 $prevBtn.prop('disabled', currentStep === 0);
                 if (currentStep === totalSteps - 1) {
-                    $nextBtn.text('Create Project ✓');
+                    $nextBtn.html('Create Project <i class="fas fa-check"></i>');
                 } else {
-                    $nextBtn.html('Next <i>→</i>');
+                    $nextBtn.html('Next <i class="fas fa-arrow-right"></i>');
                 }
             }
 

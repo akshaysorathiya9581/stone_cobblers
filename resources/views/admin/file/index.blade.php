@@ -15,15 +15,15 @@
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
             <div class="search-bar">
-                <i>🔍</i>
+                <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search projects, customers, status..." id="global-search">
             </div>
 
             <div class="header-actions">
                 <button class="header-btn secondary">
-                    <i>📤</i> Export
+                    <i class="fas fa-download"></i> Export
                 </button>
-                <a href="{{ route('admin.files.create') }}" class="header-btn primary">➕ Upload Files</a>
+                <a href="{{ route('admin.files.create') }}" class="header-btn primary"><i class="fas fa-plus"></i> Upload Files</a>
                 <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
             </div>
         </div>
@@ -31,7 +31,7 @@
         <div class="header">
             <h1 class="content-title">File Management</h1>
             <div class="header-actions">
-                <a href="{{ route('admin.files.create') }}" class="btn primary">➕ Upload Files</a>
+                <a href="{{ route('admin.files.create') }}" class="btn primary"><i class="fas fa-plus"></i> Upload Files</a>
             </div>
         </div>
 
@@ -103,7 +103,7 @@
                 if (!files?.length) return $grid.html('<div class="empty">No files found</div>');
 
                 files.forEach(f => {
-                    const preview = f.image_url ? `<img src="${f.image_url}" alt="${escapeHtml(f.name)}">` : '<div class="icon">📄</div>',
+                    const preview = f.image_url ? `<img src="${f.image_url}" alt="${escapeHtml(f.name)}">` : '<div class="icon"><i class="fas fa-file"></i></div>',
                         uploader = f.uploader?.name ? escapeHtml(f.uploader.name) + ' • ' : '';
                     const $card = $(`
                         <div class="file-card">

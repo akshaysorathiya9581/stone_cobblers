@@ -14,17 +14,17 @@
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
             <div class="search-bar">
-                <i>🔍</i>
+                <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search customers, email, phone...">
             </div>
 
             <div class="header-actions">
                 <a href="#export" class="header-btn secondary" role="button">
-                    <i>📤</i> Export
+                    <i class="fas fa-download"></i> Export
                 </a>
 
                 <a href="{{ route('admin.customers.create') }}" class="header-btn primary" role="button">
-                    <i>➕</i> New Customer
+                    <i class="fas fa-plus"></i> New Customer
                 </a>
 
                 <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
@@ -37,10 +37,10 @@
                 <h1 class="content-title">Dashboard</h1>
                 <div class="action-buttons">
                     <a href="#" class="btn secondary" role="button">
-                        <i>📊</i> Reports
+                        <i class="fas fa-chart-bar"></i> Reports
                     </a>
                     <a href="{{ route('admin.customers.create') }}" class="btn primary" role="button">
-                        <i>➕</i> Add Customer
+                        <i class="fas fa-plus"></i> Add Customer
                     </a>
                 </div>
             </div>
@@ -73,7 +73,7 @@
             <div class="company-settings-card">
                 <div class="company-settings-header">
                     <h3 class="company-settings-title">Company Settings</h3>
-                    <a href="{{ route('admin.settings.index') }}" class="company-settings-link">Edit Settings →</a>
+                    <a href="{{ route('admin.settings.index') }}" class="company-settings-link">Edit Settings <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="company-settings-grid">
                     <div class="company-settings-item">

@@ -3,17 +3,17 @@
         <i class="fas fa-bars toggle-icon"></i>
     </button>
     <div class="search-bar">
-        <i>🔍</i>
+        <i class="fas fa-search"></i>
         <input type="text" placeholder="Search..." />
     </div>
 
     <div class="header-actions">
         <a href="{{ $exportUrl }}" class="header-btn secondary">
-            <i>📤</i> {{ $exportLabel ?? 'Export' }}
+            <i class="fas fa-download"></i> {{ $exportLabel ?? 'Export' }}
         </a>
 
         <a href="{{ $createUrl }}" class="header-btn primary">
-            <i>➕</i> {{ $createLabel ?? 'New' }}
+            <i class="fas fa-plus"></i> {{ $createLabel ?? 'New' }}
         </a>
 
         <a href="{{ route('admin.profile.edit') }}"

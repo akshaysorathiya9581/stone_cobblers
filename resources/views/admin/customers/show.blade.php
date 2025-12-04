@@ -52,7 +52,7 @@
                                     <th>Contact Info</th>
                                     <td class="contact-info">
                                         @if(!empty($customer->email))
-                                            <div>📧 <a href="mailto:{{ $customer->email }}" class="email">{{ $customer->email }}</a></div>
+                                            <div><i class="fas fa-envelope"></i> <a href="mailto:{{ $customer->email }}" class="email">{{ $customer->email }}</a></div>
                                         @endif
                                         @if(!empty($customer->phone))
                                             <div>📞 {{ $customer->phone }}</div>

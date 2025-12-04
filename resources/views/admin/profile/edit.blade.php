@@ -11,7 +11,7 @@
             <i class="fas fa-bars toggle-icon"></i>
         </button>
         <div class="search-bar">
-            <i>🔍</i>
+            <i class="fas fa-search"></i>
             <input id="quote-search" type="text" placeholder="Search quotes, customers...">
         </div>
 

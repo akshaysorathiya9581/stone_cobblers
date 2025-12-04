@@ -73,7 +73,7 @@
         
             <!-- <div class="social-login">
                 <button class="social-button" id="googleLogin">
-                    <span>🔍</span>
+                    <span><i class="fas fa-search"></i></span>
                     Google
                 </button>
                 <button class="social-button" id="microsoftLogin">

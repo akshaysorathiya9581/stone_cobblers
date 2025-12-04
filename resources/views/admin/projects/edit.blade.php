@@ -212,13 +212,13 @@
                     <!-- Success -->
                     <div class="form-container-view">
                         <div style="text-align:center">
-                            <div class="form-icon icon-project" style="background-color:rgb(22,163,74); color:white;">✓</div>
+                            <div class="form-icon icon-project" style="background-color:rgb(22,163,74); color:white;"><i class="fas fa-check"></i></div>
                             <h1 class="form-title" style="color:rgb(22,163,74); margin:20px 0;">
                                 <span id="success-title">{{ isset($project) ? 'Project Updated Successfully!' : 'Project Created Successfully!' }}</span>
                             </h1>
                             <p class="form-subtitle" id="success-subtitle">Your project has been set up and is ready to go!</p>
                             <a href="{{ route('admin.projects.index') }}" class="nav-btn next" style="text-decoration:none; display:inline-flex;">
-                                <i>📋</i> Back to Projects
+                                <i class="fas fa-folder-open"></i> Back to Projects
                             </a>
                         </div>
                     </div>
@@ -226,7 +226,7 @@
                     <!-- Navigation -->
                     <div class="form-navigation">
                         <button type="button" class="nav-btn previous">← Previous</button>
-                        <button type="button" class="nav-btn next">Next →</button>
+                        <button type="button" class="nav-btn next">Next <i class="fas fa-arrow-right"></i></button>
                     </div>
                 </form>
             </div>
@@ -287,9 +287,9 @@
         function updateButtons() {
             $prevBtn.prop('disabled', currentStep === 0);
             if (currentStep === totalSteps - 1) {
-                $nextBtn.text(isEdit ? 'Save Changes ✓' : 'Create Project ✓');
+                $nextBtn.html(isEdit ? 'Save Changes <i class="fas fa-check"></i>' : 'Create Project <i class="fas fa-check"></i>');
             } else {
-                $nextBtn.html('Next <i>→</i>');
+                $nextBtn.html('Next <i class="fas fa-arrow-right"></i>');
             }
         }
 

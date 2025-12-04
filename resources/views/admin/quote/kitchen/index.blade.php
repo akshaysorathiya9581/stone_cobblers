@@ -28,10 +28,10 @@
                 <h1 class="content-title">Kitchen Quotes Management</h1>
                 <div class="action-buttons">
                     <a href="#" class="btn secondary">
-                        <i>📊</i> Reports
+                        <i class="fas fa-chart-bar"></i> Reports
                     </a>
                     <a href="{{ route('admin.kitchen.quotes.create') }}" class="btn primary">
-                        <i>➕</i> Create Kitchen Quote
+                        <i class="fas fa-plus"></i> Create Kitchen Quote
                     </a>
                 </div>
             </div>

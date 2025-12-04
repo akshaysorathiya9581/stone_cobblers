@@ -213,7 +213,7 @@
 
                                                 <div class="file-card" data-file-id="{{ $file->id }}">
                                                     <div class="file-thumb">
-                                                        <div class="icon">📄</div>
+                                                        <div class="icon"><i class="fas fa-file"></i></div>
                                                     </div>
 
                                                     <div class="file-name">{{ $filename }}</div>

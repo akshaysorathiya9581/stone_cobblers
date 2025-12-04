@@ -91,41 +91,59 @@ body {
     font-size: 16px;
 }
 
-/* Icon styles */
+/* Icon styles - Font Awesome support */
 .icon-dashboard::before {
-    content: "🏠";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f015"; /* fa-home */
 }
 
 .icon-customers::before {
-    content: "👥";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0c0"; /* fa-users */
 }
 
 .icon-projects::before {
-    content: "📋";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f07c"; /* fa-folder-open */
 }
 
 .icon-quotes::before {
-    content: "💰";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f0d6"; /* fa-dollar-sign */
 }
 
 .icon-files::before {
-    content: "📁";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f07b"; /* fa-folder */
 }
 
 .icon-reports::before {
-    content: "📊";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f080"; /* fa-chart-bar */
 }
 
 .icon-settings::before {
-    content: "⚙️";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f013"; /* fa-cog */
 }
 
 .icon-starred::before {
-    content: "⭐";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f005"; /* fa-star */
 }
 
 .icon-pinned::before {
-    content: "📌";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f08d"; /* fa-thumbtack */
 }
 
 /* Main Content */

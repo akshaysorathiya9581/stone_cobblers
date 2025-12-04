@@ -14,16 +14,16 @@
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
       <div class="search-bar">
-        <i>🔍</i>
+        <i class="fas fa-search"></i>
         <input type="text" placeholder="Search quotes, customers...">
       </div>
 
       <div class="header-actions">
         {{-- <button class="header-btn secondary">
-          <i>📤</i> Export
+          <i class="fas fa-download"></i> Export
         </button>
         <button class="header-btn primary">
-          <i>➕</i> New Quote
+          <i class="fas fa-plus"></i> New Quote
         </button> --}}
         <a href="{{ route('admin.profile.edit') }}"
           class="user-avatar">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U', 0, 2)) : 'U' }}</a>
@@ -36,7 +36,7 @@
           <div class="content-header">
             <h2 class="title">Kitchen Top — Unit Price Update</h2>
             <a href="javascript:;" class="btn primary open-modal" data-target="#addQuoteModal">
-              <i>➕</i> Add New Quote
+              <i class="fas fa-plus"></i> Add New Quote
             </a>
           </div>
           @csrf
