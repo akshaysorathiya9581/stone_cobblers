@@ -106,11 +106,13 @@ class ProjectController extends Controller
 
             // Customer: return only their own files & quotes for this project
             $project_files  = FileDocument::where('project_id', $id)->where('user_id', $user->id)->get();
-            $project_quotes = Quote::where('project_id', $id)->where('user_id', $user->id)->get();
+            $project_quotes = Quote::where('project_id', $id)->where('user_id', $user->id)
+                ->with(['project.customer', 'creator'])->get();
         } else {
             // Admin: return all files & quotes for this project
             $project_files  = FileDocument::where('project_id', $id)->get();
-            $project_quotes = Quote::where('project_id', $id)->get();
+            $project_quotes = Quote::where('project_id', $id)
+                ->with(['project.customer', 'creator'])->get();
         }
 
         return view('admin.projects.show', [

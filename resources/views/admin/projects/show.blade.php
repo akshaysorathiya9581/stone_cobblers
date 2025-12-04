@@ -48,13 +48,29 @@
                     </div>
                 </div>
 
+                @php
+                    // Check if project has both kitchen and vanity quotes for combined PDF
+                    $kitchenQuotes = collect($project_quotes)->filter(function($q) {
+                        return strtolower($q->quote_type ?? '') === 'kitchen' || 
+                               (isset($q->is_kitchen) && $q->is_kitchen);
+                    });
+                    $vanityQuotes = collect($project_quotes)->filter(function($q) {
+                        return strtolower($q->quote_type ?? '') === 'vanity' || 
+                               (isset($q->is_vanity) && $q->is_vanity);
+                    });
+                    $hasKitchenQuote = $kitchenQuotes->isNotEmpty();
+                    $hasVanityQuote = $vanityQuotes->isNotEmpty();
+                    $canCombine = $hasKitchenQuote && $hasVanityQuote;
+                @endphp
+
                 <!-- Tabs -->
                 <div class="tabs mb-20">
                     @php
                         $tabs = [
                             ['id' => 1, 'text' => 'Project Details'],
                             ['id' => 2, 'text' => 'Files'],
-                            ['id' => 3, 'text' => 'Quotes'],
+                            ['id' => 3, 'text' => 'Kitchen Quote'],
+                            ['id' => 4, 'text' => 'Vanity Quote'],
                         ];
                     @endphp
 
@@ -228,10 +244,29 @@
                     </div>
                 </div>
 
-                <!-- Tab 3: Quotes -->
+                <!-- Tab 3: Kitchen Quote -->
                 <div class="tab-content" id="tab-3" style="display:none;">
+                    @php
+                        $kitchenQuotesByStatus = $kitchenQuotes->groupBy(function($q){
+                            $s = strtolower(trim($q->status ?? 'draft'));
+                            if (in_array($s, ['draft','sent','approved','rejected','expired'])) return $s;
+                            return 'other';
+                        });
+                    @endphp
+
+                    @if($canCombine)
+                        <div class="mb-15" style="text-align: right;">
+                            <button type="button" 
+                                    class="btn primary generate-combined-pdf-btn" 
+                                    data-project-id="{{ $proj->id }}"
+                                    style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                                <i class="fa-solid fa-file-pdf"></i> Generate Combined Quote PDF
+                            </button>
+                        </div>
+                    @endif
+
                     <div class="tabs mb-15 nested-tabs">
-                        <button class="tab active" data-subtab="all">All Quotes</button>
+                        <button class="tab active" data-subtab="all">All</button>
                         <button class="tab" data-subtab="draft">Draft</button>
                         <button class="tab" data-subtab="sent">Sent</button>
                         <button class="tab" data-subtab="approved">Approved</button>
@@ -239,17 +274,9 @@
                         <button class="tab" data-subtab="expired">Expired</button>
                     </div>
 
-                    @php
-                        $quotesByStatus = $project_quotes->groupBy(function($q){
-                            $s = strtolower(trim($q->status ?? 'draft'));
-                            if (in_array($s, ['draft','sent','approved','rejected','expired'])) return $s;
-                            return 'other';
-                        });
-                    @endphp
-
-                    <div class="nested-content" id="subtab-all">
-                        @if($project_quotes->isEmpty())
-                            <div class="no-records">No quotes for this project.</div>
+                    <div class="nested-content" id="subtab-all" style="display:block;">
+                        @if($kitchenQuotes->isEmpty())
+                            <div class="no-records">No kitchen quotes for this project.</div>
                         @else
                             <div class="crm-table">
                                 <table class="table">
@@ -265,12 +292,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($project_quotes as $q)
+                                        @foreach($kitchenQuotes as $q)
                                             @php
                                                 $qCust = $q->customer ?? null;
                                                 $qCustName = $qCust->name ?? ($q->customer_name ?? $custName ?? '—');
-                                                $quoteNumber = $q->quote_number ?? ('QT-' . $q->id);
-                                                $amount = is_numeric($q->total) ? '$' . number_format((float)$q->total,2) : ($q->total_display ?? '—');
+                                                $quoteNumber = $q->quote_number ?? ('QT-'.$q->id);
+                                                $amount = is_numeric($q->total) ? '$'.number_format((float)$q->total,2) : ($q->total_display ?? '—');
                                                 $created = optional($q->created_at)->format('M d, Y') ?? '-';
                                                 $expires = optional($q->expires_at)->format('M d, Y') ?? '-';
                                                 $qStatus = ucfirst($q->status ?? 'Draft');
@@ -289,9 +316,7 @@
                                                 <td class="date">{{ $created }}</td>
                                                 <td class="date">{{ $expires }}</td>
                                                 <td class="actions">
-                                                    {{-- <a href="{{ route('admin.quotes.show', $q->id) }}" class="action-btn" title="View"><i class="fa-solid fa-eye"></i></a> --}}
                                                     <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
-
                                                     @if($user && $user->role === 'admin')
                                                         @if(strtolower($q->status ?? '') !== 'approved')
                                                             <form method="POST" action="{{ route('admin.quotes.approve', $q->id) }}" style="display:inline">
@@ -311,9 +336,9 @@
 
                     @foreach (['draft','sent','approved','rejected','expired'] as $sub)
                         <div class="nested-content" id="subtab-{{ $sub }}" style="display:none;">
-                            @php $list = $quotesByStatus->get($sub) ?? collect(); @endphp
+                            @php $list = $kitchenQuotesByStatus->get($sub) ?? collect(); @endphp
                             @if($list->isEmpty())
-                                <div class="no-records">No quotes found for this status.</div>
+                                <div class="no-records">No kitchen quotes found for this status.</div>
                             @else
                                 <div class="crm-table">
                                     <table class="table">
@@ -332,7 +357,7 @@
                                             @foreach($list as $q)
                                                 @php
                                                     $qCust = $q->customer ?? null;
-                                                    $qCustName = $qCust->name ?? ($q->customer_name ?? '—');
+                                                    $qCustName = $qCust->name ?? ($q->customer_name ?? $custName ?? '—');
                                                     $quoteNumber = $q->quote_number ?? ('QT-'.$q->id);
                                                     $amount = is_numeric($q->total) ? '$'.number_format((float)$q->total,2) : ($q->total_display ?? '—');
                                                     $created = optional($q->created_at)->format('M d, Y') ?? '-';
@@ -353,7 +378,6 @@
                                                     <td class="date">{{ $created }}</td>
                                                     <td class="date">{{ $expires }}</td>
                                                     <td class="actions">
-                                                        <a href="{{ route('admin.quotes.show', $q->id) }}" class="action-btn view" title="View"><i class="fa-solid fa-eye"></i></a>
                                                         <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
                                                         @if($user && $user->role === 'admin')
                                                             @if(strtolower($q->status ?? '') !== 'approved')
@@ -372,8 +396,161 @@
                             @endif
                         </div>
                     @endforeach
-
                 </div> {{-- end tab-3 --}}
+
+                <!-- Tab 4: Vanity Quote -->
+                <div class="tab-content" id="tab-4" style="display:none;">
+                    @php
+                        $vanityQuotesByStatus = $vanityQuotes->groupBy(function($q){
+                            $s = strtolower(trim($q->status ?? 'draft'));
+                            if (in_array($s, ['draft','sent','approved','rejected','expired'])) return $s;
+                            return 'other';
+                        });
+                    @endphp
+
+                    @if($canCombine)
+                        <div class="mb-15" style="text-align: right;">
+                            <button type="button" 
+                                    class="btn primary generate-combined-pdf-btn" 
+                                    data-project-id="{{ $proj->id }}"
+                                    style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                                <i class="fa-solid fa-file-pdf"></i> Generate Combined Quote PDF
+                            </button>
+                        </div>
+                    @endif
+
+                    <div class="tabs mb-15 nested-tabs">
+                        <button class="tab active" data-subtab="all">All</button>
+                        <button class="tab" data-subtab="draft">Draft</button>
+                        <button class="tab" data-subtab="sent">Sent</button>
+                        <button class="tab" data-subtab="approved">Approved</button>
+                        <button class="tab" data-subtab="rejected">Rejected</button>
+                        <button class="tab" data-subtab="expired">Expired</button>
+                    </div>
+
+                    <div class="nested-content" id="subtab-all" style="display:block;">
+                        @if($vanityQuotes->isEmpty())
+                            <div class="no-records">No vanity quotes for this project.</div>
+                        @else
+                            <div class="crm-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Quote #</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
+                                            <th>Expires</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($vanityQuotes as $q)
+                                            @php
+                                                $qCust = $q->customer ?? null;
+                                                $qCustName = $qCust->name ?? ($q->customer_name ?? $custName ?? '—');
+                                                $quoteNumber = $q->quote_number ?? ('QT-'.$q->id);
+                                                $amount = is_numeric($q->total) ? '$'.number_format((float)$q->total,2) : ($q->total_display ?? '—');
+                                                $created = optional($q->created_at)->format('M d, Y') ?? '-';
+                                                $expires = optional($q->expires_at)->format('M d, Y') ?? '-';
+                                                $qStatus = ucfirst($q->status ?? 'Draft');
+                                            @endphp
+                                            <tr>
+                                                <td class="customer-info">
+                                                    <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
+                                                    <div class="customer-details">
+                                                        <h4>{{ $qCustName }}</h4>
+                                                        <p>{{ $proj->title ?? $proj->name ?? '' }}</p>
+                                                    </div>
+                                                </td>
+                                                <td class="quote-number">{{ $quoteNumber }}</td>
+                                                <td class="amount">{{ $amount }}</td>
+                                                <td><span class="status-tag {{ 'status-'.strtolower($q->status ?? 'draft') }}">{{ $qStatus }}</span></td>
+                                                <td class="date">{{ $created }}</td>
+                                                <td class="date">{{ $expires }}</td>
+                                                <td class="actions">
+                                                    <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
+                                                    @if($user && $user->role === 'admin')
+                                                        @if(strtolower($q->status ?? '') !== 'approved')
+                                                            <form method="POST" action="{{ route('admin.quotes.approve', $q->id) }}" style="display:inline">
+                                                                @csrf
+                                                                <button class="action-btn approve" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
+                                                            </form>
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+
+                    @foreach (['draft','sent','approved','rejected','expired'] as $sub)
+                        <div class="nested-content" id="subtab-{{ $sub }}" style="display:none;">
+                            @php $list = $vanityQuotesByStatus->get($sub) ?? collect(); @endphp
+                            @if($list->isEmpty())
+                                <div class="no-records">No vanity quotes found for this status.</div>
+                            @else
+                                <div class="crm-table">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Customer</th>
+                                                <th>Quote #</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Created</th>
+                                                <th>Expires</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($list as $q)
+                                                @php
+                                                    $qCust = $q->customer ?? null;
+                                                    $qCustName = $qCust->name ?? ($q->customer_name ?? $custName ?? '—');
+                                                    $quoteNumber = $q->quote_number ?? ('QT-'.$q->id);
+                                                    $amount = is_numeric($q->total) ? '$'.number_format((float)$q->total,2) : ($q->total_display ?? '—');
+                                                    $created = optional($q->created_at)->format('M d, Y') ?? '-';
+                                                    $expires = optional($q->expires_at)->format('M d, Y') ?? '-';
+                                                    $qStatus = ucfirst($q->status ?? $sub);
+                                                @endphp
+                                                <tr>
+                                                    <td class="customer-info">
+                                                        <div class="customer-avatar">{{ strtoupper(mb_substr($qCustName,0,2)) }}</div>
+                                                        <div class="customer-details">
+                                                            <h4>{{ $qCustName }}</h4>
+                                                            <p>{{ $proj->title ?? $proj->name ?? '' }}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td class="quote-number">{{ $quoteNumber }}</td>
+                                                    <td class="amount">{{ $amount }}</td>
+                                                    <td><span class="status-tag {{ 'status-'.strtolower($q->status ?? $sub) }}">{{ $qStatus }}</span></td>
+                                                    <td class="date">{{ $created }}</td>
+                                                    <td class="date">{{ $expires }}</td>
+                                                    <td class="actions">
+                                                        <a href="{{ route('admin.quotes.download', $q->id) }}" class="action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
+                                                        @if($user && $user->role === 'admin')
+                                                            @if(strtolower($q->status ?? '') !== 'approved')
+                                                                <form method="POST" action="{{ route('admin.quotes.approve', $q->id) }}" style="display:inline">
+                                                                    @csrf
+                                                                    <button class="action-btn approve" title="Approve" type="submit"><i class="fa-solid fa-check"></i></button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div> {{-- end tab-4 --}}
 
             </div>
         </div>
@@ -383,6 +560,11 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
+        // CSRF setup
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
         // 🔹 Main Tabs
         $('.tabs .tab').click(function () {
             if ($(this).closest('.nested-tabs').length) return;
@@ -397,7 +579,7 @@
             $('#tab-' + status).show();
         });
 
-        // 🔹 Nested Tabs inside "Quotes"
+        // 🔹 Nested Tabs inside Kitchen Quote and Vanity Quote
         $(document).on('click', '.nested-tabs .tab', function () {
             $(this).siblings().removeClass('active');
             $(this).addClass('active');
@@ -419,6 +601,94 @@
                 parent.find('.nested-content').hide();
                 parent.find('#subtab-' + subtab).show();
             }
+        });
+
+        // Generate Combined PDF using AJAX
+        $(document).on('click', '.generate-combined-pdf-btn', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var projectId = $btn.data('project-id');
+            
+            if (!projectId) {
+                if (window.toastr) toastr.error('Project ID not found');
+                return;
+            }
+
+            // Disable button and show loading state
+            var original = $btn.html();
+            $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Generating...');
+
+            // AJAX request to generate and download PDF
+            var url = '{{ url("admin/quotes-combined") }}/' + projectId + '/generate-pdf';
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                xhrFields: {
+                    responseType: 'blob' // Important: tell jQuery to expect binary data
+                },
+                success: function(data, status, xhr) {
+                    // Get filename from Content-Disposition header or use default
+                    var filename = 'combined-quote.pdf';
+                    var disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        var matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) {
+                            filename = matches[1].replace(/['"]/g, '');
+                            // Handle URL encoding
+                            filename = decodeURIComponent(filename);
+                        }
+                    }
+
+                    // Create blob URL
+                    var blob = new Blob([data], { type: 'application/pdf' });
+                    var url = window.URL.createObjectURL(blob);
+                    
+                    // Create temporary link and trigger download
+                    var link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                    // Clean up
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                    
+                    // Re-enable button
+                    $btn.prop('disabled', false).html(original);
+                    
+                    // Show success message
+                    if (window.toastr) {
+                        toastr.success('PDF generated and downloaded successfully!');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Re-enable button
+                    $btn.prop('disabled', false).html(original);
+                    
+                    // Show error message
+                    var errorMsg = 'Failed to generate PDF';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    } else if (xhr.status === 403) {
+                        errorMsg = 'You are not authorized to generate this PDF';
+                    } else if (xhr.status === 404) {
+                        errorMsg = 'Project or quotes not found';
+                    } else if (xhr.status === 400) {
+                        errorMsg = 'Project must have both kitchen and vanity quotes';
+                    }
+                    
+                    if (window.toastr) {
+                        toastr.error(errorMsg);
+                    } else {
+                        alert(errorMsg);
+                    }
+                    
+                    console.error('PDF generation error:', error, xhr);
+                }
+            });
         });
     });
 </script>

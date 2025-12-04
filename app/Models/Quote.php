@@ -81,6 +81,22 @@ class Quote extends Model
         return $this->morphMany(\App\Models\File::class, 'fileable');
     }
 
+    /**
+     * Customer through project relationship
+     * Quote -> Project -> Customer/User
+     */
+    public function customer()
+    {
+        return $this->hasOneThrough(
+            \App\Models\User::class,
+            \App\Models\Project::class,
+            'id',           // Foreign key on projects table
+            'id',           // Foreign key on users table  
+            'project_id',    // Local key on quotes table
+            'user_id'       // Local key on projects table
+        );
+    }
+
     // -----------------------
     // Helpers / Accessors
     // -----------------------
