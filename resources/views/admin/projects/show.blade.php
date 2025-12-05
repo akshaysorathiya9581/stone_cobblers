@@ -255,12 +255,9 @@
                     @endphp
 
                     @if($canCombine)
-                        <div class="mb-15" style="text-align: right;">
-                            <button type="button" 
-                                    class="btn primary generate-combined-pdf-btn" 
-                                    data-project-id="{{ $proj->id }}"
-                                    style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
-                                <i class="fa-solid fa-file-pdf"></i> Generate Combined Quote PDF
+                        <div class="mb-15" style="display: flex; justify-content: flex-end;">
+                            <button type="button" class="btn theme generate-combined-pdf-btn" data-project-id="{{ $proj->id }}">
+                                    <i class="fa-solid fa-file-pdf"></i> Generate Combined Quote PDF
                             </button>
                         </div>
                     @endif
@@ -409,11 +406,8 @@
                     @endphp
 
                     @if($canCombine)
-                        <div class="mb-15" style="text-align: right;">
-                            <button type="button" 
-                                    class="btn primary generate-combined-pdf-btn" 
-                                    data-project-id="{{ $proj->id }}"
-                                    style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                        <div class="mb-15" style="display: flex; justify-content: flex-end;">
+                            <button type="button" class="btn theme generate-combined-pdf-btn" data-project-id="{{ $proj->id }}">
                                 <i class="fa-solid fa-file-pdf"></i> Generate Combined Quote PDF
                             </button>
                         </div>

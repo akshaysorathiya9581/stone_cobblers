@@ -14,21 +14,21 @@
             <button class="sidebar-toggle">
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
-            <div class="search-bar">
+            <!-- <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search projects, customers, status..." id="global-search">
-            </div>
+            </div> -->
 
             <div class="header-actions">
-                <button class="header-btn secondary">
+                <!-- <button class="header-btn secondary">
                     <i class="fas fa-download"></i> Export
-                </button>
+                </button> -->
                 <a href="{{ route('admin.files.create') }}" class="header-btn primary"><i class="fas fa-plus"></i> Upload Files</a>
                 <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
             </div>
         </div>
 
-        <div class="header">
+        <div class="header header-between">
             <h1 class="content-title">File Management</h1>
             <div class="header-actions">
                 <a href="{{ route('admin.files.create') }}" class="btn primary"><i class="fas fa-plus"></i> Upload Files</a>

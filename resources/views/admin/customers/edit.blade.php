@@ -9,7 +9,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <x-header :export-url="null" :create-url="route('admin.customers.create')" export-label="Export Customers" create-label="New Customer" />
+        <x-header :export-url="null" :create-url="route('admin.customers.create')" create-label="New Customer" />
 
         <!-- Content -->
         <div class="content bg-content">

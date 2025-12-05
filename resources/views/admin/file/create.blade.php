@@ -13,15 +13,15 @@
             <button class="sidebar-toggle">
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
-            <div class="search-bar">
+            <!-- <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search projects, customers, status..." id="global-search">
-            </div>
+            </div> -->
 
             <div class="header-actions">
-                <button class="header-btn secondary">
+                <!-- <button class="header-btn secondary">
                     <i class="fas fa-download"></i> Export
-                </button>
+                </button> -->
                 <a href="{{ route('admin.files.index') }}" class="header-btn primary">📂 View All Files</a>
                 <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">BM</a>
             </div>

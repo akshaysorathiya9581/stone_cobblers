@@ -16,7 +16,7 @@
 @endphp
 
     <div class="main-content">
-        <x-header :export-url="null" :create-url="route('admin.customers.create')" export-label="Export Customers"
+        <x-header :export-url="null" :create-url="route('admin.customers.create')"
             create-label="New Customer" />
 
         <div class="content bg-content">

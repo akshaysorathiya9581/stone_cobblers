@@ -10,8 +10,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <x-header :export-url="null" :create-url="route('admin.customers.create')" export-label="Export Customers"
-            create-label="New Customer" />
+        <x-header :export-url="null" :create-url="route('admin.customers.create')" create-label="New Customer" />
 
 
         <!-- Content -->
@@ -19,9 +18,9 @@
             <div class="content-header">
                 <h1 class="content-title">Customer Management</h1>
                 <div class="action-buttons">
-                    <a href="/reports" class="btn secondary" role="button">
+                    <!-- <a href="/reports" class="btn secondary" role="button">
                         <i class="fas fa-chart-bar"></i> Reports
-                    </a>
+                    </a> -->
 
                     <a href="{{ route('admin.customers.create') }}" class="btn primary" role="button">
                         <i class="fas fa-plus"></i> Add Customer
