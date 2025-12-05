@@ -13,10 +13,10 @@
       <button class="sidebar-toggle">
                 <i class="fas fa-bars toggle-icon"></i>
             </button>
-      <div class="search-bar">
+      <!-- <div class="search-bar">
         <i class="fas fa-search"></i>
         <input type="text" placeholder="Search quotes, customers...">
-      </div>
+      </div> -->
 
       <div class="header-actions">
         {{-- <button class="header-btn secondary">

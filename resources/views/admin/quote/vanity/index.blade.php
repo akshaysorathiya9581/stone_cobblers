@@ -27,9 +27,9 @@
             <div class="content-header">
                 <h1 class="content-title">Vanity Quotes Management</h1>
                 <div class="action-buttons">
-                    <a href="#" class="btn secondary">
+                    <!-- <a href="#" class="btn secondary">
                         <i class="fas fa-chart-bar"></i> Reports
-                    </a>
+                    </a> -->
                     <a href="{{ route('admin.vanity.quotes.create') }}" class="btn primary">
                         <i class="fas fa-plus"></i> Create Vanity Quote
                     </a>

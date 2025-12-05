@@ -113,7 +113,7 @@
                                 </td>
                                 <td class="actions">
                                     <button type="button" 
-                                            class="btn primary generate-pdf-btn" 
+                                            class="btn theme generate-pdf-btn" 
                                             data-project-id="{{ $project->id }}"
                                             title="Generate Combined PDF">
                                         <i class="fa-solid fa-file-pdf"></i> Generate PDF

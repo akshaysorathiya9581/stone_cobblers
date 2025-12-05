@@ -19,9 +19,9 @@
             <div class="content-header">
                 <h1 class="content-title">Project Management</h1>
                 <div class="action-buttons">
-                    <a href="#" class="btn secondary" role="button">
+                    <!-- <a href="#" class="btn secondary" role="button">
                         <i class="fas fa-chart-bar"></i> Reports
-                    </a>
+                    </a> -->
                     <a href="{{ route('admin.projects.create') }}" class="btn primary" role="button">
                         <i class="fas fa-plus"></i> Create Project
                     </a>

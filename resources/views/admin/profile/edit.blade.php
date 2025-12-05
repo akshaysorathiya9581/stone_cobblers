@@ -10,10 +10,10 @@
         <button class="sidebar-toggle">
             <i class="fas fa-bars toggle-icon"></i>
         </button>
-        <div class="search-bar">
+        <!-- <div class="search-bar">
             <i class="fas fa-search"></i>
             <input id="quote-search" type="text" placeholder="Search quotes, customers...">
-        </div>
+        </div> -->
 
         <div class="header-actions">
             <a href="{{ route('admin.profile.edit') }}" class="user-avatar" aria-label="Open profile">{{ auth()->user() ? Str::upper(Str::substr(auth()->user()->name ?? 'U',0,2)) : 'U' }}</a>
